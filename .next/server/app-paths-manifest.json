@@ -1,4 +1,3 @@
 {
-  "/page": "app/page.js",
   "/api/iracing/auth/route": "app/api/iracing/auth/route.js"
 }

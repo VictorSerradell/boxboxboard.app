@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
 import { toggleFavoriteSeries } from "../lib/iracing-client";
+import { getCurrentRaceWeek } from "../lib/season-week";
 
 interface SeriesCardProps {
   series: SeriesSeason;
@@ -89,6 +90,10 @@ export default function SeriesCard({
   const duration = getSessionDuration(series);
   const weekCount = series.schedules?.length ?? 0;
   const tracks = series.schedules ?? [];
+  const currentWeek = getCurrentRaceWeek(
+    series.season_year,
+    series.season_quarter,
+  );
 
   function handleFavClick(e: React.MouseEvent) {
     e.stopPropagation();
@@ -172,6 +177,37 @@ export default function SeriesCard({
             >
               {catStyle.label}
             </span>
+            {/* Indicador de semana activa */}
+            {currentWeek !== null && currentWeek < tracks.length && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "2px 8px",
+                  borderRadius: 20,
+                  background: "rgba(34,197,94,0.15)",
+                  border: "1px solid rgba(34,197,94,0.35)",
+                  fontFamily: "DM Mono, monospace",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: "#22C55E",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                <span
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: "50%",
+                    background: "#22C55E",
+                    display: "inline-block",
+                    animation: "pulse 2s infinite",
+                  }}
+                />
+                WK {currentWeek + 1} LIVE
+              </span>
+            )}
           </div>
 
           <div style={{ display: "flex", gap: 6 }}>
@@ -339,64 +375,104 @@ export default function SeriesCard({
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          {tracks.slice(0, 6).map((week, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "7px 10px",
-                borderRadius: 8,
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.05)",
-              }}
-            >
-              <span
+          {tracks.slice(0, 6).map((week, i) => {
+            const isActive = currentWeek === i;
+            return (
+              <div
+                key={i}
                 style={{
-                  fontFamily: "DM Mono, monospace",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: catStyle.accent,
-                  minWidth: 24,
-                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "7px 10px",
+                  borderRadius: 8,
+                  background: isActive
+                    ? `${catStyle.accent}18`
+                    : "rgba(255,255,255,0.03)",
+                  border: `1px solid ${isActive ? catStyle.accent + "50" : "rgba(255,255,255,0.05)"}`,
+                  transition: "background 0.15s",
                 }}
               >
-                W{i + 1}
-              </span>
-              <Flag
-                size={11}
-                strokeWidth={1.8}
-                color="rgba(255,255,255,0.2)"
-                style={{ flexShrink: 0 }}
-              />
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: "rgba(255,255,255,0.8)",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  flex: 1,
-                }}
-                title={`${week.track.track_name}${week.track.config_name ? ` — ${week.track.config_name}` : ""}`}
-              >
-                {week.track.track_name}
-                {week.track.config_name && (
+                <span
+                  style={{
+                    fontFamily: "DM Mono, monospace",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: isActive ? catStyle.accent : catStyle.accent,
+                    minWidth: 24,
+                    flexShrink: 0,
+                  }}
+                >
+                  W{i + 1}
+                </span>
+                {isActive ? (
                   <span
                     style={{
-                      color: "rgba(255,255,255,0.35)",
-                      fontSize: 11,
-                      marginLeft: 6,
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      background: "#22C55E",
+                      flexShrink: 0,
+                      boxShadow: "0 0 6px #22C55E",
+                    }}
+                  />
+                ) : (
+                  <Flag
+                    size={11}
+                    strokeWidth={1.8}
+                    color="rgba(255,255,255,0.2)"
+                    style={{ flexShrink: 0 }}
+                  />
+                )}
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive
+                      ? "rgba(255,255,255,0.95)"
+                      : "rgba(255,255,255,0.8)",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    flex: 1,
+                  }}
+                  title={`${week.track.track_name}${week.track.config_name ? ` — ${week.track.config_name}` : ""}`}
+                >
+                  {week.track.track_name}
+                  {week.track.config_name && (
+                    <span
+                      style={{
+                        color: isActive
+                          ? "rgba(255,255,255,0.55)"
+                          : "rgba(255,255,255,0.35)",
+                        fontSize: 11,
+                        marginLeft: 6,
+                      }}
+                    >
+                      {week.track.config_name}
+                    </span>
+                  )}
+                </span>
+                {isActive && (
+                  <span
+                    style={{
+                      fontFamily: "DM Mono, monospace",
+                      fontSize: 9,
+                      fontWeight: 700,
+                      color: "#22C55E",
+                      background: "rgba(34,197,94,0.15)",
+                      border: "1px solid rgba(34,197,94,0.3)",
+                      borderRadius: 4,
+                      padding: "1px 5px",
+                      flexShrink: 0,
                     }}
                   >
-                    {week.track.config_name}
+                    NOW
                   </span>
                 )}
-              </span>
-            </div>
-          ))}
+              </div>
+            );
+          })}
 
           {tracks.length > 6 && (
             <div

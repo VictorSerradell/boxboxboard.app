@@ -28,29 +28,35 @@ import {
   getSeriesSeasons,
   getFavoriteSeriesIds,
 } from "../lib/iracing-client";
+import { useTheme } from "../lib/theme";
 
 function SkeletonCard() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const shimA = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+  const shimB = isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.08)";
+  const headerBg = isDark
+    ? "linear-gradient(135deg, #0E2A4A 0%, #070F1C 100%)"
+    : "linear-gradient(135deg, #EBF4FF 0%, #F0F7FF 100%)";
+  const border = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
+  const footerBg = isDark ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.03)";
+
   return (
     <div
       style={{
-        background: "#070D19",
-        border: "1px solid rgba(255,255,255,0.07)",
+        background: "var(--bg-surface)",
+        border: `1px solid ${border}`,
         borderRadius: 16,
         overflow: "hidden",
       }}
     >
-      <div
-        style={{
-          background: "linear-gradient(135deg, #0E2A4A 0%, #070F1C 100%)",
-          padding: "18px 18px 16px",
-        }}
-      >
+      <div style={{ background: headerBg, padding: "18px 18px 16px" }}>
         <div
           style={{
             height: 12,
             width: 80,
             borderRadius: 6,
-            background: "rgba(255,255,255,0.07)",
+            background: shimA,
             marginBottom: 14,
           }}
         />
@@ -59,7 +65,7 @@ function SkeletonCard() {
             height: 22,
             width: "70%",
             borderRadius: 6,
-            background: "rgba(255,255,255,0.09)",
+            background: shimB,
             marginBottom: 14,
           }}
         />
@@ -71,7 +77,7 @@ function SkeletonCard() {
                 height: 26,
                 width: w,
                 borderRadius: 20,
-                background: "rgba(255,255,255,0.07)",
+                background: shimA,
               }}
             />
           ))}
@@ -84,7 +90,7 @@ function SkeletonCard() {
             style={{
               height: 34,
               borderRadius: 8,
-              background: "rgba(255,255,255,0.04)",
+              background: shimA,
               marginBottom: i < 4 ? 4 : 0,
             }}
           />
@@ -93,8 +99,8 @@ function SkeletonCard() {
       <div
         style={{
           display: "flex",
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-          background: "rgba(0,0,0,0.3)",
+          borderTop: `1px solid ${border}`,
+          background: footerBg,
         }}
       >
         {[1, 2, 3].map((i) => (
@@ -103,7 +109,7 @@ function SkeletonCard() {
             style={{
               flex: 1,
               padding: "11px 14px",
-              borderRight: i < 3 ? "1px solid rgba(255,255,255,0.06)" : "none",
+              borderRight: i < 3 ? `1px solid ${border}` : "none",
             }}
           >
             <div
@@ -111,7 +117,7 @@ function SkeletonCard() {
                 height: 10,
                 width: 50,
                 borderRadius: 4,
-                background: "rgba(255,255,255,0.06)",
+                background: shimA,
                 marginBottom: 6,
               }}
             />
@@ -120,7 +126,7 @@ function SkeletonCard() {
                 height: 15,
                 width: 35,
                 borderRadius: 4,
-                background: "rgba(255,255,255,0.09)",
+                background: shimB,
               }}
             />
           </div>
@@ -152,6 +158,24 @@ export default function HomePage() {
     ownedOnly: false,
     searchQuery: "",
   });
+
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const T = {
+    border: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
+    cardBg: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+    cardBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.09)",
+    textMuted: isDark ? "#64748B" : "#94A3B8",
+    textFaint: isDark ? "#334155" : "#94A3B8",
+    textDimmed: isDark ? "#1E293B" : "#CBD5E1",
+    footerBg: isDark ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.04)",
+    divider: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
+    emptyIcon: isDark ? "#334155" : "#CBD5E1",
+    emptyTitle: isDark ? "#475569" : "#94A3B8",
+    emptyText: isDark ? "#334155" : "#CBD5E1",
+    btnBorder: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.12)",
+    btnColor: isDark ? "#64748B" : "#94A3B8",
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -583,7 +607,7 @@ export default function HomePage() {
             style={{
               fontFamily: "DM Mono, monospace",
               fontSize: 13,
-              color: "#334155",
+              color: T.textFaint,
             }}
           >
             {loading ? "" : `${displayed.length} series`}
@@ -637,12 +661,12 @@ export default function HomePage() {
                   width: 72,
                   height: 72,
                   borderRadius: 20,
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: T.cardBg,
+                  border: `1px solid ${T.cardBorder}`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#334155",
+                  color: T.emptyIcon,
                 }}
               >
                 <svg
@@ -662,13 +686,13 @@ export default function HomePage() {
                   fontFamily: "Syne, sans-serif",
                   fontSize: 20,
                   fontWeight: 800,
-                  color: "#475569",
+                  color: T.emptyTitle,
                   margin: 0,
                 }}
               >
                 No series found
               </p>
-              <p style={{ fontSize: 14, color: "#334155", margin: 0 }}>
+              <p style={{ fontSize: 14, color: T.emptyText, margin: 0 }}>
                 Try adjusting or resetting your filters.
               </p>
               <button
@@ -686,9 +710,9 @@ export default function HomePage() {
                   marginTop: 8,
                   padding: "10px 20px",
                   borderRadius: 10,
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  border: `1px solid ${T.btnBorder}`,
                   background: "transparent",
-                  color: "#64748B",
+                  color: T.btnColor,
                   cursor: "pointer",
                   fontSize: 14,
                   fontFamily: "Syne, sans-serif",
@@ -717,8 +741,8 @@ export default function HomePage() {
       ════════════════════════════════════════════════════════ */}
       <footer
         style={{
-          borderTop: "1px solid rgba(255,255,255,0.07)",
-          background: "rgba(0,0,0,0.3)",
+          borderTop: `1px solid ${T.border}`,
+          background: T.footerBg,
           padding: "32px 24px",
         }}
       >
@@ -775,7 +799,7 @@ export default function HomePage() {
               <p
                 style={{
                   fontSize: 13,
-                  color: "#334155",
+                  color: T.textFaint,
                   lineHeight: 1.6,
                   margin: 0,
                 }}
@@ -793,7 +817,7 @@ export default function HomePage() {
                     fontFamily: "DM Mono, monospace",
                     fontSize: 10,
                     fontWeight: 600,
-                    color: "#1E293B",
+                    color: T.textDimmed,
                     textTransform: "uppercase",
                     letterSpacing: "0.14em",
                     margin: "0 0 12px",
@@ -826,17 +850,17 @@ export default function HomePage() {
                         alignItems: "center",
                         gap: 7,
                         fontSize: 13,
-                        color: "#475569",
+                        color: T.textMuted,
                         textDecoration: "none",
                         transition: "color 0.15s",
                       }}
                       onMouseEnter={(e) =>
                         ((e.currentTarget as HTMLElement).style.color =
-                          "#94A3B8")
+                          "var(--text-secondary)")
                       }
                       onMouseLeave={(e) =>
                         ((e.currentTarget as HTMLElement).style.color =
-                          "#475569")
+                          T.textMuted)
                       }
                     >
                       {link.icon} {link.label}
@@ -851,7 +875,7 @@ export default function HomePage() {
                     fontFamily: "DM Mono, monospace",
                     fontSize: 10,
                     fontWeight: 600,
-                    color: "#1E293B",
+                    color: T.textDimmed,
                     textTransform: "uppercase",
                     letterSpacing: "0.14em",
                     margin: "0 0 12px",
@@ -883,17 +907,17 @@ export default function HomePage() {
                         alignItems: "center",
                         gap: 6,
                         fontSize: 13,
-                        color: "#475569",
+                        color: T.textMuted,
                         textDecoration: "none",
                         transition: "color 0.15s",
                       }}
                       onMouseEnter={(e) =>
                         ((e.currentTarget as HTMLElement).style.color =
-                          "#94A3B8")
+                          "var(--text-secondary)")
                       }
                       onMouseLeave={(e) =>
                         ((e.currentTarget as HTMLElement).style.color =
-                          "#475569")
+                          T.textMuted)
                       }
                     >
                       <ExternalLink size={11} /> {link.label}
@@ -905,13 +929,7 @@ export default function HomePage() {
           </div>
 
           {/* Divisor */}
-          <div
-            style={{
-              height: 1,
-              background: "rgba(255,255,255,0.06)",
-              marginBottom: 20,
-            }}
-          />
+          <div style={{ height: 1, background: T.divider, marginBottom: 20 }} />
 
           {/* Legal disclaimer */}
           <div
@@ -926,7 +944,7 @@ export default function HomePage() {
             <p
               style={{
                 fontSize: 12,
-                color: "#1E293B",
+                color: T.textDimmed,
                 margin: 0,
                 lineHeight: 1.5,
               }}
@@ -938,7 +956,7 @@ export default function HomePage() {
             <p
               style={{
                 fontSize: 12,
-                color: "#1E293B",
+                color: T.textDimmed,
                 margin: 0,
                 whiteSpace: "nowrap",
               }}

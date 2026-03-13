@@ -15,6 +15,7 @@ import {
 import SeriesCard from "./components/SeriesCard";
 import FiltersBar from "./components/FiltersBar";
 import LoginModal from "./components/LoginModal";
+import SeriesDetailPanel from "./components/SeriesDetailPanel";
 import type {
   SeriesSeason,
   FilterState,
@@ -136,6 +137,9 @@ export default function HomePage() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [user, setUser] = useState<AppUser | null>(null);
   const [showLogin, setShowLogin] = useState(false);
+  const [selectedSeries, setSelectedSeries] = useState<SeriesSeason | null>(
+    null,
+  );
   const [activeSection, setActiveSection] = useState<
     "all" | "favorites" | "myContent"
   >("all");
@@ -676,6 +680,7 @@ export default function HomePage() {
                 series={s}
                 isFavorite={favorites.includes(s.series_id)}
                 onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
+                onClick={() => setSelectedSeries(s)}
               />
             ))
           )}
@@ -920,6 +925,15 @@ export default function HomePage() {
       </footer>
 
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+
+      <SeriesDetailPanel
+        series={selectedSeries}
+        isFavorite={
+          selectedSeries ? favorites.includes(selectedSeries.series_id) : false
+        }
+        onClose={() => setSelectedSeries(null)}
+        onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
+      />
 
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap");

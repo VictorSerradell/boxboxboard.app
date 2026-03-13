@@ -19,6 +19,7 @@ interface SeriesCardProps {
   series: SeriesSeason;
   isFavorite: boolean;
   onFavoriteToggle: (seriesId: number, newFavs: number[]) => void;
+  onClick?: () => void;
 }
 
 const CATEGORY_STYLE: Record<
@@ -74,6 +75,7 @@ export default function SeriesCard({
   series,
   isFavorite,
   onFavoriteToggle,
+  onClick,
 }: SeriesCardProps) {
   const [localFav, setLocalFav] = useState(isFavorite);
   const [favAnimating, setFavAnimating] = useState(false);
@@ -101,6 +103,7 @@ export default function SeriesCard({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
       style={{
         background: "#070D19",
         border: `1px solid ${hovered ? catStyle.accent + "55" : "rgba(255,255,255,0.08)"}`,

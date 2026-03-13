@@ -16,6 +16,7 @@ import SeriesCard from "../components/SeriesCard";
 import FiltersBar from "../components/FiltersBar";
 import LoginModal from "../components/LoginModal";
 import SeriesDetailPanel from "../components/SeriesDetailPanel";
+import ThemeToggle from "../components/ThemeToggle";
 import type {
   SeriesSeason,
   FilterState,
@@ -162,13 +163,39 @@ export default function HomePage() {
           display_name: decodeURIComponent(name),
           cust_id: Number(cid),
         } as unknown as AppUser);
-      window.history.replaceState({}, "", "/");
+      window.history.replaceState({}, "", "/app");
     }
     if (params.get("auth_error")) {
       console.error("Auth error:", params.get("auth_error"));
-      window.history.replaceState({}, "", "/");
+      window.history.replaceState({}, "", "/app");
     }
   }, []);
+
+  // Open panel from URL param ?series=ID once series data is loaded
+  useEffect(() => {
+    if (series.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const seriesId = params.get("series");
+    if (seriesId) {
+      const found = series.find((s) => s.series_id === Number(seriesId));
+      if (found) setSelectedSeries(found);
+    }
+  }, [series]);
+
+  // Sync URL when panel opens/closes
+  function openSeries(s: SeriesSeason) {
+    setSelectedSeries(s);
+    const url = new URL(window.location.href);
+    url.searchParams.set("series", String(s.series_id));
+    window.history.pushState({}, "", url.toString());
+  }
+
+  function closeSeries() {
+    setSelectedSeries(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("series");
+    window.history.replaceState({}, "", url.toString());
+  }
 
   useEffect(() => {
     async function init() {
@@ -232,8 +259,8 @@ export default function HomePage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#060C18",
-        color: "white",
+        background: "var(--bg-base)",
+        color: "var(--text-primary)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -249,9 +276,9 @@ export default function HomePage() {
           right: 0,
           height: 64,
           zIndex: 100,
-          background: "rgba(6,12,24,0.92)",
+          background: "var(--bg-header)",
           backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          borderBottom: "1px solid var(--border)",
           display: "flex",
           alignItems: "center",
           padding: "0 24px",
@@ -417,13 +444,13 @@ export default function HomePage() {
             gap: 7,
             padding: "8px 14px",
             borderRadius: 10,
-            border: "1px solid rgba(255,255,255,0.1)",
-            background: "rgba(255,255,255,0.05)",
+            border: "1px solid var(--border)",
+            background: "var(--bg-card)",
             cursor: "pointer",
             fontFamily: "Syne, sans-serif",
             fontWeight: 600,
             fontSize: 13,
-            color: "#94A3B8",
+            color: "var(--text-muted)",
             marginRight: 10,
             transition: "all 0.15s",
           }}
@@ -431,19 +458,17 @@ export default function HomePage() {
             (e.currentTarget as HTMLElement).style.color = "#FB923C";
             (e.currentTarget as HTMLElement).style.borderColor =
               "rgba(251,146,60,0.3)";
-            (e.currentTarget as HTMLElement).style.background =
-              "rgba(251,146,60,0.08)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.color = "#94A3B8";
+            (e.currentTarget as HTMLElement).style.color = "var(--text-muted)";
             (e.currentTarget as HTMLElement).style.borderColor =
-              "rgba(255,255,255,0.1)";
-            (e.currentTarget as HTMLElement).style.background =
-              "rgba(255,255,255,0.05)";
+              "var(--border)";
           }}
         >
           <Coffee size={14} /> Support
         </button>
+
+        <ThemeToggle />
 
         {/* Login / Username */}
         <button
@@ -680,7 +705,7 @@ export default function HomePage() {
                 series={s}
                 isFavorite={favorites.includes(s.series_id)}
                 onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
-                onClick={() => setSelectedSeries(s)}
+                onClick={() => openSeries(s)}
               />
             ))
           )}
@@ -931,7 +956,7 @@ export default function HomePage() {
         isFavorite={
           selectedSeries ? favorites.includes(selectedSeries.series_id) : false
         }
-        onClose={() => setSelectedSeries(null)}
+        onClose={() => closeSeries()}
         onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
       />
 

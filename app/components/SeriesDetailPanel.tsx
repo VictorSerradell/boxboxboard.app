@@ -17,9 +17,11 @@ import {
   MapPin,
   BarChart2,
   Users,
-  ChevronRight,
   Zap,
   Weight,
+  Link,
+  Copy,
+  Check as CheckIcon,
 } from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
 import { toggleFavoriteSeries } from "../lib/iracing-client";
@@ -190,6 +192,7 @@ export default function SeriesDetailPanel({
 }: Props) {
   const [localFav, setLocalFav] = useState(isFavorite);
   const [visible, setVisible] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Sincronizar fav con prop
   useEffect(() => setLocalFav(isFavorite), [isFavorite]);
@@ -238,6 +241,15 @@ export default function SeriesDetailPanel({
     const newFavs = toggleFavoriteSeries(series!.series_id);
     setLocalFav(!localFav);
     onFavoriteToggle(series!.series_id, newFavs);
+  }
+
+  function copyLink() {
+    const url = new URL(window.location.href);
+    url.searchParams.set("series", String(series!.series_id));
+    navigator.clipboard.writeText(url.toString()).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   }
 
   return (
@@ -455,6 +467,31 @@ export default function SeriesDetailPanel({
                 }}
               >
                 <X size={16} />
+              </button>
+              <button
+                onClick={copyLink}
+                title="Copy share link"
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: copied
+                    ? "rgba(34,197,94,0.15)"
+                    : "rgba(255,255,255,0.07)",
+                  border: `1px solid ${copied ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.12)"}`,
+                  color: copied ? "#22C55E" : "#64748B",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                {copied ? (
+                  <Check size={15} strokeWidth={2.5} />
+                ) : (
+                  <Link size={14} strokeWidth={2} />
+                )}
               </button>
               <button
                 onClick={handleFav}

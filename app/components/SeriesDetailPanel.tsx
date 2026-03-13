@@ -1,6 +1,5 @@
 "use client";
 // /app/components/SeriesDetailPanel.tsx
-// Panel lateral de detalle de serie — desliza desde la derecha
 
 import { useEffect, useState } from "react";
 import {
@@ -14,18 +13,15 @@ import {
   Flag,
   Trophy,
   Car,
-  MapPin,
   BarChart2,
   Users,
   Zap,
-  Weight,
   Link,
-  Copy,
-  Check as CheckIcon,
 } from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
 import { toggleFavoriteSeries } from "../lib/iracing-client";
 import { getCurrentRaceWeek } from "../lib/season-week";
+import { useTheme } from "../lib/theme";
 
 interface Props {
   series: SeriesSeason | null;
@@ -34,7 +30,6 @@ interface Props {
   onFavoriteToggle: (seriesId: number, newFavs: number[]) => void;
 }
 
-// Demo cars por serie — en producción vendrán del API
 const DEMO_CARS: Record<
   number,
   { name: string; owned: boolean; free: boolean }[]
@@ -63,7 +58,6 @@ const DEMO_CARS: Record<
   312: [{ name: "ORECA LMP2 07", owned: true, free: false }],
 };
 
-// Demo race times — en producción del API
 const DEMO_TIMES: Record<number, string[]> = {
   301: ["Sat 14:00 UTC", "Sat 20:00 UTC", "Sun 02:00 UTC"],
   302: ["Tue 18:00 UTC", "Sat 17:00 UTC"],
@@ -73,7 +67,6 @@ const DEMO_TIMES: Record<number, string[]> = {
   308: ["Every 4h repeating"],
 };
 
-// Demo stats
 const DEMO_STATS: Record<
   number,
   { avg_sof: number; avg_drivers: number; splits: number }
@@ -105,76 +98,6 @@ const LICENSE_CONFIG = {
   5: { label: "PRO", color: "#A855F7" },
 } as const;
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      style={{
-        fontFamily: "DM Mono, monospace",
-        fontSize: 10,
-        fontWeight: 600,
-        color: "#334155",
-        letterSpacing: "0.14em",
-        textTransform: "uppercase",
-        margin: "0 0 10px",
-      }}
-    >
-      {children}
-    </p>
-  );
-}
-
-function StatBox({
-  icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  accent?: string;
-}) {
-  return (
-    <div
-      style={{
-        flex: 1,
-        padding: "12px 14px",
-        borderRadius: 10,
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.07)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 5,
-      }}
-    >
-      <span
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          color: "#334155",
-          fontSize: 10,
-          fontFamily: "DM Mono, monospace",
-          textTransform: "uppercase",
-          letterSpacing: "0.1em",
-        }}
-      >
-        {icon} {label}
-      </span>
-      <span
-        style={{
-          fontSize: 18,
-          fontWeight: 800,
-          fontFamily: "Syne, sans-serif",
-          color: accent ?? "rgba(255,255,255,0.9)",
-        }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
-
 function getSessionDuration(series: SeriesSeason): string {
   const td = series.race_time_descriptors;
   if (!td?.[0]?.session_minutes) return "—";
@@ -193,20 +116,14 @@ export default function SeriesDetailPanel({
   const [localFav, setLocalFav] = useState(isFavorite);
   const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
-  // Sincronizar fav con prop
   useEffect(() => setLocalFav(isFavorite), [isFavorite]);
-
-  // Animación de entrada/salida
   useEffect(() => {
-    if (series) {
-      requestAnimationFrame(() => setVisible(true));
-    } else {
-      setVisible(false);
-    }
+    if (series) requestAnimationFrame(() => setVisible(true));
+    else setVisible(false);
   }, [series]);
-
-  // Cerrar con Escape
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -222,7 +139,6 @@ export default function SeriesDetailPanel({
     LICENSE_CONFIG[series.minLicenseLevel as keyof typeof LICENSE_CONFIG] ??
     LICENSE_CONFIG[0];
   const duration = getSessionDuration(series);
-  const weekCount = series.schedules?.length ?? 0;
   const cars = DEMO_CARS[series.series_id] ?? [
     { name: "Series car", owned: false, free: false },
   ];
@@ -236,6 +152,33 @@ export default function SeriesDetailPanel({
     series.season_year,
     series.season_quarter,
   );
+
+  // Theme-aware local tokens
+  const T = {
+    panelBg: isDark ? "#070D19" : "#FFFFFF",
+    headerBg: isDark
+      ? `linear-gradient(160deg, ${accent}18 0%, #070D19 60%)`
+      : `linear-gradient(160deg, ${accent}10 0%, #FFFFFF 60%)`,
+    sectionBorder: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
+    rowBg: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+    rowBgAlt: isDark ? "rgba(255,255,255,0.025)" : "rgba(0,0,0,0.02)",
+    rowBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
+    labelColor: isDark ? "#334155" : "#94A3B8",
+    textPrimary: isDark ? "#FFFFFF" : "#0F172A",
+    textSecondary: isDark ? "rgba(255,255,255,0.85)" : "#1E293B",
+    textMuted: isDark ? "rgba(255,255,255,0.8)" : "#334155",
+    textFaint: isDark ? "rgba(255,255,255,0.45)" : "#94A3B8",
+    statValue: isDark ? "rgba(255,255,255,0.9)" : "#0F172A",
+    iconBtnBg: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)",
+    iconBtnBorder: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)",
+    iconBtnColor: isDark ? "#64748B" : "#94A3B8",
+    flagColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
+    carIconBg: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+    carIconBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
+    dateColor: isDark ? "#334155" : "#94A3B8",
+    infoGridBg: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+    infoGridBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
+  };
 
   function handleFav() {
     const newFavs = toggleFavoriteSeries(series!.series_id);
@@ -252,6 +195,72 @@ export default function SeriesDetailPanel({
     });
   }
 
+  const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+    <p
+      style={{
+        fontFamily: "DM Mono, monospace",
+        fontSize: 10,
+        fontWeight: 600,
+        color: T.labelColor,
+        letterSpacing: "0.14em",
+        textTransform: "uppercase",
+        margin: "0 0 10px",
+      }}
+    >
+      {children}
+    </p>
+  );
+
+  const StatBox = ({
+    icon,
+    label,
+    value,
+    accent: a,
+  }: {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+    accent?: string;
+  }) => (
+    <div
+      style={{
+        flex: 1,
+        padding: "12px 14px",
+        borderRadius: 10,
+        background: T.rowBg,
+        border: `1px solid ${T.sectionBorder}`,
+        display: "flex",
+        flexDirection: "column",
+        gap: 5,
+      }}
+    >
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          color: T.labelColor,
+          fontSize: 10,
+          fontFamily: "DM Mono, monospace",
+          textTransform: "uppercase",
+          letterSpacing: "0.1em",
+        }}
+      >
+        {icon} {label}
+      </span>
+      <span
+        style={{
+          fontSize: 18,
+          fontWeight: 800,
+          fontFamily: "Syne, sans-serif",
+          color: a ?? T.statValue,
+        }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+
   return (
     <>
       {/* Backdrop */}
@@ -261,7 +270,7 @@ export default function SeriesDetailPanel({
           position: "fixed",
           inset: 0,
           zIndex: 200,
-          background: "rgba(0,0,0,0.55)",
+          background: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.35)",
           backdropFilter: "blur(4px)",
           opacity: visible ? 1 : 0,
           transition: "opacity 0.25s ease",
@@ -277,7 +286,7 @@ export default function SeriesDetailPanel({
           bottom: 0,
           zIndex: 201,
           width: "min(520px, 100vw)",
-          background: "#070D19",
+          background: T.panelBg,
           borderLeft: `1px solid ${accent}30`,
           display: "flex",
           flexDirection: "column",
@@ -286,10 +295,10 @@ export default function SeriesDetailPanel({
           overflowY: "auto",
         }}
       >
-        {/* ── HEADER del panel ─────────────────────────────────── */}
+        {/* ── HEADER ─────────────────────────────────────────── */}
         <div
           style={{
-            background: `linear-gradient(160deg, ${accent}18 0%, #070D19 60%)`,
+            background: T.headerBg,
             borderBottom: `1px solid ${accent}20`,
             padding: "20px 20px 18px",
             position: "sticky",
@@ -298,7 +307,6 @@ export default function SeriesDetailPanel({
             backdropFilter: "blur(20px)",
           }}
         >
-          {/* Barra de acento */}
           <div
             style={{
               position: "absolute",
@@ -357,7 +365,7 @@ export default function SeriesDetailPanel({
                   fontFamily: "Syne, sans-serif",
                   fontSize: 22,
                   fontWeight: 900,
-                  color: "white",
+                  color: T.textPrimary,
                   margin: "0 0 12px",
                   letterSpacing: "-0.4px",
                   lineHeight: 1.2,
@@ -420,25 +428,6 @@ export default function SeriesDetailPanel({
                     <Trophy size={10} /> Official
                   </span>
                 )}
-                {series.driver_changes && (
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 5,
-                      padding: "4px 11px",
-                      borderRadius: 20,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      fontFamily: "DM Mono, monospace",
-                      background: "rgba(168,85,247,0.14)",
-                      border: "1px solid rgba(168,85,247,0.35)",
-                      color: "#A855F7",
-                    }}
-                  >
-                    <Users size={10} /> Team
-                  </span>
-                )}
               </div>
             </div>
 
@@ -451,6 +440,7 @@ export default function SeriesDetailPanel({
                 flexShrink: 0,
               }}
             >
+              {/* Cerrar */}
               <button
                 onClick={onClose}
                 style={{
@@ -461,13 +451,14 @@ export default function SeriesDetailPanel({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  color: "#64748B",
+                  background: T.iconBtnBg,
+                  border: `1px solid ${T.iconBtnBorder}`,
+                  color: T.iconBtnColor,
                 }}
               >
                 <X size={16} />
               </button>
+              {/* Copiar link */}
               <button
                 onClick={copyLink}
                 title="Copy share link"
@@ -479,12 +470,10 @@ export default function SeriesDetailPanel({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: copied
-                    ? "rgba(34,197,94,0.15)"
-                    : "rgba(255,255,255,0.07)",
-                  border: `1px solid ${copied ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.12)"}`,
-                  color: copied ? "#22C55E" : "#64748B",
-                  transition: "all 0.2s ease",
+                  background: copied ? "rgba(34,197,94,0.15)" : T.iconBtnBg,
+                  border: `1px solid ${copied ? "rgba(34,197,94,0.4)" : T.iconBtnBorder}`,
+                  color: copied ? "#22C55E" : T.iconBtnColor,
+                  transition: "all 0.2s",
                 }}
               >
                 {copied ? (
@@ -493,6 +482,7 @@ export default function SeriesDetailPanel({
                   <Link size={14} strokeWidth={2} />
                 )}
               </button>
+              {/* Favorito */}
               <button
                 onClick={handleFav}
                 style={{
@@ -503,11 +493,9 @@ export default function SeriesDetailPanel({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: localFav
-                    ? "rgba(239,68,68,0.18)"
-                    : "rgba(255,255,255,0.07)",
-                  border: `1px solid ${localFav ? "rgba(239,68,68,0.45)" : "rgba(255,255,255,0.12)"}`,
-                  color: localFav ? "#EF4444" : "#64748B",
+                  background: localFav ? "rgba(239,68,68,0.18)" : T.iconBtnBg,
+                  border: `1px solid ${localFav ? "rgba(239,68,68,0.45)" : T.iconBtnBorder}`,
+                  color: localFav ? "#EF4444" : T.iconBtnColor,
                 }}
               >
                 <Heart
@@ -516,7 +504,9 @@ export default function SeriesDetailPanel({
                   strokeWidth={2}
                 />
               </button>
+              {/* Owned */}
               <div
+                title={series.isOwned ? "Content owned" : "Missing content"}
                 style={{
                   width: 36,
                   height: 36,
@@ -526,11 +516,10 @@ export default function SeriesDetailPanel({
                   justifyContent: "center",
                   background: series.isOwned
                     ? "rgba(34,197,94,0.15)"
-                    : "rgba(255,255,255,0.07)",
-                  border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.12)"}`,
-                  color: series.isOwned ? "#22C55E" : "#475569",
+                    : T.iconBtnBg,
+                  border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.35)" : T.iconBtnBorder}`,
+                  color: series.isOwned ? "#22C55E" : T.iconBtnColor,
                 }}
-                title={series.isOwned ? "Content owned" : "Missing content"}
               >
                 {series.isOwned ? (
                   <Check size={15} strokeWidth={2.5} />
@@ -542,7 +531,7 @@ export default function SeriesDetailPanel({
           </div>
         </div>
 
-        {/* ── CONTENIDO ────────────────────────────────────────── */}
+        {/* ── CONTENIDO ──────────────────────────────────────── */}
         <div
           style={{
             padding: "20px",
@@ -551,7 +540,7 @@ export default function SeriesDetailPanel({
             gap: 24,
           }}
         >
-          {/* ESTADÍSTICAS */}
+          {/* Stats */}
           <section>
             <SectionTitle>
               <BarChart2
@@ -585,7 +574,7 @@ export default function SeriesDetailPanel({
             </div>
           </section>
 
-          {/* COCHES PERMITIDOS */}
+          {/* Cars */}
           <section>
             <SectionTitle>
               <Car size={10} style={{ display: "inline", marginRight: 5 }} />
@@ -601,8 +590,8 @@ export default function SeriesDetailPanel({
                     justifyContent: "space-between",
                     padding: "10px 14px",
                     borderRadius: 10,
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.07)",
+                    background: T.rowBg,
+                    border: `1px solid ${T.sectionBorder}`,
                   }}
                 >
                   <div
@@ -619,9 +608,9 @@ export default function SeriesDetailPanel({
                         justifyContent: "center",
                         background: car.owned
                           ? "rgba(34,197,94,0.12)"
-                          : "rgba(255,255,255,0.05)",
-                        border: `1px solid ${car.owned ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.08)"}`,
-                        color: car.owned ? "#22C55E" : "#475569",
+                          : T.carIconBg,
+                        border: `1px solid ${car.owned ? "rgba(34,197,94,0.3)" : T.carIconBorder}`,
+                        color: car.owned ? "#22C55E" : T.iconBtnColor,
                       }}
                     >
                       {car.owned ? (
@@ -634,9 +623,7 @@ export default function SeriesDetailPanel({
                       style={{
                         fontSize: 13,
                         fontWeight: 500,
-                        color: car.owned
-                          ? "rgba(255,255,255,0.85)"
-                          : "rgba(255,255,255,0.45)",
+                        color: car.owned ? T.textSecondary : T.textFaint,
                       }}
                     >
                       {car.name}
@@ -663,7 +650,7 @@ export default function SeriesDetailPanel({
             </div>
           </section>
 
-          {/* HORARIOS */}
+          {/* Race Schedule */}
           <section>
             <SectionTitle>
               <Clock size={10} style={{ display: "inline", marginRight: 5 }} />
@@ -679,8 +666,8 @@ export default function SeriesDetailPanel({
                     gap: 12,
                     padding: "10px 14px",
                     borderRadius: 10,
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.07)",
+                    background: T.rowBg,
+                    border: `1px solid ${T.sectionBorder}`,
                   }}
                 >
                   <div
@@ -697,7 +684,7 @@ export default function SeriesDetailPanel({
                     style={{
                       fontSize: 13,
                       fontWeight: 500,
-                      color: "rgba(255,255,255,0.8)",
+                      color: T.textMuted,
                       fontFamily: "DM Mono, monospace",
                     }}
                   >
@@ -708,7 +695,7 @@ export default function SeriesDetailPanel({
             </div>
           </section>
 
-          {/* CALENDARIO COMPLETO */}
+          {/* Full Calendar */}
           <section>
             <SectionTitle>
               <Calendar
@@ -732,9 +719,9 @@ export default function SeriesDetailPanel({
                       background: isActive
                         ? `${accent}15`
                         : i % 2 === 0
-                          ? "rgba(255,255,255,0.04)"
-                          : "rgba(255,255,255,0.025)",
-                      border: `1px solid ${isActive ? accent + "45" : "rgba(255,255,255,0.06)"}`,
+                          ? T.rowBg
+                          : T.rowBgAlt,
+                      border: `1px solid ${isActive ? accent + "45" : T.rowBorder}`,
                     }}
                   >
                     <span
@@ -749,7 +736,6 @@ export default function SeriesDetailPanel({
                     >
                       W{i + 1}
                     </span>
-
                     {isActive ? (
                       <span
                         style={{
@@ -765,17 +751,16 @@ export default function SeriesDetailPanel({
                       <Flag
                         size={12}
                         strokeWidth={1.8}
-                        color="rgba(255,255,255,0.2)"
+                        color={T.flagColor}
                         style={{ flexShrink: 0 }}
                       />
                     )}
-
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div
                         style={{
                           fontSize: 13,
                           fontWeight: isActive ? 700 : 600,
-                          color: isActive ? "white" : "rgba(255,255,255,0.85)",
+                          color: isActive ? T.textPrimary : T.textSecondary,
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
@@ -787,7 +772,7 @@ export default function SeriesDetailPanel({
                         <div
                           style={{
                             fontSize: 11,
-                            color: "#475569",
+                            color: T.labelColor,
                             marginTop: 1,
                           }}
                         >
@@ -795,7 +780,6 @@ export default function SeriesDetailPanel({
                         </div>
                       )}
                     </div>
-
                     {isActive ? (
                       <span
                         style={{
@@ -818,7 +802,7 @@ export default function SeriesDetailPanel({
                           style={{
                             fontFamily: "DM Mono, monospace",
                             fontSize: 10,
-                            color: "#334155",
+                            color: T.dateColor,
                             flexShrink: 0,
                           }}
                         >
@@ -835,7 +819,7 @@ export default function SeriesDetailPanel({
             </div>
           </section>
 
-          {/* Info adicional */}
+          {/* Series Info */}
           <section>
             <SectionTitle>Series Info</SectionTitle>
             <div
@@ -868,15 +852,15 @@ export default function SeriesDetailPanel({
                   style={{
                     padding: "10px 14px",
                     borderRadius: 10,
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.06)",
+                    background: T.infoGridBg,
+                    border: `1px solid ${T.infoGridBorder}`,
                   }}
                 >
                   <div
                     style={{
                       fontSize: 10,
                       fontFamily: "DM Mono, monospace",
-                      color: "#334155",
+                      color: T.labelColor,
                       textTransform: "uppercase",
                       letterSpacing: "0.1em",
                       marginBottom: 4,
@@ -888,7 +872,7 @@ export default function SeriesDetailPanel({
                     style={{
                       fontSize: 14,
                       fontWeight: 600,
-                      color: "rgba(255,255,255,0.8)",
+                      color: T.textSecondary,
                     }}
                   >
                     {item.value}

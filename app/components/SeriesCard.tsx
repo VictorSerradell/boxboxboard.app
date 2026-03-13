@@ -1,5 +1,5 @@
 "use client";
-// /app/components/SeriesCard.tsx — iRacing-inspired redesign
+// /app/components/SeriesCard.tsx
 
 import { useState } from "react";
 import {
@@ -15,6 +15,7 @@ import {
 import type { SeriesSeason } from "../types/iracing";
 import { toggleFavoriteSeries } from "../lib/iracing-client";
 import { getCurrentRaceWeek } from "../lib/season-week";
+import { useTheme } from "../lib/theme";
 
 interface SeriesCardProps {
   series: SeriesSeason;
@@ -25,30 +26,35 @@ interface SeriesCardProps {
 
 const CATEGORY_STYLE: Record<
   string,
-  { gradient: string; accent: string; label: string }
+  { gradientDark: string; gradientLight: string; accent: string; label: string }
 > = {
   "Sports Car": {
-    gradient: "linear-gradient(135deg, #0E2A4A 0%, #070F1C 100%)",
+    gradientDark: "linear-gradient(135deg, #0E2A4A 0%, #070F1C 100%)",
+    gradientLight: "linear-gradient(135deg, #EBF4FF 0%, #F0F7FF 100%)",
     accent: "#3B9EFF",
     label: "Sports Car",
   },
   "Formula Car": {
-    gradient: "linear-gradient(135deg, #2A0E4A 0%, #10071C 100%)",
+    gradientDark: "linear-gradient(135deg, #2A0E4A 0%, #10071C 100%)",
+    gradientLight: "linear-gradient(135deg, #F5EEFF 0%, #F9F5FF 100%)",
     accent: "#A855F7",
     label: "Formula",
   },
   Oval: {
-    gradient: "linear-gradient(135deg, #2A1800 0%, #120A00 100%)",
+    gradientDark: "linear-gradient(135deg, #2A1800 0%, #120A00 100%)",
+    gradientLight: "linear-gradient(135deg, #FFF4EB 0%, #FFF8F2 100%)",
     accent: "#F97316",
     label: "Oval",
   },
   "Dirt Oval": {
-    gradient: "linear-gradient(135deg, #2A2000 0%, #121000 100%)",
+    gradientDark: "linear-gradient(135deg, #2A2000 0%, #121000 100%)",
+    gradientLight: "linear-gradient(135deg, #FEFCE8 0%, #FFFDF2 100%)",
     accent: "#EAB308",
     label: "Dirt Oval",
   },
   "Dirt Road": {
-    gradient: "linear-gradient(135deg, #0A2A14 0%, #041209 100%)",
+    gradientDark: "linear-gradient(135deg, #0A2A14 0%, #041209 100%)",
+    gradientLight: "linear-gradient(135deg, #EDFAF2 0%, #F2FCF5 100%)",
     accent: "#22C55E",
     label: "Dirt Road",
   },
@@ -81,6 +87,8 @@ export default function SeriesCard({
   const [localFav, setLocalFav] = useState(isFavorite);
   const [favAnimating, setFavAnimating] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const catStyle =
     CATEGORY_STYLE[series.category ?? ""] ?? CATEGORY_STYLE["Sports Car"];
@@ -94,6 +102,43 @@ export default function SeriesCard({
     series.season_year,
     series.season_quarter,
   );
+  const accent = catStyle.accent;
+
+  // Theme-aware local tokens
+  const T = {
+    cardBg: isDark ? "#070D19" : "#FFFFFF",
+    cardBorder: hovered
+      ? accent + "55"
+      : isDark
+        ? "rgba(255,255,255,0.08)"
+        : "rgba(0,0,0,0.10)",
+    cardShadow: hovered
+      ? isDark
+        ? `0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px ${accent}25`
+        : `0 16px 40px rgba(0,0,0,0.12), 0 0 0 1px ${accent}30`
+      : isDark
+        ? "0 4px 20px rgba(0,0,0,0.5)"
+        : "0 2px 12px rgba(0,0,0,0.08)",
+    headerGrad: isDark ? catStyle.gradientDark : catStyle.gradientLight,
+    seriesName: isDark ? "#FFFFFF" : "#0F172A",
+    trackRowBg: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+    trackRowBorder: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.07)",
+    trackName: isDark ? "rgba(255,255,255,0.8)" : "#1E293B",
+    trackConfig: isDark ? "rgba(255,255,255,0.35)" : "#94A3B8",
+    trackNameActive: isDark ? "rgba(255,255,255,0.95)" : "#0F172A",
+    trackConfigActive: isDark ? "rgba(255,255,255,0.55)" : "#64748B",
+    flagColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
+    moreTracksBg: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.03)",
+    moreTracksBorder: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)",
+    moreTracksText: isDark ? "#334155" : "#94A3B8",
+    sectionBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
+    labelColor: isDark ? "#334155" : "#94A3B8",
+    statValue: isDark ? "rgba(255,255,255,0.82)" : "#1E293B",
+    footerBg: isDark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.04)",
+    iconBtnBg: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+    iconBtnBorder: isDark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.12)",
+    iconBtnColor: isDark ? "#475569" : "#94A3B8",
+  };
 
   function handleFavClick(e: React.MouseEvent) {
     e.stopPropagation();
@@ -110,30 +155,27 @@ export default function SeriesCard({
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
       style={{
-        background: "#070D19",
-        border: `1px solid ${hovered ? catStyle.accent + "55" : "rgba(255,255,255,0.08)"}`,
+        background: T.cardBg,
+        border: `1px solid ${T.cardBorder}`,
         borderRadius: 16,
         overflow: "hidden",
         cursor: "pointer",
         transform: hovered ? "translateY(-4px)" : "translateY(0)",
-        boxShadow: hovered
-          ? `0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px ${catStyle.accent}25`
-          : "0 4px 20px rgba(0,0,0,0.5)",
+        boxShadow: T.cardShadow,
         transition:
           "transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      {/* ── HEADER ────────────────────────────────────────────── */}
+      {/* ── HEADER ──────────────────────────────────────────── */}
       <div
         style={{
-          background: catStyle.gradient,
+          background: T.headerGrad,
           padding: "18px 18px 16px",
           position: "relative",
         }}
       >
-        {/* Barra de acento superior */}
         <div
           style={{
             position: "absolute",
@@ -141,12 +183,12 @@ export default function SeriesCard({
             left: 0,
             right: 0,
             height: 3,
-            background: `linear-gradient(90deg, ${catStyle.accent} 0%, ${catStyle.accent}00 100%)`,
+            background: `linear-gradient(90deg, ${accent} 0%, ${accent}00 100%)`,
             borderRadius: "16px 16px 0 0",
           }}
         />
 
-        {/* Fila: categoría + acciones */}
+        {/* Categoría + live badge + acciones */}
         <div
           style={{
             display: "flex",
@@ -161,8 +203,8 @@ export default function SeriesCard({
                 width: 7,
                 height: 7,
                 borderRadius: "50%",
-                background: catStyle.accent,
-                boxShadow: `0 0 8px ${catStyle.accent}`,
+                background: accent,
+                boxShadow: `0 0 8px ${accent}`,
               }}
             />
             <span
@@ -170,14 +212,13 @@ export default function SeriesCard({
                 fontFamily: "Syne, sans-serif",
                 fontSize: 11,
                 fontWeight: 700,
-                color: catStyle.accent,
+                color: accent,
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
               }}
             >
               {catStyle.label}
             </span>
-            {/* Indicador de semana activa */}
             {currentWeek !== null && currentWeek < tracks.length && (
               <span
                 style={{
@@ -202,14 +243,12 @@ export default function SeriesCard({
                     borderRadius: "50%",
                     background: "#22C55E",
                     display: "inline-block",
-                    animation: "pulse 2s infinite",
                   }}
                 />
                 WK {currentWeek + 1} LIVE
               </span>
             )}
           </div>
-
           <div style={{ display: "flex", gap: 6 }}>
             <div
               title={series.isOwned ? "All content owned" : "Missing content"}
@@ -222,9 +261,9 @@ export default function SeriesCard({
                 justifyContent: "center",
                 background: series.isOwned
                   ? "rgba(34,197,94,0.18)"
-                  : "rgba(255,255,255,0.08)",
-                border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.14)"}`,
-                color: series.isOwned ? "#22C55E" : "#475569",
+                  : T.iconBtnBg,
+                border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.4)" : T.iconBtnBorder}`,
+                color: series.isOwned ? "#22C55E" : T.iconBtnColor,
               }}
             >
               {series.isOwned ? (
@@ -243,11 +282,9 @@ export default function SeriesCard({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                background: localFav
-                  ? "rgba(239,68,68,0.2)"
-                  : "rgba(255,255,255,0.08)",
-                border: `1px solid ${localFav ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.14)"}`,
-                color: localFav ? "#EF4444" : "#475569",
+                background: localFav ? "rgba(239,68,68,0.2)" : T.iconBtnBg,
+                border: `1px solid ${localFav ? "rgba(239,68,68,0.5)" : T.iconBtnBorder}`,
+                color: localFav ? "#EF4444" : T.iconBtnColor,
                 transform: favAnimating ? "scale(1.35)" : "scale(1)",
                 transition: "transform 0.15s ease",
               }}
@@ -261,13 +298,13 @@ export default function SeriesCard({
           </div>
         </div>
 
-        {/* Nombre de la serie */}
+        {/* Nombre */}
         <h3
           style={{
             fontFamily: "Syne, sans-serif",
             fontSize: 18,
             fontWeight: 900,
-            color: "#FFFFFF",
+            color: T.seriesName,
             lineHeight: 1.2,
             margin: "0 0 14px",
             letterSpacing: "-0.4px",
@@ -285,7 +322,6 @@ export default function SeriesCard({
               fontSize: 12,
               fontWeight: 700,
               fontFamily: "DM Mono, monospace",
-              letterSpacing: "0.04em",
               background: licConfig.color + "22",
               border: `1px solid ${licConfig.color}50`,
               color: licConfig.color,
@@ -310,7 +346,7 @@ export default function SeriesCard({
               color: series.fixed_setup ? "#3B9EFF" : "#22C55E",
             }}
           >
-            <Wrench size={10} strokeWidth={2.5} />
+            <Wrench size={10} strokeWidth={2.5} />{" "}
             {series.fixed_setup ? "Fixed" : "Open"}
           </span>
           {series.official && (
@@ -335,12 +371,12 @@ export default function SeriesCard({
         </div>
       </div>
 
-      {/* ── TRACK ROTATION ────────────────────────────────────── */}
+      {/* ── TRACK ROTATION ──────────────────────────────────── */}
       <div
         style={{
           padding: "14px 18px 16px",
           flex: 1,
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: `1px solid ${T.sectionBorder}`,
         }}
       >
         <div
@@ -356,7 +392,7 @@ export default function SeriesCard({
               fontFamily: "DM Mono, monospace",
               fontSize: 10,
               fontWeight: 600,
-              color: "#334155",
+              color: T.labelColor,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
             }}
@@ -367,7 +403,7 @@ export default function SeriesCard({
             style={{
               fontFamily: "DM Mono, monospace",
               fontSize: 10,
-              color: catStyle.accent + "AA",
+              color: accent + "AA",
             }}
           >
             {weekCount} wks
@@ -386,10 +422,8 @@ export default function SeriesCard({
                   gap: 10,
                   padding: "7px 10px",
                   borderRadius: 8,
-                  background: isActive
-                    ? `${catStyle.accent}18`
-                    : "rgba(255,255,255,0.03)",
-                  border: `1px solid ${isActive ? catStyle.accent + "50" : "rgba(255,255,255,0.05)"}`,
+                  background: isActive ? `${accent}18` : T.trackRowBg,
+                  border: `1px solid ${isActive ? accent + "50" : T.trackRowBorder}`,
                   transition: "background 0.15s",
                 }}
               >
@@ -398,7 +432,7 @@ export default function SeriesCard({
                     fontFamily: "DM Mono, monospace",
                     fontSize: 10,
                     fontWeight: 700,
-                    color: isActive ? catStyle.accent : catStyle.accent,
+                    color: accent,
                     minWidth: 24,
                     flexShrink: 0,
                   }}
@@ -420,7 +454,7 @@ export default function SeriesCard({
                   <Flag
                     size={11}
                     strokeWidth={1.8}
-                    color="rgba(255,255,255,0.2)"
+                    color={T.flagColor}
                     style={{ flexShrink: 0 }}
                   />
                 )}
@@ -428,9 +462,7 @@ export default function SeriesCard({
                   style={{
                     fontSize: 13,
                     fontWeight: isActive ? 700 : 500,
-                    color: isActive
-                      ? "rgba(255,255,255,0.95)"
-                      : "rgba(255,255,255,0.8)",
+                    color: isActive ? T.trackNameActive : T.trackName,
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -442,9 +474,7 @@ export default function SeriesCard({
                   {week.track.config_name && (
                     <span
                       style={{
-                        color: isActive
-                          ? "rgba(255,255,255,0.55)"
-                          : "rgba(255,255,255,0.35)",
+                        color: isActive ? T.trackConfigActive : T.trackConfig,
                         fontSize: 11,
                         marginLeft: 6,
                       }}
@@ -473,22 +503,21 @@ export default function SeriesCard({
               </div>
             );
           })}
-
           {tracks.length > 6 && (
             <div
               style={{
                 padding: "6px 10px",
                 borderRadius: 8,
                 textAlign: "center",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.04)",
+                background: T.moreTracksBg,
+                border: `1px solid ${T.moreTracksBorder}`,
               }}
             >
               <span
                 style={{
                   fontFamily: "DM Mono, monospace",
                   fontSize: 11,
-                  color: "#334155",
+                  color: T.moreTracksText,
                 }}
               >
                 +{tracks.length - 6} more tracks
@@ -498,8 +527,8 @@ export default function SeriesCard({
         </div>
       </div>
 
-      {/* ── STATS FOOTER ──────────────────────────────────────── */}
-      <div style={{ display: "flex", background: "rgba(0,0,0,0.35)" }}>
+      {/* ── STATS FOOTER ────────────────────────────────────── */}
+      <div style={{ display: "flex", background: T.footerBg }}>
         {[
           {
             icon: <Clock size={12} strokeWidth={2} />,
@@ -525,7 +554,7 @@ export default function SeriesCard({
             style={{
               flex: 1,
               padding: "11px 14px",
-              borderRight: i < 2 ? "1px solid rgba(255,255,255,0.06)" : "none",
+              borderRight: i < 2 ? `1px solid ${T.sectionBorder}` : "none",
               display: "flex",
               flexDirection: "column",
               gap: 3,
@@ -540,7 +569,7 @@ export default function SeriesCard({
                 fontSize: 10,
                 textTransform: "uppercase",
                 letterSpacing: "0.1em",
-                color: "#334155",
+                color: T.labelColor,
               }}
             >
               {stat.icon} {stat.label}
@@ -550,7 +579,7 @@ export default function SeriesCard({
                 fontFamily: "DM Mono, monospace",
                 fontSize: 15,
                 fontWeight: 700,
-                color: stat.accent ? catStyle.accent : "rgba(255,255,255,0.82)",
+                color: stat.accent ? accent : T.statValue,
               }}
             >
               {stat.value}

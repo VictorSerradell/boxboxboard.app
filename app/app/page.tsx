@@ -321,7 +321,7 @@ export default function HomePage() {
               fontFamily: "Syne, sans-serif",
               fontWeight: 900,
               fontSize: 20,
-              color: "white",
+              color: "var(--text-primary)",
               letterSpacing: "-0.5px",
             }}
           >
@@ -334,7 +334,7 @@ export default function HomePage() {
           style={{
             width: 1,
             height: 28,
-            background: "rgba(255,255,255,0.1)",
+            background: "var(--border)",
             marginRight: 24,
             flexShrink: 0,
           }}
@@ -346,8 +346,8 @@ export default function HomePage() {
             display: "flex",
             alignItems: "center",
             gap: 2,
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: "var(--bg-card)",
+            border: "1px solid var(--border)",
             borderRadius: 12,
             padding: 4,
           }}
@@ -491,7 +491,7 @@ export default function HomePage() {
             background: user
               ? "rgba(34,197,94,0.15)"
               : "linear-gradient(135deg, #3B9EFF, #2563EB)",
-            color: user ? "#22C55E" : "white",
+            color: user ? "#22C55E" : "var(--text-primary)",
             boxShadow: user ? "none" : "0 0 20px rgba(59,158,255,0.25)",
             transition: "all 0.15s",
           }}
@@ -570,7 +570,7 @@ export default function HomePage() {
               fontFamily: "Syne, sans-serif",
               fontSize: 26,
               fontWeight: 900,
-              color: "white",
+              color: "var(--text-primary)",
               letterSpacing: "-0.5px",
               margin: 0,
             }}
@@ -766,7 +766,7 @@ export default function HomePage() {
                     fontFamily: "Syne, sans-serif",
                     fontWeight: 900,
                     fontSize: 17,
-                    color: "white",
+                    color: "var(--text-primary)",
                   }}
                 >
                   PitBoard

@@ -12,6 +12,7 @@ import {
   Flag,
   Trophy,
   GitCompare,
+  CalendarClock,
 } from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
 import { toggleFavoriteSeries } from "../lib/iracing-client";
@@ -22,9 +23,11 @@ interface SeriesCardProps {
   series: SeriesSeason;
   isFavorite: boolean;
   isComparing?: boolean;
+  isScheduled?: boolean;
   onFavoriteToggle: (seriesId: number, newFavs: number[]) => void;
   onClick?: () => void;
   onCompare?: () => void;
+  onSchedule?: () => void;
 }
 
 const CATEGORY_STYLE: Record<
@@ -85,9 +88,11 @@ export default function SeriesCard({
   series,
   isFavorite,
   isComparing,
+  isScheduled,
   onFavoriteToggle,
   onClick,
   onCompare,
+  onSchedule,
 }: SeriesCardProps) {
   const [localFav, setLocalFav] = useState(isFavorite);
   const [favAnimating, setFavAnimating] = useState(false);
@@ -301,6 +306,34 @@ export default function SeriesCard({
                 }}
               >
                 <GitCompare size={13} strokeWidth={2} />
+              </button>
+            )}
+            {onSchedule && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSchedule();
+                }}
+                title={
+                  isScheduled ? "Remove from schedule" : "Add to my schedule"
+                }
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: isScheduled
+                    ? "rgba(168,85,247,0.2)"
+                    : T.iconBtnBg,
+                  border: `1px solid ${isScheduled ? "rgba(168,85,247,0.5)" : T.iconBtnBorder}`,
+                  color: isScheduled ? "#A855F7" : T.iconBtnColor,
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <CalendarClock size={13} strokeWidth={2} />
               </button>
             )}
             <button

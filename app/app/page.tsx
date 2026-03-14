@@ -8,6 +8,7 @@ import {
   Heart,
   LayoutGrid,
   LayoutList,
+  CalendarClock,
   Github,
   ExternalLink,
   ChevronDown,
@@ -19,6 +20,7 @@ import LoginModal from "../components/LoginModal";
 import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
 import CalendarView from "../components/CalendarView";
+import ScheduleView from "../components/ScheduleView";
 import type {
   SeriesSeason,
   FilterState,
@@ -151,7 +153,16 @@ export default function HomePage() {
     null,
   );
   const [comparingSeries, setComparingSeries] = useState<SeriesSeason[]>([]);
-  const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
+  const [scheduledIds, setScheduledIds] = useState<number[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("pitboard_schedule") ?? "[]");
+    } catch {
+      return [];
+    }
+  });
+  const [viewMode, setViewMode] = useState<"grid" | "calendar" | "schedule">(
+    "grid",
+  );
   const [activeSection, setActiveSection] = useState<
     "all" | "favorites" | "myContent"
   >("all");
@@ -232,6 +243,18 @@ export default function HomePage() {
       if (exists) return prev.filter((x) => x.series_id !== s.series_id);
       if (prev.length >= 3) return prev; // max 3
       return [...prev, s];
+    });
+  }
+
+  function toggleSchedule(id: number) {
+    setScheduledIds((prev) => {
+      const next = prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : [...prev, id];
+      try {
+        localStorage.setItem("pitboard_schedule", JSON.stringify(next));
+      } catch {}
+      return next;
     });
   }
 
@@ -668,6 +691,12 @@ export default function HomePage() {
                   icon: <LayoutList size={15} />,
                   label: "Calendar",
                 },
+                {
+                  mode: "schedule",
+                  icon: <CalendarClock size={15} />,
+                  label: "Schedule",
+                  badge: scheduledIds.length || undefined,
+                },
               ] as const
             ).map((v) => (
               <button
@@ -694,13 +723,43 @@ export default function HomePage() {
                   fontWeight: 600,
                   fontSize: 13,
                   transition: "all 0.15s",
+                  position: "relative",
                 }}
               >
                 {v.icon} {v.label}
+                {"badge" in v && v.badge ? (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 16,
+                      height: 16,
+                      borderRadius: "50%",
+                      background: "#A855F7",
+                      color: "white",
+                      fontSize: 9,
+                      fontWeight: 800,
+                      fontFamily: "DM Mono, monospace",
+                    }}
+                  >
+                    {v.badge}
+                  </span>
+                ) : null}
               </button>
             ))}
           </div>
         </div>
+
+        {/* Schedule view */}
+        {viewMode === "schedule" && !loading && (
+          <ScheduleView
+            series={series}
+            scheduledIds={scheduledIds}
+            onRemove={(id) => toggleSchedule(id)}
+            onSeriesClick={(s) => openSeries(s)}
+          />
+        )}
 
         {/* Calendar view */}
         {viewMode === "calendar" && !loading && (
@@ -808,9 +867,11 @@ export default function HomePage() {
                   isComparing={comparingSeries.some(
                     (x) => x.series_id === s.series_id,
                   )}
+                  isScheduled={scheduledIds.includes(s.series_id)}
                   onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
                   onClick={() => openSeries(s)}
                   onCompare={() => toggleCompare(s)}
+                  onSchedule={() => toggleSchedule(s.series_id)}
                 />
               ))
             )}

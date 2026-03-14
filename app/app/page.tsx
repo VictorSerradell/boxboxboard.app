@@ -7,6 +7,7 @@ import {
   Coffee,
   Heart,
   LayoutGrid,
+  LayoutList,
   Github,
   ExternalLink,
   ChevronDown,
@@ -17,6 +18,7 @@ import FiltersBar from "../components/FiltersBar";
 import LoginModal from "../components/LoginModal";
 import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
+import CalendarView from "../components/CalendarView";
 import type {
   SeriesSeason,
   FilterState,
@@ -149,6 +151,7 @@ export default function HomePage() {
     null,
   );
   const [comparingSeries, setComparingSeries] = useState<SeriesSeason[]>([]);
+  const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
   const [activeSection, setActiveSection] = useState<
     "all" | "favorites" | "myContent"
   >("all");
@@ -593,7 +596,7 @@ export default function HomePage() {
             comparingSeries.length > 0 ? "calc(48px + 60vh)" : "48px",
         }}
       >
-        {/* Título de temporada */}
+        {/* Título de temporada + toggle de vista */}
         <div
           style={{
             display: "flex",
@@ -642,115 +645,177 @@ export default function HomePage() {
               LIVE
             </span>
           )}
-        </div>
-
-        {/* Grid */}
-        <div
-          style={{
-            display: "grid",
-            gap: 16,
-            gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
-          }}
-        >
-          {loading ? (
-            Array(6)
-              .fill(0)
-              .map((_, i) => <SkeletonCard key={i} />)
-          ) : displayed.length === 0 ? (
-            <div
-              style={{
-                gridColumn: "1 / -1",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "96px 0",
-                gap: 16,
-                textAlign: "center",
-              }}
-            >
-              <div
+          <div
+            style={{
+              marginLeft: "auto",
+              display: "flex",
+              gap: 2,
+              background: T.cardBg,
+              border: `1px solid ${T.cardBorder}`,
+              borderRadius: 10,
+              padding: 3,
+            }}
+          >
+            {(
+              [
+                {
+                  mode: "grid",
+                  icon: <LayoutGrid size={15} />,
+                  label: "Cards",
+                },
+                {
+                  mode: "calendar",
+                  icon: <LayoutList size={15} />,
+                  label: "Calendar",
+                },
+              ] as const
+            ).map((v) => (
+              <button
+                key={v.mode}
+                onClick={() => setViewMode(v.mode)}
+                title={v.label}
                 style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: 20,
-                  background: T.cardBg,
-                  border: `1px solid ${T.cardBorder}`,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  color: T.emptyIcon,
-                }}
-              >
-                <svg
-                  width="30"
-                  height="30"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-              </div>
-              <p
-                style={{
-                  fontFamily: "Syne, sans-serif",
-                  fontSize: 20,
-                  fontWeight: 800,
-                  color: T.emptyTitle,
-                  margin: 0,
-                }}
-              >
-                No series found
-              </p>
-              <p style={{ fontSize: 14, color: T.emptyText, margin: 0 }}>
-                Try adjusting or resetting your filters.
-              </p>
-              <button
-                onClick={() =>
-                  setFilters({
-                    categories: [],
-                    licenses: [],
-                    statuses: [],
-                    favoritesOnly: false,
-                    ownedOnly: false,
-                    searchQuery: "",
-                  })
-                }
-                style={{
-                  marginTop: 8,
-                  padding: "10px 20px",
-                  borderRadius: 10,
-                  border: `1px solid ${T.btnBorder}`,
-                  background: "transparent",
-                  color: T.btnColor,
+                  gap: 6,
+                  padding: "6px 12px",
+                  borderRadius: 8,
+                  border: "none",
                   cursor: "pointer",
-                  fontSize: 14,
+                  background:
+                    viewMode === v.mode
+                      ? isDark
+                        ? "rgba(255,255,255,0.1)"
+                        : "rgba(0,0,0,0.08)"
+                      : "transparent",
+                  color:
+                    viewMode === v.mode ? "var(--text-primary)" : T.textFaint,
                   fontFamily: "Syne, sans-serif",
                   fontWeight: 600,
+                  fontSize: 13,
+                  transition: "all 0.15s",
                 }}
               >
-                Reset Filters
+                {v.icon} {v.label}
               </button>
-            </div>
-          ) : (
-            displayed.map((s) => (
-              <SeriesCard
-                key={s.season_id}
-                series={s}
-                isFavorite={favorites.includes(s.series_id)}
-                isComparing={comparingSeries.some(
-                  (x) => x.series_id === s.series_id,
-                )}
-                onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
-                onClick={() => openSeries(s)}
-                onCompare={() => toggleCompare(s)}
-              />
-            ))
-          )}
+            ))}
+          </div>
         </div>
+
+        {/* Calendar view */}
+        {viewMode === "calendar" && !loading && (
+          <CalendarView series={series} onSeriesClick={(s) => openSeries(s)} />
+        )}
+
+        {/* Grid view */}
+        {viewMode === "grid" && (
+          <div
+            style={{
+              display: "grid",
+              gap: 16,
+              gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+            }}
+          >
+            {loading ? (
+              Array(6)
+                .fill(0)
+                .map((_, i) => <SkeletonCard key={i} />)
+            ) : displayed.length === 0 ? (
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "96px 0",
+                  gap: 16,
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: 20,
+                    background: T.cardBg,
+                    border: `1px solid ${T.cardBorder}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: T.emptyIcon,
+                  }}
+                >
+                  <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                  </svg>
+                </div>
+                <p
+                  style={{
+                    fontFamily: "Syne, sans-serif",
+                    fontSize: 20,
+                    fontWeight: 800,
+                    color: T.emptyTitle,
+                    margin: 0,
+                  }}
+                >
+                  No series found
+                </p>
+                <p style={{ fontSize: 14, color: T.emptyText, margin: 0 }}>
+                  Try adjusting or resetting your filters.
+                </p>
+                <button
+                  onClick={() =>
+                    setFilters({
+                      categories: [],
+                      licenses: [],
+                      statuses: [],
+                      favoritesOnly: false,
+                      ownedOnly: false,
+                      searchQuery: "",
+                    })
+                  }
+                  style={{
+                    marginTop: 8,
+                    padding: "10px 20px",
+                    borderRadius: 10,
+                    border: `1px solid ${T.btnBorder}`,
+                    background: "transparent",
+                    color: T.btnColor,
+                    cursor: "pointer",
+                    fontSize: 14,
+                    fontFamily: "Syne, sans-serif",
+                    fontWeight: 600,
+                  }}
+                >
+                  Reset Filters
+                </button>
+              </div>
+            ) : (
+              displayed.map((s) => (
+                <SeriesCard
+                  key={s.season_id}
+                  series={s}
+                  isFavorite={favorites.includes(s.series_id)}
+                  isComparing={comparingSeries.some(
+                    (x) => x.series_id === s.series_id,
+                  )}
+                  onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
+                  onClick={() => openSeries(s)}
+                  onCompare={() => toggleCompare(s)}
+                />
+              ))
+            )}
+          </div>
+        )}
       </main>
 
       {/* ════════════════════════════════════════════════════════

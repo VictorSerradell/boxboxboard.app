@@ -21,7 +21,6 @@ import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
 import LangToggle from "../components/LangToggle";
 import DriverStats from "../components/DriverStats";
-import CompareBar from "../components/CompareBar";
 import CalendarView from "../components/CalendarView";
 import ScheduleView from "../components/ScheduleView";
 import WeekChangeBanner from "../components/WeekChangeBanner";
@@ -38,6 +37,7 @@ import {
   getFavoriteSeriesIds,
 } from "../lib/iracing-client";
 import { useTheme } from "../lib/theme";
+import CompareBar from "../components/Comparebar";
 
 function SkeletonCard() {
   const { theme } = useTheme();
@@ -177,6 +177,7 @@ export default function HomePage() {
     favoritesOnly: false,
     ownedOnly: false,
     searchQuery: "",
+    myLicense: null,
   });
 
   const { theme } = useTheme();
@@ -197,6 +198,21 @@ export default function HomePage() {
     btnBorder: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.12)",
     btnColor: isDark ? "#64748B" : "#94A3B8",
   };
+
+  // Derive auto-license from connected account (highest level across categories)
+  const autoLicense: number | null | undefined = user
+    ? (() => {
+        const lics = (user as any).licenses as any[] | undefined;
+        if (!lics?.length) return null;
+        return Math.max(
+          ...lics.map((l: any) => l.license_level ?? 0),
+        ) as number;
+      })()
+    : undefined; // undefined = no account → show manual selector
+
+  // Effective license for eligibility badge
+  const effectiveLicense: number | null =
+    autoLicense !== undefined ? autoLicense : filters.myLicense;
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -612,7 +628,11 @@ export default function HomePage() {
 
       {/* ── FILTERS ─────────────────────────────────────────── */}
       <div style={{ marginTop: user ? 64 : 0 }}>
-        <FiltersBar filters={filters} onChange={setFilters} />
+        <FiltersBar
+          filters={filters}
+          onChange={setFilters}
+          autoLicense={autoLicense as any}
+        />
       </div>
 
       {/* ════════════════════════════════════════════════════════
@@ -850,6 +870,7 @@ export default function HomePage() {
                       favoritesOnly: false,
                       ownedOnly: false,
                       searchQuery: "",
+                      myLicense: null,
                     })
                   }
                   style={{
@@ -878,6 +899,10 @@ export default function HomePage() {
                     (x) => x.series_id === s.series_id,
                   )}
                   isScheduled={scheduledIds.includes(s.series_id)}
+                  isEligible={
+                    effectiveLicense !== null &&
+                    (s.minLicenseLevel ?? 0) <= effectiveLicense
+                  }
                   onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
                   onClick={() => openSeries(s)}
                   onCompare={() => toggleCompare(s)}

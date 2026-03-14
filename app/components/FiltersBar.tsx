@@ -13,6 +13,7 @@ import { useTheme } from "../lib/theme";
 interface FiltersBarProps {
   filters: FilterState;
   onChange: (newFilters: FilterState) => void;
+  autoLicense?: LicenseLevel | null; // detected from connected account
 }
 
 const CATEGORIES: { label: string; value: CarCategory }[] = [
@@ -40,10 +41,18 @@ const STATUSES: { label: string; value: SessionType; color: string }[] = [
 
 import { useT } from "../lib/i18n";
 
-export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
+export default function FiltersBar({
+  filters,
+  onChange,
+  autoLicense,
+}: FiltersBarProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { t } = useT();
+
+  // If account is connected, auto-license overrides manual
+  const effectiveLicense =
+    autoLicense !== undefined ? autoLicense : filters.myLicense;
 
   const T = {
     barBg: isDark ? "rgba(6,12,24,0.94)" : "rgba(248,250,252,0.96)",
@@ -104,6 +113,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
       favoritesOnly: false,
       ownedOnly: false,
       searchQuery: "",
+      myLicense: null,
     });
   }
 
@@ -113,7 +123,8 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
     filters.statuses.length > 0 ||
     filters.favoritesOnly ||
     filters.ownedOnly ||
-    filters.searchQuery.length > 0;
+    filters.searchQuery.length > 0 ||
+    filters.myLicense !== null;
 
   // Chip helper
   function chip({
@@ -355,6 +366,120 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
             <RotateCcw size={11} /> {t.filterReset}
           </button>
         )}
+
+        {/* My License selector — only shown when no auto-license from account */}
+        {autoLicense === undefined && (
+          <>
+            <div
+              style={{
+                width: 1,
+                height: 22,
+                background: T.divider,
+                flexShrink: 0,
+                margin: "0 2px",
+              }}
+            />
+            <span
+              style={{
+                fontFamily: "DM Mono, monospace",
+                fontSize: 10,
+                color: T.groupLabel,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.myLicenseLabel}
+            </span>
+            {LICENSES.map((lic) => {
+              const active = filters.myLicense === lic.value;
+              return (
+                <button
+                  key={lic.value}
+                  onClick={() =>
+                    onChange({
+                      ...filters,
+                      myLicense: active ? null : lic.value,
+                    })
+                  }
+                  title={t.myLicenseTooltip}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    padding: "4px 10px",
+                    borderRadius: 20,
+                    border: `1px solid ${active ? lic.color + "60" : T.chipDefault.border}`,
+                    background: active ? lic.color + "18" : "transparent",
+                    color: active ? lic.color : T.chipDefault.color,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    fontFamily: "DM Mono, monospace",
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {active && (
+                    <span
+                      style={{
+                        width: 5,
+                        height: 5,
+                        borderRadius: "50%",
+                        background: lic.color,
+                      }}
+                    />
+                  )}
+                  {lic.label}
+                </button>
+              );
+            })}
+          </>
+        )}
+        {/* Auto-license indicator when account connected */}
+        {autoLicense !== undefined &&
+          autoLicense !== null &&
+          (() => {
+            const lic = LICENSES.find((l) => l.value === autoLicense);
+            if (!lic) return null;
+            return (
+              <>
+                <div
+                  style={{
+                    width: 1,
+                    height: 22,
+                    background: T.divider,
+                    flexShrink: 0,
+                    margin: "0 2px",
+                  }}
+                />
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    padding: "4px 10px",
+                    borderRadius: 20,
+                    border: `1px solid ${lic.color}50`,
+                    background: lic.color + "15",
+                    fontFamily: "DM Mono, monospace",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: lic.color,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 5,
+                      height: 5,
+                      borderRadius: "50%",
+                      background: lic.color,
+                    }}
+                  />
+                  {t.myLicenseLabel}: {lic.label}
+                </span>
+              </>
+            );
+          })()}
 
         {/* Search */}
         <div style={{ position: "relative", marginLeft: "auto" }}>

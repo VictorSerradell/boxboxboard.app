@@ -25,6 +25,7 @@ interface SeriesCardProps {
   isFavorite: boolean;
   isComparing?: boolean;
   isScheduled?: boolean;
+  isEligible?: boolean;
   onFavoriteToggle: (seriesId: number, newFavs: number[]) => void;
   onClick?: () => void;
   onCompare?: () => void;
@@ -90,6 +91,7 @@ export default function SeriesCard({
   isFavorite,
   isComparing,
   isScheduled,
+  isEligible,
   onFavoriteToggle,
   onClick,
   onCompare,
@@ -258,6 +260,26 @@ export default function SeriesCard({
                   }}
                 />
                 {t.wkLive(currentWeek + 1)}
+              </span>
+            )}
+            {isEligible && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "2px 8px",
+                  borderRadius: 20,
+                  background: "rgba(168,85,247,0.15)",
+                  border: "1px solid rgba(168,85,247,0.35)",
+                  fontFamily: "DM Mono, monospace",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: "#A855F7",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                ✓ {t.eligible}
               </span>
             )}
           </div>

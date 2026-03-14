@@ -113,6 +113,9 @@ export interface Translations {
   starts: string;
   demoStatsNote: string;
   logout: string;
+  eligible: string;
+  myLicenseLabel: string;
+  myLicenseTooltip: string;
 }
 
 // ── Translations ──────────────────────────────────────────────
@@ -271,6 +274,9 @@ const translations: Record<Lang, Translations> = {
     starts: "starts",
     demoStatsNote: "Demo data — connect iRacing for real stats",
     logout: "Disconnect iRacing",
+    eligible: "Eligible",
+    myLicenseLabel: "My License",
+    myLicenseTooltip: "Mark your license to see eligible series",
     // Stats bar
     seriesPerSeason: "Series per season",
     activeDrivers: "Active drivers",
@@ -460,6 +466,9 @@ const translations: Record<Lang, Translations> = {
     starts: "salidas",
     demoStatsNote: "Datos demo — conecta iRacing para stats reales",
     logout: "Desconectar iRacing",
+    eligible: "Elegible",
+    myLicenseLabel: "Mi Licencia",
+    myLicenseTooltip: "Selecciona tu licencia para ver series elegibles",
     // Stats bar
     seriesPerSeason: "Series por temporada",
     activeDrivers: "Pilotos activos",

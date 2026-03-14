@@ -143,8 +143,14 @@ const translations = {
         a: "Yes. When you open a series detail panel, the URL updates automatically. Just copy and send the link — the panel will open directly for them.",
       },
     ],
-    // Stats bar
-    seriesPerSeason: "Series per season",
+    // Week change banner
+    weekChangedTitle: "New Week",
+    weekLabel: "Week",
+    weekChangedScheduled: (n: number) =>
+      `${n} series in your schedule racing now`,
+    weekChangedNoSchedule: "New circuits this week",
+    yourSchedule: "Your schedule",
+    racingThisWeek: "Racing this week",
     activeDrivers: "Active drivers",
     trackConfigs: "Track configs",
     seasonsTracked: "Seasons tracked",
@@ -314,8 +320,14 @@ const translations = {
         a: "Sí. Al abrir el panel de detalle de una serie, la URL se actualiza automáticamente. Solo copia y envía el enlace.",
       },
     ],
-    // Stats bar
-    seriesPerSeason: "Series por temporada",
+    // Week change banner
+    weekChangedTitle: "Nueva Semana",
+    weekLabel: "Semana",
+    weekChangedScheduled: (n: number) =>
+      `${n} series de tu horario corren ahora`,
+    weekChangedNoSchedule: "Nuevos circuitos esta semana",
+    yourSchedule: "Tu horario",
+    racingThisWeek: "Corriendo esta semana",
     activeDrivers: "Pilotos activos",
     trackConfigs: "Configs de circuito",
     seasonsTracked: "Temporadas",

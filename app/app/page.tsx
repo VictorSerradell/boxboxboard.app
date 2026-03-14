@@ -22,6 +22,7 @@ import ThemeToggle from "../components/ThemeToggle";
 import LangToggle from "../components/LangToggle";
 import CalendarView from "../components/CalendarView";
 import ScheduleView from "../components/ScheduleView";
+import WeekChangeBanner from "../components/WeekChangeBanner";
 import { useT } from "../lib/i18n";
 import type {
   SeriesSeason,
@@ -1123,6 +1124,13 @@ export default function HomePage() {
         }
         onClose={() => closeSeries()}
         onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
+      />
+
+      <WeekChangeBanner
+        series={series}
+        scheduledIds={scheduledIds}
+        seasonYear={currentSeason?.season_year ?? 0}
+        seasonQuarter={currentSeason?.season_quarter ?? 0}
       />
 
       <CompareBar

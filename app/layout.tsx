@@ -1,10 +1,17 @@
 // /app/layout.tsx
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "./lib/theme";
 import { I18nProvider } from "./lib/i18n";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://pitboard.app";
+
+export const viewport: Viewport = {
+  themeColor: "#3B9EFF",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "PitBoard — iRacing Season Planner",
@@ -18,6 +25,12 @@ export const metadata: Metadata = {
     "track rotation",
   ],
   metadataBase: new URL(BASE_URL),
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "PitBoard",
+  },
   openGraph: {
     title: "PitBoard — iRacing Season Planner",
     description:
@@ -58,7 +71,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark">
       <head>
-        {/* No-flash script: apply saved theme before first paint */}
+        {/* No-flash theme script */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -69,6 +82,20 @@ export default function RootLayout({
               document.documentElement.setAttribute('data-theme', t);
             } catch(e) {}
           })();
+        `,
+          }}
+        />
+        {/* PWA service worker registration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+              navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                console.log('SW registration failed:', err);
+              });
+            });
+          }
         `,
           }}
         />

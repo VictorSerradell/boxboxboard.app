@@ -1,0 +1,45 @@
+{
+  "name": "PitBoard — iRacing Season Planner",
+  "short_name": "PitBoard",
+  "description": "Browse every iRacing series, track rotation and schedule. Filter by license, category and owned content.",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#060C18",
+  "theme_color": "#3B9EFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon-16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "PitBoard season planner"
+    }
+  ],
+  "categories": ["sports", "utilities"],
+  "lang": "en"
+}

@@ -116,6 +116,12 @@ export interface Translations {
   eligible: string;
   myLicenseLabel: string;
   myLicenseTooltip: string;
+  installTitle: string;
+  installDesc: string;
+  installBtn: string;
+  exportIcal: string;
+  exportedIcal: string;
+  exportGcal: string;
 }
 
 // ── Translations ──────────────────────────────────────────────
@@ -277,6 +283,12 @@ const translations: Record<Lang, Translations> = {
     eligible: "Eligible",
     myLicenseLabel: "My License",
     myLicenseTooltip: "Mark your license to see eligible series",
+    installTitle: "Install PitBoard",
+    installDesc: "Add to home screen for quick access",
+    installBtn: "Install",
+    exportIcal: "Export .ics",
+    exportedIcal: "Downloaded!",
+    exportGcal: "Google Calendar",
     // Stats bar
     seriesPerSeason: "Series per season",
     activeDrivers: "Active drivers",
@@ -469,6 +481,12 @@ const translations: Record<Lang, Translations> = {
     eligible: "Elegible",
     myLicenseLabel: "Mi Licencia",
     myLicenseTooltip: "Selecciona tu licencia para ver series elegibles",
+    installTitle: "Instalar PitBoard",
+    installDesc: "Añadir a pantalla de inicio",
+    installBtn: "Instalar",
+    exportIcal: "Exportar .ics",
+    exportedIcal: "¡Descargado!",
+    exportGcal: "Google Calendar",
     // Stats bar
     seriesPerSeason: "Series por temporada",
     activeDrivers: "Pilotos activos",

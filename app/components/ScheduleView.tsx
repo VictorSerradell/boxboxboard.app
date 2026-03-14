@@ -1,13 +1,27 @@
 "use client";
-import { useT } from "../lib/i18n";
 // /app/components/ScheduleView.tsx
-// Vista de horario personal — series marcadas por el usuario ordenadas por semana
 
-import { CalendarClock, X, Flag, Clock, Trophy, Wrench } from "lucide-react";
+import { useState } from "react";
+import {
+  CalendarClock,
+  X,
+  Flag,
+  Clock,
+  Trophy,
+  Wrench,
+  Download,
+  Calendar,
+  Check,
+} from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
 import { getCurrentRaceWeek } from "../lib/season-week";
 import { useTheme } from "../lib/theme";
-
+import { useT } from "../lib/i18n";
+import {
+  downloadICS,
+  buildEvents,
+  googleCalendarUrl,
+} from "../lib/export-calendar";
 const CATEGORY_ACCENT: Record<string, string> = {
   "Sports Car": "#3B9EFF",
   "Formula Car": "#A855F7",
@@ -50,6 +64,7 @@ export default function ScheduleView({
   const { theme } = useTheme();
   const { t } = useT();
   const isDark = theme === "dark";
+  const [exported, setExported] = useState(false);
 
   const T = {
     border: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
@@ -167,7 +182,7 @@ export default function ScheduleView({
               color: "var(--text-primary)",
             }}
           >
-            My Schedule
+            {t.mySchedule}
           </span>
         </div>
         <span
@@ -177,7 +192,7 @@ export default function ScheduleView({
             color: T.textMuted,
           }}
         >
-          {scheduled.length} series · {weeks.length} active weeks
+          {t.activeWeeks(scheduled.length, weeks.length)}
         </span>
 
         {/* Series pills */}
@@ -222,6 +237,60 @@ export default function ScheduleView({
               </span>
             );
           })}
+        </div>
+
+        {/* Export buttons */}
+        <div
+          style={{ display: "flex", gap: 6, marginLeft: "auto", flexShrink: 0 }}
+        >
+          <button
+            onClick={() => {
+              downloadICS(scheduled);
+              setExported(true);
+              setTimeout(() => setExported(false), 2500);
+            }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "7px 14px",
+              borderRadius: 10,
+              cursor: "pointer",
+              border: `1px solid ${exported ? "rgba(34,197,94,0.4)" : T.cardBorder}`,
+              background: exported ? "rgba(34,197,94,0.1)" : T.cardBg,
+              color: exported ? "#22C55E" : T.textMuted,
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 600,
+              fontSize: 13,
+              transition: "all 0.2s",
+            }}
+          >
+            {exported ? <Check size={13} /> : <Download size={13} />}
+            {exported ? t.exportedIcal : t.exportIcal}
+          </button>
+          {buildEvents(scheduled).length > 0 && (
+            <a
+              href={googleCalendarUrl(buildEvents(scheduled)[0])}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "7px 14px",
+                borderRadius: 10,
+                border: "1px solid rgba(66,133,244,0.4)",
+                background: "rgba(66,133,244,0.08)",
+                color: "#4285F4",
+                fontFamily: "Syne, sans-serif",
+                fontWeight: 600,
+                fontSize: 13,
+                textDecoration: "none",
+              }}
+            >
+              <Calendar size={13} /> {t.exportGcal}
+            </a>
+          )}
         </div>
       </div>
 

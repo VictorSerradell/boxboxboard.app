@@ -1,6 +1,7 @@
+// /app/components/SeriesDetailPanel.tsx
 "use client";
 import { useT } from "../lib/i18n";
-// /app/components/SeriesDetailPanel.tsx
+import { useIsMobile } from "../lib/useBreakpoint";
 
 import { useEffect, useState } from "react";
 import {
@@ -120,6 +121,7 @@ export default function SeriesDetailPanel({
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { t } = useT();
+  const isMobile = useIsMobile();
 
   useEffect(() => setLocalFav(isFavorite), [isFavorite]);
   useEffect(() => {
@@ -283,13 +285,13 @@ export default function SeriesDetailPanel({
       <div
         style={{
           position: "fixed",
-          top: 0,
+          top: isMobile ? 0 : 0,
           right: 0,
           bottom: 0,
           zIndex: 201,
-          width: "min(520px, 100vw)",
+          width: isMobile ? "100vw" : "min(520px, 100vw)",
           background: T.panelBg,
-          borderLeft: `1px solid ${accent}30`,
+          borderLeft: isMobile ? "none" : `1px solid ${accent}30`,
           display: "flex",
           flexDirection: "column",
           transform: visible ? "translateX(0)" : "translateX(100%)",

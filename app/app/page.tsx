@@ -13,6 +13,8 @@ import {
   ExternalLink,
   ChevronDown,
   User,
+  Menu,
+  X as XIcon,
 } from "lucide-react";
 import SeriesCard from "../components/SeriesCard";
 import FiltersBar from "../components/FiltersBar";
@@ -21,9 +23,12 @@ import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
 import LangToggle from "../components/LangToggle";
 import DriverStats from "../components/DriverStats";
+import CompareBar from "../components/CompareBar";
 import CalendarView from "../components/CalendarView";
 import ScheduleView from "../components/ScheduleView";
 import WeekChangeBanner from "../components/WeekChangeBanner";
+import InstallBanner from "../components/InstallBanner";
+import { useBreakpoint } from "../lib/useBreakpoint";
 import { useT } from "../lib/i18n";
 import type {
   SeriesSeason,
@@ -37,7 +42,6 @@ import {
   getFavoriteSeriesIds,
 } from "../lib/iracing-client";
 import { useTheme } from "../lib/theme";
-import CompareBar from "../components/Comparebar";
 
 function SkeletonCard() {
   const { theme } = useTheme();
@@ -167,6 +171,10 @@ export default function HomePage() {
   const [viewMode, setViewMode] = useState<"grid" | "calendar" | "schedule">(
     "grid",
   );
+  const [menuOpen, setMenuOpen] = useState(false);
+  const bp = useBreakpoint();
+  const isMobile = bp === "mobile";
+  const isTablet = bp === "tablet";
   const [activeSection, setActiveSection] = useState<
     "all" | "favorites" | "myContent"
   >("all");
@@ -212,7 +220,7 @@ export default function HomePage() {
 
   // Effective license for eligibility badge
   const effectiveLicense: number | null =
-    autoLicense !== undefined ? autoLicense : filters.myLicense;
+    autoLicense !== undefined ? autoLicense : (filters.myLicense ?? null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -363,7 +371,7 @@ export default function HomePage() {
           borderBottom: "1px solid var(--border)",
           display: "flex",
           alignItems: "center",
-          padding: "0 24px",
+          padding: "0 16px",
           gap: 0,
         }}
       >
@@ -375,7 +383,6 @@ export default function HomePage() {
             alignItems: "center",
             gap: 10,
             textDecoration: "none",
-            marginRight: 32,
             flexShrink: 0,
           }}
         >
@@ -392,201 +399,411 @@ export default function HomePage() {
               fontWeight: 900,
               fontSize: 13,
               color: "white",
-              letterSpacing: "-0.5px",
               boxShadow: "0 0 20px rgba(59,158,255,0.3)",
             }}
           >
             PB
           </div>
-          <span
-            style={{
-              fontFamily: "Syne, sans-serif",
-              fontWeight: 900,
-              fontSize: 20,
-              color: "var(--text-primary)",
-              letterSpacing: "-0.5px",
-            }}
-          >
-            PitBoard
-          </span>
+          {!isMobile && (
+            <span
+              style={{
+                fontFamily: "Syne, sans-serif",
+                fontWeight: 900,
+                fontSize: 20,
+                color: "var(--text-primary)",
+                letterSpacing: "-0.5px",
+              }}
+            >
+              PitBoard
+            </span>
+          )}
         </a>
 
-        {/* Divisor */}
-        <div
-          style={{
-            width: 1,
-            height: 28,
-            background: "var(--border)",
-            marginRight: 24,
-            flexShrink: 0,
-          }}
-        />
+        {/* Season selector — hidden on mobile (shown in menu) */}
+        {!isMobile && (
+          <>
+            <div
+              style={{
+                width: 1,
+                height: 28,
+                background: "var(--border)",
+                margin: "0 20px",
+                flexShrink: 0,
+              }}
+            />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                background: "var(--bg-card)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                padding: 4,
+              }}
+            >
+              {seasons.map((s) => {
+                const active =
+                  currentSeason?.season_year === s.season_year &&
+                  currentSeason?.season_quarter === s.season_quarter;
+                return (
+                  <button
+                    key={`${s.season_year}-${s.season_quarter}`}
+                    onClick={() => setCurrentSeason(s)}
+                    style={{
+                      padding: "6px 14px",
+                      borderRadius: 8,
+                      border: "none",
+                      cursor: "pointer",
+                      fontFamily: "Syne, sans-serif",
+                      fontWeight: 700,
+                      fontSize: 13,
+                      background: active
+                        ? "rgba(59,158,255,0.18)"
+                        : "transparent",
+                      color: active ? "#3B9EFF" : "#64748B",
+                      transition: "all 0.15s",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
 
-        {/* Season selector */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            background: "var(--bg-card)",
-            border: "1px solid var(--border)",
-            borderRadius: 12,
-            padding: 4,
-          }}
-        >
-          {seasons.map((s) => {
-            const active =
-              currentSeason?.season_year === s.season_year &&
-              currentSeason?.season_quarter === s.season_quarter;
-            return (
+        <div style={{ flex: 1 }} />
+
+        {/* Desktop nav */}
+        {!isMobile && !isTablet && (
+          <nav style={{ display: "flex", gap: 4, marginRight: 12 }}>
+            {(
+              [
+                {
+                  id: "favorites",
+                  label: t.favorites,
+                  icon: <Heart size={14} />,
+                },
+                {
+                  id: "myContent",
+                  label: t.myContent,
+                  icon: <LayoutGrid size={14} />,
+                },
+              ] as const
+            ).map((item) => {
+              const active = activeSection === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() =>
+                    setActiveSection(
+                      activeSection === item.id ? "all" : item.id,
+                    )
+                  }
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 7,
+                    padding: "8px 14px",
+                    borderRadius: 10,
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "Syne, sans-serif",
+                    fontWeight: 600,
+                    fontSize: 13,
+                    background: active
+                      ? "rgba(59,158,255,0.12)"
+                      : "transparent",
+                    color: active ? "#3B9EFF" : "#64748B",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {item.icon} {item.label}
+                </button>
+              );
+            })}
+          </nav>
+        )}
+
+        {/* Desktop: Ko-fi + toggles + login */}
+        {!isMobile && (
+          <>
+            {!isTablet && (
               <button
-                key={`${s.season_year}-${s.season_quarter}`}
-                onClick={() => setCurrentSeason(s)}
+                onClick={() => window.open("https://ko-fi.com", "_blank")}
                 style={{
-                  padding: "6px 14px",
-                  borderRadius: 8,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 7,
+                  padding: "8px 14px",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                  background: "var(--bg-card)",
+                  cursor: "pointer",
+                  fontFamily: "Syne, sans-serif",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  color: "var(--text-muted)",
+                  marginRight: 10,
+                  transition: "all 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "#FB923C";
+                  (e.currentTarget as HTMLElement).style.borderColor =
+                    "rgba(251,146,60,0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color =
+                    "var(--text-muted)";
+                  (e.currentTarget as HTMLElement).style.borderColor =
+                    "var(--border)";
+                }}
+              >
+                <Coffee size={14} /> {t.support}
+              </button>
+            )}
+            <LangToggle />
+            <div style={{ width: 6 }} />
+            <ThemeToggle />
+            <div style={{ width: 6 }} />
+            {user ? (
+              <DriverStats
+                user={user}
+                memberSince={(user as any).member_since}
+                onLogout={() => (window.location.href = "/api/auth/logout")}
+              />
+            ) : (
+              <button
+                onClick={() => setShowLogin(true)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 18px",
+                  borderRadius: 10,
                   border: "none",
                   cursor: "pointer",
                   fontFamily: "Syne, sans-serif",
                   fontWeight: 700,
                   fontSize: 13,
-                  background: active ? "rgba(59,158,255,0.18)" : "transparent",
-                  color: active ? "#3B9EFF" : "#64748B",
-                  transition: "all 0.15s",
-                  whiteSpace: "nowrap",
+                  background: "linear-gradient(135deg, #3B9EFF, #2563EB)",
+                  color: "white",
+                  boxShadow: "0 0 20px rgba(59,158,255,0.25)",
                 }}
               >
-                {s.label}
+                <User size={14} /> {t.connectIRacing}
               </button>
-            );
-          })}
-        </div>
+            )}
+          </>
+        )}
 
-        <div style={{ flex: 1 }} />
+        {/* Mobile: toggles + hamburger */}
+        {isMobile && (
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <ThemeToggle />
+            <button
+              onClick={() => setMenuOpen((o) => !o)}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                border: "1px solid var(--border)",
+                background: "var(--bg-card)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--text-muted)",
+              }}
+            >
+              {menuOpen ? <XIcon size={16} /> : <Menu size={16} />}
+            </button>
+          </div>
+        )}
+      </header>
 
-        {/* Nav — Favorites / My Content */}
-        <nav style={{ display: "flex", gap: 4, marginRight: 16 }}>
+      {/* Mobile menu drawer */}
+      {isMobile && menuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 64,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99,
+            background: "var(--bg-base)",
+            overflowY: "auto",
+            padding: "20px 16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+          }}
+        >
+          {/* Season selector */}
+          <div>
+            <p
+              style={{
+                fontFamily: "DM Mono, monospace",
+                fontSize: 10,
+                color: "var(--text-muted)",
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                margin: "0 0 8px",
+              }}
+            >
+              {t.season}
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {seasons.map((s) => {
+                const active =
+                  currentSeason?.season_year === s.season_year &&
+                  currentSeason?.season_quarter === s.season_quarter;
+                return (
+                  <button
+                    key={`${s.season_year}-${s.season_quarter}`}
+                    onClick={() => {
+                      setCurrentSeason(s);
+                      setMenuOpen(false);
+                    }}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: 10,
+                      border: `1px solid ${active ? "rgba(59,158,255,0.4)" : "var(--border)"}`,
+                      background: active
+                        ? "rgba(59,158,255,0.12)"
+                        : "var(--bg-card)",
+                      color: active ? "#3B9EFF" : "var(--text-muted)",
+                      fontFamily: "Syne, sans-serif",
+                      fontWeight: 700,
+                      fontSize: 14,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: "var(--border)" }} />
+
+          {/* Nav sections */}
           {(
             [
+              { id: "all", label: t.cards, icon: <LayoutGrid size={16} /> },
               {
                 id: "favorites",
                 label: t.favorites,
-                icon: <Heart size={14} />,
+                icon: <Heart size={16} />,
               },
               {
                 id: "myContent",
                 label: t.myContent,
-                icon: <LayoutGrid size={14} />,
+                icon: <LayoutGrid size={16} />,
               },
             ] as const
-          ).map((item) => {
-            const active = activeSection === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() =>
-                  setActiveSection(activeSection === item.id ? "all" : item.id)
-                }
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 7,
-                  padding: "8px 16px",
-                  borderRadius: 10,
-                  border: "none",
-                  cursor: "pointer",
-                  fontFamily: "Syne, sans-serif",
-                  fontWeight: 600,
-                  fontSize: 13,
-                  background: active ? "rgba(59,158,255,0.12)" : "transparent",
-                  color: active ? "#3B9EFF" : "#64748B",
-                  transition: "all 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                  if (!active)
-                    (e.currentTarget as HTMLElement).style.color = "#CBD5E1";
-                }}
-                onMouseLeave={(e) => {
-                  if (!active)
-                    (e.currentTarget as HTMLElement).style.color = "#64748B";
-                }}
-              >
-                {item.icon} {item.label}
-              </button>
-            );
-          })}
-        </nav>
+          ).map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setActiveSection(item.id === "all" ? "all" : (item.id as any));
+                setMenuOpen(false);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "14px 16px",
+                borderRadius: 12,
+                border: `1px solid ${activeSection === item.id ? "rgba(59,158,255,0.3)" : "var(--border)"}`,
+                background:
+                  activeSection === item.id
+                    ? "rgba(59,158,255,0.08)"
+                    : "var(--bg-card)",
+                color:
+                  activeSection === item.id ? "#3B9EFF" : "var(--text-primary)",
+                fontFamily: "Syne, sans-serif",
+                fontWeight: 600,
+                fontSize: 15,
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
+              {item.icon} {item.label}
+            </button>
+          ))}
 
-        {/* Ko-fi — sobrio, sin gradiente llamativo */}
-        <button
-          onClick={() => window.open("https://ko-fi.com", "_blank")}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            padding: "8px 14px",
-            borderRadius: 10,
-            border: "1px solid var(--border)",
-            background: "var(--bg-card)",
-            cursor: "pointer",
-            fontFamily: "Syne, sans-serif",
-            fontWeight: 600,
-            fontSize: 13,
-            color: "var(--text-muted)",
-            marginRight: 10,
-            transition: "all 0.15s",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.color = "#FB923C";
-            (e.currentTarget as HTMLElement).style.borderColor =
-              "rgba(251,146,60,0.3)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.color = "var(--text-muted)";
-            (e.currentTarget as HTMLElement).style.borderColor =
-              "var(--border)";
-          }}
-        >
-          <Coffee size={14} /> {t.support}
-        </button>
+          <div style={{ height: 1, background: "var(--border)" }} />
 
-        <LangToggle />
-        <div style={{ width: 6 }} />
-        <ThemeToggle />
-        <div style={{ width: 6 }} />
+          {/* Language toggle */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span
+              style={{
+                fontFamily: "DM Mono, monospace",
+                fontSize: 11,
+                color: "var(--text-muted)",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+              }}
+            >
+              Language
+            </span>
+            <LangToggle />
+          </div>
 
-        {/* Login / Username */}
-        {user ? (
-          <DriverStats
-            user={user}
-            memberSince={(user as any).member_since}
-            onLogout={() => (window.location.href = "/api/auth/logout")}
-          />
-        ) : (
-          <button
-            onClick={() => setShowLogin(true)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "8px 18px",
-              borderRadius: 10,
-              border: "none",
-              cursor: "pointer",
-              fontFamily: "Syne, sans-serif",
-              fontWeight: 700,
-              fontSize: 13,
-              background: "linear-gradient(135deg, #3B9EFF, #2563EB)",
-              color: "white",
-              boxShadow: "0 0 20px rgba(59,158,255,0.25)",
-              transition: "all 0.15s",
-            }}
-          >
-            <User size={14} />
-            {t.connectIRacing}
-          </button>
-        )}
-      </header>
+          {/* Login button */}
+          {user ? (
+            <button
+              onClick={() => (window.location.href = "/api/auth/logout")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "14px",
+                borderRadius: 12,
+                border: "1px solid rgba(239,68,68,0.3)",
+                background: "rgba(239,68,68,0.08)",
+                color: "#EF4444",
+                fontFamily: "Syne, sans-serif",
+                fontWeight: 700,
+                fontSize: 15,
+                cursor: "pointer",
+              }}
+            >
+              {t.logout}
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setShowLogin(true);
+                setMenuOpen(false);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "14px",
+                borderRadius: 12,
+                background: "linear-gradient(135deg, #3B9EFF, #2563EB)",
+                color: "white",
+                fontFamily: "Syne, sans-serif",
+                fontWeight: 700,
+                fontSize: 15,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <User size={16} /> {t.connectIRacing}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* ── DEMO BANNER ─────────────────────────────────────── */}
       {!user && (
@@ -641,27 +858,32 @@ export default function HomePage() {
       <main
         style={{
           flex: 1,
-          padding: "28px 24px 48px",
+          padding: isMobile ? "16px 12px 48px" : "28px 24px 48px",
           maxWidth: 1680,
           margin: "0 auto",
           width: "100%",
           paddingBottom:
-            comparingSeries.length > 0 ? "calc(48px + 60vh)" : "48px",
+            comparingSeries.length > 0
+              ? "calc(48px + 60vh)"
+              : isMobile
+                ? "80px"
+                : "48px",
         }}
       >
         {/* Título de temporada + toggle de vista */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            gap: 14,
+            alignItems: isMobile ? "flex-start" : "center",
+            flexDirection: isMobile ? "column" : "row",
+            gap: isMobile ? 10 : 14,
             marginBottom: 24,
           }}
         >
           <h1
             style={{
               fontFamily: "Syne, sans-serif",
-              fontSize: 26,
+              fontSize: isMobile ? 20 : 26,
               fontWeight: 900,
               color: "var(--text-primary)",
               letterSpacing: "-0.5px",
@@ -736,8 +958,8 @@ export default function HomePage() {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 6,
-                  padding: "6px 12px",
+                  gap: isMobile ? 0 : 6,
+                  padding: isMobile ? "6px 10px" : "6px 12px",
                   borderRadius: 8,
                   border: "none",
                   cursor: "pointer",
@@ -756,7 +978,8 @@ export default function HomePage() {
                   position: "relative",
                 }}
               >
-                {v.icon} {v.label}
+                {v.icon}
+                {!isMobile && v.label}
                 {"badge" in v && v.badge ? (
                   <span
                     style={{
@@ -801,8 +1024,10 @@ export default function HomePage() {
           <div
             style={{
               display: "grid",
-              gap: 16,
-              gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+              gap: isMobile ? 12 : 16,
+              gridTemplateColumns: isMobile
+                ? "1fr"
+                : "repeat(auto-fill, minmax(400px, 1fr))",
             }}
           >
             {loading ? (
@@ -1167,6 +1392,8 @@ export default function HomePage() {
         }
         onClear={() => setComparingSeries([])}
       />
+
+      <InstallBanner />
 
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap");

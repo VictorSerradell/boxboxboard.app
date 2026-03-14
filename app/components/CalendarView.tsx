@@ -2,6 +2,7 @@
 // /app/components/CalendarView.tsx
 // Vista de calendario global — filas = semanas, columnas = series
 import { useT } from "../lib/i18n";
+import { useIsMobile } from "../lib/useBreakpoint";
 
 import { useState } from "react";
 import { Flag } from "lucide-react";
@@ -33,6 +34,7 @@ interface Props {
 export default function CalendarView({ series, onSeriesClick }: Props) {
   const { theme } = useTheme();
   const { t } = useT();
+  const isMobile = useIsMobile();
   const isDark = theme === "dark";
   const [hoveredCol, setHoveredCol] = useState<number | null>(null);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
@@ -182,7 +184,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
         style={{
           overflowX: "auto",
           overflowY: "auto",
-          maxHeight: "calc(100vh - 260px)",
+          maxHeight: isMobile ? "calc(100vh - 200px)" : "calc(100vh - 260px)",
           borderRadius: 14,
           border: `1px solid ${T.borderStrong}`,
           background: T.tableBg,
@@ -193,14 +195,14 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
             borderCollapse: "collapse",
             width: "100%",
             tableLayout: "fixed",
-            minWidth: filtered.length * 180 + 60,
+            minWidth: filtered.length * (isMobile ? 120 : 180) + 60,
           }}
         >
           {/* Column widths */}
           <colgroup>
-            <col style={{ width: 56 }} />
+            <col style={{ width: isMobile ? 40 : 56 }} />
             {filtered.map((s) => (
-              <col key={s.series_id} style={{ width: 180 }} />
+              <col key={s.series_id} style={{ width: isMobile ? 120 : 180 }} />
             ))}
           </colgroup>
 
@@ -454,7 +456,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                             <div style={{ minWidth: 0 }}>
                               <div
                                 style={{
-                                  fontSize: 12,
+                                  fontSize: isMobile ? 10 : 12,
                                   fontWeight: isActiveWeek ? 700 : 500,
                                   color: isActiveWeek ? T.text : T.trackName,
                                   whiteSpace: "nowrap",
@@ -467,7 +469,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                               {week.track.config_name && (
                                 <div
                                   style={{
-                                    fontSize: 10,
+                                    fontSize: isMobile ? 9 : 10,
                                     color: T.configName,
                                     marginTop: 1,
                                     whiteSpace: "nowrap",

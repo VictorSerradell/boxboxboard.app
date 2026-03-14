@@ -122,6 +122,12 @@ export interface Translations {
   exportIcal: string;
   exportedIcal: string;
   exportGcal: string;
+  loginRedirect: string;
+  loginBenefit1: string;
+  loginBenefit2: string;
+  loginBenefit3: string;
+  loginCta: string;
+  loginFinePrint: string;
 }
 
 // ── Translations ──────────────────────────────────────────────
@@ -289,6 +295,14 @@ const translations: Record<Lang, Translations> = {
     exportIcal: "Export .ics",
     exportedIcal: "Downloaded!",
     exportGcal: "Google Calendar",
+    loginRedirect:
+      "You'll be redirected to iRacing's official login page. PitBoard never sees your password.",
+    loginBenefit1: "Real season schedules & track rotations",
+    loginBenefit2: "See which cars & tracks you own",
+    loginBenefit3: "Sync favorites across devices",
+    loginCta: "Continue with iRacing",
+    loginFinePrint:
+      "You'll be taken to oauth.iracing.com to sign in securely. PitBoard only requests read-only access.",
     // Stats bar
     seriesPerSeason: "Series per season",
     activeDrivers: "Active drivers",
@@ -487,6 +501,14 @@ const translations: Record<Lang, Translations> = {
     exportIcal: "Exportar .ics",
     exportedIcal: "¡Descargado!",
     exportGcal: "Google Calendar",
+    loginRedirect:
+      "Serás redirigido a la página oficial de iRacing. PitBoard nunca ve tu contraseña.",
+    loginBenefit1: "Calendarios y rotaciones de circuitos en tiempo real",
+    loginBenefit2: "Ver qué coches y circuitos ya tienes",
+    loginBenefit3: "Sincronizar favoritos entre dispositivos",
+    loginCta: "Continuar con iRacing",
+    loginFinePrint:
+      "Serás llevado a oauth.iracing.com para iniciar sesión de forma segura. PitBoard solo solicita acceso de lectura.",
     // Stats bar
     seriesPerSeason: "Series por temporada",
     activeDrivers: "Pilotos activos",

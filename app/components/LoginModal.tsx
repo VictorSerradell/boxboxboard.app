@@ -1,92 +1,228 @@
 "use client";
 // /app/components/LoginModal.tsx
-// Authorization Code flow — el usuario es redirigido a iRacing
-// para autenticarse en su pantalla oficial, sin exponer credenciales.
 
 import { X, ShieldCheck, ExternalLink } from "lucide-react";
+import { useTheme } from "../lib/theme";
+import { useT } from "../lib/i18n";
 
 interface LoginModalProps {
   onClose: () => void;
 }
 
 export default function LoginModal({ onClose }: LoginModalProps) {
+  const { theme } = useTheme();
+  const { t } = useT();
+  const isDark = theme === "dark";
+
   function handleConnect() {
-    // Redirige al endpoint que genera PKCE y lanza el flujo OAuth2
     window.location.href = "/api/auth/login";
   }
 
+  const bg = isDark ? "#0D1117" : "#FFFFFF";
+  const border = isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)";
+  const itemBg = isDark ? "#111520" : "#F8FAFC";
+  const itemBorder = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)";
+  const text = isDark ? "rgba(255,255,255,0.85)" : "#1E293B";
+  const muted = isDark ? "#64748B" : "#94A3B8";
+  const faint = isDark ? "#334155" : "#CBD5E1";
+
   return (
     <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-lg z-[200] flex items-center justify-center"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 200,
+        background: "rgba(0,0,0,0.7)",
+        backdropFilter: "blur(12px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "16px",
+      }}
     >
-      <div className="bg-[#0D1117] border border-white/10 rounded-2xl p-8 w-[400px] max-w-[calc(100vw-2rem)] relative animate-in">
+      <div
+        style={{
+          background: bg,
+          border: `1px solid ${border}`,
+          borderRadius: 20,
+          padding: "32px",
+          width: 400,
+          maxWidth: "100%",
+          position: "relative",
+          animation: "modalIn 0.25s ease",
+        }}
+      >
+        {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-7 h-7 bg-[#111520] border border-white/06 rounded-lg text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+          style={{
+            position: "absolute",
+            top: 14,
+            right: 14,
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            background: itemBg,
+            border: `1px solid ${itemBorder}`,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: muted,
+          }}
         >
           <X size={12} strokeWidth={2.5} />
         </button>
 
         {/* Icon */}
-        <div className="flex justify-center mb-5">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center">
-            <ShieldCheck
-              size={32}
-              className="text-cyan-400"
-              strokeWidth={1.5}
-            />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 20,
+          }}
+        >
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 18,
+              background:
+                "linear-gradient(135deg, rgba(34,211,238,0.15), rgba(168,85,247,0.15))",
+              border: `1px solid ${border}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ShieldCheck size={30} color="#22D3EE" strokeWidth={1.5} />
           </div>
         </div>
 
+        {/* Title */}
         <h2
-          className="font-black text-xl tracking-tight text-center mb-2"
-          style={{ fontFamily: "Syne, sans-serif" }}
+          style={{
+            fontFamily: "Syne, sans-serif",
+            fontWeight: 900,
+            fontSize: 20,
+            color: "var(--text-primary)",
+            textAlign: "center",
+            margin: "0 0 8px",
+            letterSpacing: "-0.4px",
+          }}
         >
-          Connect iRacing
+          {t.connectIRacing}
         </h2>
 
-        <p className="text-xs text-slate-400 text-center mb-6 leading-relaxed">
-          You'll be redirected to iRacing's official login page. PitBoard never
-          sees your password.
+        {/* Subtitle */}
+        <p
+          style={{
+            fontSize: 12,
+            color: muted,
+            textAlign: "center",
+            margin: "0 0 20px",
+            lineHeight: 1.6,
+          }}
+        >
+          {t.loginRedirect}
         </p>
 
-        {/* What you get */}
-        <div className="bg-[#111520] border border-white/06 rounded-xl p-4 mb-6 space-y-2.5">
-          {[
-            "Real season schedules & track rotations",
-            "See which cars & tracks you own",
-            "Sync favorites across devices",
-          ].map((item) => (
-            <div
-              key={item}
-              className="flex items-center gap-2.5 text-xs text-slate-300"
-            >
-              <span className="w-4 h-4 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 flex items-center justify-center flex-shrink-0 text-[10px]">
-                ✓
-              </span>
-              {item}
-            </div>
-          ))}
+        {/* Benefits */}
+        <div
+          style={{
+            background: itemBg,
+            border: `1px solid ${itemBorder}`,
+            borderRadius: 12,
+            padding: "14px 16px",
+            marginBottom: 20,
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+          }}
+        >
+          {[t.loginBenefit1, t.loginBenefit2, t.loginBenefit3].map(
+            (item, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  fontSize: 13,
+                  color: text,
+                }}
+              >
+                <span
+                  style={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: "50%",
+                    background: "rgba(34,211,238,0.1)",
+                    border: "1px solid rgba(34,211,238,0.2)",
+                    color: "#22D3EE",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    flexShrink: 0,
+                  }}
+                >
+                  ✓
+                </span>
+                {item}
+              </div>
+            ),
+          )}
         </div>
 
+        {/* CTA */}
         <button
           onClick={handleConnect}
-          className="w-full py-3 bg-gradient-to-r from-cyan-600 to-cyan-400 rounded-xl text-black font-black text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-          style={{ fontFamily: "Syne, sans-serif" }}
+          style={{
+            width: "100%",
+            padding: "13px",
+            background: "linear-gradient(135deg, #06B6D4, #22D3EE)",
+            border: "none",
+            borderRadius: 12,
+            cursor: "pointer",
+            fontFamily: "Syne, sans-serif",
+            fontWeight: 900,
+            fontSize: 14,
+            color: "#0A1221",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+          }}
         >
-          Continue with iRacing
+          {t.loginCta}
           <ExternalLink size={14} strokeWidth={2.5} />
         </button>
 
-        <p className="text-[11px] text-slate-600 text-center mt-4 leading-relaxed">
-          You'll be taken to oauth.iracing.com to sign in securely.
-          <br />
-          PitBoard only requests read-only access.
+        {/* Fine print */}
+        <p
+          style={{
+            fontSize: 11,
+            color: faint,
+            textAlign: "center",
+            margin: "14px 0 0",
+            lineHeight: 1.6,
+          }}
+        >
+          {t.loginFinePrint}
         </p>
       </div>
+
+      <style>{`
+        @keyframes modalIn {
+          from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
     </div>
   );
 }

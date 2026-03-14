@@ -11,6 +11,7 @@ import {
   Wrench,
   Flag,
   Trophy,
+  GitCompare,
 } from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
 import { toggleFavoriteSeries } from "../lib/iracing-client";
@@ -20,8 +21,10 @@ import { useTheme } from "../lib/theme";
 interface SeriesCardProps {
   series: SeriesSeason;
   isFavorite: boolean;
+  isComparing?: boolean;
   onFavoriteToggle: (seriesId: number, newFavs: number[]) => void;
   onClick?: () => void;
+  onCompare?: () => void;
 }
 
 const CATEGORY_STYLE: Record<
@@ -81,8 +84,10 @@ function getSessionDuration(series: SeriesSeason): string {
 export default function SeriesCard({
   series,
   isFavorite,
+  isComparing,
   onFavoriteToggle,
   onClick,
+  onCompare,
 }: SeriesCardProps) {
   const [localFav, setLocalFav] = useState(isFavorite);
   const [favAnimating, setFavAnimating] = useState(false);
@@ -272,6 +277,32 @@ export default function SeriesCard({
                 <Lock size={13} strokeWidth={2} />
               )}
             </div>
+            {onCompare && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCompare();
+                }}
+                title={isComparing ? "Remove from compare" : "Add to compare"}
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: isComparing
+                    ? "rgba(59,158,255,0.2)"
+                    : T.iconBtnBg,
+                  border: `1px solid ${isComparing ? "rgba(59,158,255,0.5)" : T.iconBtnBorder}`,
+                  color: isComparing ? "#3B9EFF" : T.iconBtnColor,
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <GitCompare size={13} strokeWidth={2} />
+              </button>
+            )}
             <button
               onClick={handleFavClick}
               style={{

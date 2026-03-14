@@ -29,6 +29,7 @@ import {
   getFavoriteSeriesIds,
 } from "../lib/iracing-client";
 import { useTheme } from "../lib/theme";
+import CompareBar from "../components/Comparebar";
 
 function SkeletonCard() {
   const { theme } = useTheme();
@@ -147,6 +148,7 @@ export default function HomePage() {
   const [selectedSeries, setSelectedSeries] = useState<SeriesSeason | null>(
     null,
   );
+  const [comparingSeries, setComparingSeries] = useState<SeriesSeason[]>([]);
   const [activeSection, setActiveSection] = useState<
     "all" | "favorites" | "myContent"
   >("all");
@@ -219,6 +221,15 @@ export default function HomePage() {
     const url = new URL(window.location.href);
     url.searchParams.delete("series");
     window.history.replaceState({}, "", url.toString());
+  }
+
+  function toggleCompare(s: SeriesSeason) {
+    setComparingSeries((prev) => {
+      const exists = prev.find((x) => x.series_id === s.series_id);
+      if (exists) return prev.filter((x) => x.series_id !== s.series_id);
+      if (prev.length >= 3) return prev; // max 3
+      return [...prev, s];
+    });
   }
 
   useEffect(() => {
@@ -578,6 +589,8 @@ export default function HomePage() {
           maxWidth: 1680,
           margin: "0 auto",
           width: "100%",
+          paddingBottom:
+            comparingSeries.length > 0 ? "calc(48px + 60vh)" : "48px",
         }}
       >
         {/* Título de temporada */}
@@ -728,8 +741,12 @@ export default function HomePage() {
                 key={s.season_id}
                 series={s}
                 isFavorite={favorites.includes(s.series_id)}
+                isComparing={comparingSeries.some(
+                  (x) => x.series_id === s.series_id,
+                )}
                 onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
                 onClick={() => openSeries(s)}
+                onCompare={() => toggleCompare(s)}
               />
             ))
           )}
@@ -976,6 +993,14 @@ export default function HomePage() {
         }
         onClose={() => closeSeries()}
         onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
+      />
+
+      <CompareBar
+        series={comparingSeries}
+        onRemove={(id) =>
+          setComparingSeries((prev) => prev.filter((x) => x.series_id !== id))
+        }
+        onClear={() => setComparingSeries([])}
       />
 
       <style jsx global>{`

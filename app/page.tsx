@@ -367,7 +367,7 @@ export default function LandingPage() {
           borderBottom: `1px solid ${T.border}`,
           display: "flex",
           alignItems: "center",
-          padding: "0 32px",
+          padding: "0 16px",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -401,7 +401,7 @@ export default function LandingPage() {
           </span>
         </div>
         <div style={{ flex: 1 }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <LangToggle />
           <ThemeToggle />
           <a
@@ -412,7 +412,7 @@ export default function LandingPage() {
               display: "flex",
               alignItems: "center",
               gap: 7,
-              padding: "7px 14px",
+              padding: "7px 12px",
               borderRadius: 8,
               border: `1px solid ${T.githubBtnBorder}`,
               background: T.githubBtn,
@@ -421,7 +421,9 @@ export default function LandingPage() {
               fontSize: 13,
               fontFamily: "Syne, sans-serif",
               fontWeight: 600,
+              whiteSpace: "nowrap",
             }}
+            className="hide-mobile"
           >
             <Github size={14} /> GitHub
           </a>
@@ -431,7 +433,7 @@ export default function LandingPage() {
               display: "flex",
               alignItems: "center",
               gap: 7,
-              padding: "8px 18px",
+              padding: "8px 16px",
               borderRadius: 8,
               background: "linear-gradient(135deg, #3B9EFF, #2563EB)",
               color: "white",
@@ -440,12 +442,19 @@ export default function LandingPage() {
               fontWeight: 700,
               fontSize: 13,
               boxShadow: "0 0 20px rgba(59,158,255,0.2)",
+              whiteSpace: "nowrap",
             }}
           >
             {t.openApp} <ArrowRight size={14} />
           </a>
         </div>
       </nav>
+
+      <style>{`
+        @media (max-width: 480px) {
+          .hide-mobile { display: none !important; }
+        }
+      `}</style>
 
       {/* ── HERO ────────────────────────────────────────────── */}
       <section
@@ -455,7 +464,7 @@ export default function LandingPage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "120px 32px 80px",
+          padding: "100px 20px 60px",
           position: "relative",
           textAlign: "center",
         }}
@@ -547,8 +556,7 @@ export default function LandingPage() {
             transition: "opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s",
           }}
         >
-          Browse every series, track rotation and schedule for the current{" "}
-          {t.heroTitle2}. Filter by license, category, and owned content.
+          {t.heroSubtitle}
         </p>
 
         {/* CTAs */}
@@ -608,14 +616,17 @@ export default function LandingPage() {
         {/* Preview cards */}
         <div
           style={{
-            marginTop: 68,
+            marginTop: 56,
             display: "flex",
-            gap: 12,
-            justifyContent: "center",
-            flexWrap: "wrap",
-            maxWidth: 1050,
+            gap: 10,
+            justifyContent: "flex-start",
+            flexWrap: "nowrap",
+            maxWidth: "100vw",
+            overflowX: "auto",
+            paddingBottom: 8,
             opacity: heroVisible ? 1 : 0,
             transition: "opacity 0.6s ease 0.5s",
+            scrollbarWidth: "none",
           }}
         >
           {DEMO_SERIES.map((s, i) => (
@@ -643,10 +654,10 @@ export default function LandingPage() {
         }}
       >
         {[
-          { label: "{t.seriesPerSeason}", value: 80, suffix: "+" },
-          { label: "{t.activeDrivers}", value: 80000, suffix: "+" },
-          { label: "{t.trackConfigs}", value: 120, suffix: "+" },
-          { label: "{t.seasonsTracked}", value: 4, suffix: "" },
+          { label: t.seriesPerSeason, value: 80, suffix: "+" },
+          { label: t.activeDrivers, value: 80000, suffix: "+" },
+          { label: t.trackConfigs, value: 120, suffix: "+" },
+          { label: t.seasonsTracked, value: 4, suffix: "" },
         ].map((stat, i) => (
           <div
             key={i}

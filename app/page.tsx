@@ -20,6 +20,8 @@ import {
   ChevronUp,
 } from "lucide-react";
 import ThemeToggle from "./components/ThemeToggle";
+import LangToggle from "./components/LangToggle";
+import { useT } from "./lib/i18n";
 import { useTheme } from "./lib/theme";
 
 const ACCENT = "#3B9EFF";
@@ -71,85 +73,14 @@ const DEMO_SERIES = [
   { name: "IndyCar Series", cat: "Oval", lic: "A", weeks: 8, duration: "45m" },
 ];
 
-const FEATURES = [
-  {
-    icon: <Calendar size={20} />,
-    title: "Full Season Calendar",
-    desc: "Browse every series, every week. Track rotations visualized clearly so you can plan ahead.",
-  },
-  {
-    icon: <Car size={20} />,
-    title: "Owned Content",
-    desc: "Connect your iRacing account to see exactly which cars and tracks you already own.",
-  },
-  {
-    icon: <BarChart2 size={20} />,
-    title: "Series Stats",
-    desc: "Average SOF, typical driver counts and split info so you know what level of competition to expect.",
-  },
-  {
-    icon: <Shield size={20} />,
-    title: "License Filtering",
-    desc: "Filter by your license class to only see series you're eligible for right now.",
-  },
-  {
-    icon: <Flag size={20} />,
-    title: "Track Details",
-    desc: "Every circuit for every week at a glance — including config name and start dates.",
-  },
-  {
-    icon: <Users size={20} />,
-    title: "Team Racing",
-    desc: "Quickly identify team driving series and multi-class events for endurance planning.",
-  },
-];
-
-const HOW_IT_WORKS = [
-  {
-    step: "01",
-    icon: <Eye size={24} />,
-    title: "Browse without an account",
-    desc: "Open PitBoard and immediately see every iRacing series for the current season. No login needed to explore.",
-  },
-  {
-    step: "02",
-    icon: <Filter size={24} />,
-    title: "Filter to your situation",
-    desc: "Use the filter bar to narrow down by license class, category, fixed/open setup, or just search by name.",
-  },
-  {
-    step: "03",
-    icon: <LogIn size={24} />,
-    title: "Connect iRacing (optional)",
-    desc: "Link your iRacing account to see which cars and tracks you already own highlighted across every series.",
-  },
-];
-
-const FAQ = [
-  {
-    q: "Is PitBoard free?",
-    a: "Yes, completely free. PitBoard is an open source project with no ads, no subscriptions, and no paywalls.",
-  },
-  {
-    q: "Do I need an iRacing account to use it?",
-    a: "No. You can browse all series, track rotations and schedules without logging in. Connecting your account is optional and only adds owned-content highlighting.",
-  },
-  {
-    q: "Is my iRacing password safe?",
-    a: "PitBoard uses the official iRacing OAuth2 authorization flow. Your credentials go directly to iRacing — PitBoard never sees your password.",
-  },
-  {
-    q: "How often is the data updated?",
-    a: "Series and schedule data comes directly from the iRacing API and reflects the current season in real time.",
-  },
-  {
-    q: "Which iRacing season is shown?",
-    a: "The current active season is shown by default. You can switch between seasons using the selector at the top of the app.",
-  },
-  {
-    q: "Can I share a specific series with someone?",
-    a: "Yes. When you open a series detail panel, the URL updates automatically. Just copy and send the link — the panel will open directly for them.",
-  },
+// Iconos en orden fijo — los textos vienen de t.features
+const FEATURE_ICONS = [
+  <Calendar size={20} />,
+  <Car size={20} />,
+  <BarChart2 size={20} />,
+  <Shield size={20} />,
+  <Flag size={20} />,
+  <Users size={20} />,
 ];
 
 // ── Hook: scroll-triggered visibility ────────────────────────
@@ -386,6 +317,7 @@ export default function LandingPage() {
   const [heroVisible, setHeroVisible] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { t } = useT();
 
   useEffect(() => {
     setTimeout(() => setHeroVisible(true), 80);
@@ -470,6 +402,7 @@ export default function LandingPage() {
         </div>
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <LangToggle />
           <ThemeToggle />
           <a
             href="https://github.com/VictorSerradell/simplan.app"
@@ -509,7 +442,7 @@ export default function LandingPage() {
               boxShadow: "0 0 20px rgba(59,158,255,0.2)",
             }}
           >
-            Open App <ArrowRight size={14} />
+            {t.openApp} <ArrowRight size={14} />
           </a>
         </div>
       </nav>
@@ -569,7 +502,7 @@ export default function LandingPage() {
               letterSpacing: "0.06em",
             }}
           >
-            Free & open source
+            {t.freeOpenSource}
           </span>
         </div>
 
@@ -589,7 +522,7 @@ export default function LandingPage() {
             transition: "opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s",
           }}
         >
-          Plan your
+          {t.heroTitle1}
           <br />
           <span
             style={{
@@ -598,7 +531,7 @@ export default function LandingPage() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            iRacing season
+            {t.heroTitle2}
           </span>
         </h1>
 
@@ -614,8 +547,8 @@ export default function LandingPage() {
             transition: "opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s",
           }}
         >
-          Browse every series, track rotation and schedule for the current
-          iRacing season. Filter by license, category, and owned content.
+          Browse every series, track rotation and schedule for the current{" "}
+          {t.heroTitle2}. Filter by license, category, and owned content.
         </p>
 
         {/* CTAs */}
@@ -647,7 +580,7 @@ export default function LandingPage() {
               boxShadow: "0 0 40px rgba(59,158,255,0.28)",
             }}
           >
-            Open PitBoard <ArrowRight size={16} />
+            {t.openPitBoard} <ArrowRight size={16} />
           </a>
           <a
             href="https://github.com/VictorSerradell/simplan.app"
@@ -668,7 +601,7 @@ export default function LandingPage() {
               fontSize: 16,
             }}
           >
-            <Github size={16} /> View on GitHub
+            <Github size={16} /> {t.viewOnGithub}
           </a>
         </div>
 
@@ -710,10 +643,10 @@ export default function LandingPage() {
         }}
       >
         {[
-          { label: "Series per season", value: 80, suffix: "+" },
-          { label: "Active drivers", value: 80000, suffix: "+" },
-          { label: "Track configs", value: 120, suffix: "+" },
-          { label: "Seasons tracked", value: 4, suffix: "" },
+          { label: "{t.seriesPerSeason}", value: 80, suffix: "+" },
+          { label: "{t.activeDrivers}", value: 80000, suffix: "+" },
+          { label: "{t.trackConfigs}", value: 120, suffix: "+" },
+          { label: "{t.seasonsTracked}", value: 4, suffix: "" },
         ].map((stat, i) => (
           <div
             key={i}
@@ -776,7 +709,7 @@ export default function LandingPage() {
               transition: "opacity 0.6s ease, transform 0.6s ease",
             }}
           >
-            How it works
+            {t.howItWorksTitle}
           </h2>
           <p
             style={{
@@ -788,7 +721,7 @@ export default function LandingPage() {
               transition: "opacity 0.6s ease 0.1s",
             }}
           >
-            Up and running in seconds. No setup required.
+            {t.howItWorksSubtitle}
           </p>
         </div>
 
@@ -799,7 +732,26 @@ export default function LandingPage() {
             gap: 24,
           }}
         >
-          {HOW_IT_WORKS.map((step, i) => (
+          {[
+            {
+              step: "01",
+              icon: <Eye size={24} />,
+              title: t.step1Title,
+              desc: t.step1Desc,
+            },
+            {
+              step: "02",
+              icon: <Filter size={24} />,
+              title: t.step2Title,
+              desc: t.step2Desc,
+            },
+            {
+              step: "03",
+              icon: <LogIn size={24} />,
+              title: t.step3Title,
+              desc: t.step3Desc,
+            },
+          ].map((step, i) => (
             <div
               key={i}
               style={{
@@ -893,7 +845,7 @@ export default function LandingPage() {
               transition: "opacity 0.6s ease, transform 0.6s ease",
             }}
           >
-            Everything you need to plan
+            {t.everythingTitle}
           </h2>
           <p
             style={{
@@ -905,8 +857,7 @@ export default function LandingPage() {
               transition: "opacity 0.6s ease 0.1s",
             }}
           >
-            No more digging through PDFs or the iRacing member site. PitBoard
-            puts it all in one place.
+            {t.everythingSubtitle}
           </p>
         </div>
         <div
@@ -916,7 +867,7 @@ export default function LandingPage() {
             gap: 14,
           }}
         >
-          {FEATURES.map((f, i) => (
+          {t.features.map((f, i) => (
             <div
               key={i}
               style={{
@@ -959,7 +910,7 @@ export default function LandingPage() {
                   color: ACCENT,
                 }}
               >
-                {f.icon}
+                {FEATURE_ICONS[i]}
               </div>
               <h3
                 style={{
@@ -1006,11 +957,11 @@ export default function LandingPage() {
               transition: "opacity 0.6s ease, transform 0.6s ease",
             }}
           >
-            Frequently asked questions
+            {t.faqTitle}
           </h2>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {FAQ.map((item, i) => (
+          {t.faq.map((item, i) => (
             <div
               key={i}
               style={{
@@ -1053,7 +1004,7 @@ export default function LandingPage() {
             transition: "opacity 0.6s ease, transform 0.6s ease",
           }}
         >
-          Ready to race smarter?
+          {t.readyTitle}
         </h2>
         <p
           style={{
@@ -1065,8 +1016,7 @@ export default function LandingPage() {
             transition: "opacity 0.6s ease 0.1s",
           }}
         >
-          Free to use. No account required to browse. Connect iRacing for the
-          full experience.
+          {t.readyCta}
         </p>
         <a
           href="/app"
@@ -1088,7 +1038,7 @@ export default function LandingPage() {
             transition: "opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s",
           }}
         >
-          Open PitBoard <ArrowRight size={16} />
+          {t.openPitBoard} <ArrowRight size={16} />
         </a>
       </section>
 
@@ -1106,7 +1056,7 @@ export default function LandingPage() {
         }}
       >
         <span style={{ fontSize: 12, color: T.textMuted }}>
-          PitBoard · Not affiliated with iRacing.com Motorsport Simulations
+          {t.notAffiliated}
         </span>
         <div style={{ display: "flex", gap: 16 }}>
           <a

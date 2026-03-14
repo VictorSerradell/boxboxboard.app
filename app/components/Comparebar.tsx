@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "../lib/i18n";
 // /app/components/CompareBar.tsx
 // Panel inferior fijo para comparar hasta 3 series en paralelo
 
@@ -34,6 +35,7 @@ interface Props {
 export default function CompareBar({ series, onRemove, onClear }: Props) {
   const [expanded, setExpanded] = useState(true);
   const { theme } = useTheme();
+  const { t } = useT();
   const isDark = theme === "dark";
 
   if (series.length === 0) return null;

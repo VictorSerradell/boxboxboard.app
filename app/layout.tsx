@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "./lib/theme";
+import { I18nProvider } from "./lib/i18n";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://pitboard.app";
 
@@ -83,7 +84,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <I18nProvider>{children}</I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

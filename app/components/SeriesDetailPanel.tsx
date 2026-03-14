@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "../lib/i18n";
 // /app/components/SeriesDetailPanel.tsx
 
 import { useEffect, useState } from "react";
@@ -118,6 +119,7 @@ export default function SeriesDetailPanel({
   const [copied, setCopied] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { t } = useT();
 
   useEffect(() => setLocalFav(isFavorite), [isFavorite]);
   useEffect(() => {
@@ -461,7 +463,7 @@ export default function SeriesDetailPanel({
               {/* Copiar link */}
               <button
                 onClick={copyLink}
-                title="Copy share link"
+                title={t.copyLink}
                 style={{
                   width: 36,
                   height: 36,
@@ -506,7 +508,7 @@ export default function SeriesDetailPanel({
               </button>
               {/* Owned */}
               <div
-                title={series.isOwned ? "Content owned" : "Missing content"}
+                title={series.isOwned ? t.contentOwned : t.missingContent}
                 style={{
                   width: 36,
                   height: 36,
@@ -547,28 +549,28 @@ export default function SeriesDetailPanel({
                 size={10}
                 style={{ display: "inline", marginRight: 5 }}
               />
-              Stats
+              {t.stats}
             </SectionTitle>
             <div style={{ display: "flex", gap: 8 }}>
               <StatBox
                 icon={<Zap size={11} />}
-                label="Avg SOF"
+                label="t.avgSof"
                 value={stats.avg_sof.toLocaleString()}
                 accent={accent}
               />
               <StatBox
                 icon={<Users size={11} />}
-                label="Avg Drivers"
+                label="t.avgDrivers"
                 value={String(stats.avg_drivers)}
               />
               <StatBox
                 icon={<BarChart2 size={11} />}
-                label="Splits"
+                label="t.splits"
                 value={String(stats.splits)}
               />
               <StatBox
                 icon={<Clock size={11} />}
-                label="Race Time"
+                label="t.raceTime"
                 value={duration}
               />
             </div>
@@ -578,7 +580,7 @@ export default function SeriesDetailPanel({
           <section>
             <SectionTitle>
               <Car size={10} style={{ display: "inline", marginRight: 5 }} />
-              Allowed Cars
+              {t.allowedCars}
             </SectionTitle>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {cars.map((car, i) => (
@@ -654,7 +656,7 @@ export default function SeriesDetailPanel({
           <section>
             <SectionTitle>
               <Clock size={10} style={{ display: "inline", marginRight: 5 }} />
-              Race Schedule
+              {t.raceSchedule}
             </SectionTitle>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {times.map((t, i) => (
@@ -702,7 +704,7 @@ export default function SeriesDetailPanel({
                 size={10}
                 style={{ display: "inline", marginRight: 5 }}
               />
-              Full Track Calendar
+              {t.fullCalendar}
             </SectionTitle>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {series.schedules.map((week, i) => {
@@ -821,7 +823,7 @@ export default function SeriesDetailPanel({
 
           {/* Series Info */}
           <section>
-            <SectionTitle>Series Info</SectionTitle>
+            <SectionTitle>{t.seriesInfo}</SectionTitle>
             <div
               style={{
                 display: "grid",
@@ -831,20 +833,20 @@ export default function SeriesDetailPanel({
             >
               {[
                 {
-                  label: "Season",
+                  label: t.seasonLabel,
                   value: `S${series.season_quarter} ${series.season_year}`,
                 },
                 {
-                  label: "Min License",
+                  label: t.minLicense,
                   value: series.allowed_licenses?.[0]?.group_name ?? "—",
                 },
                 {
-                  label: "Team Driving",
-                  value: series.driver_changes ? "Yes" : "No",
+                  label: t.teamDriving,
+                  value: series.driver_changes ? t.yes : t.no,
                 },
                 {
-                  label: "Multiclass",
-                  value: series.multiclass ? "Yes" : "No",
+                  label: t.multiclass,
+                  value: series.multiclass ? t.yes : t.no,
                 },
               ].map((item) => (
                 <div

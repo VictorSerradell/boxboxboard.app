@@ -19,8 +19,10 @@ import FiltersBar from "../components/FiltersBar";
 import LoginModal from "../components/LoginModal";
 import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
+import LangToggle from "../components/LangToggle";
 import CalendarView from "../components/CalendarView";
 import ScheduleView from "../components/ScheduleView";
+import { useT } from "../lib/i18n";
 import type {
   SeriesSeason,
   FilterState,
@@ -177,6 +179,7 @@ export default function HomePage() {
 
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { t } = useT();
   const T = {
     border: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
     cardBg: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
@@ -526,9 +529,10 @@ export default function HomePage() {
               "var(--border)";
           }}
         >
-          <Coffee size={14} /> Support
+          <Coffee size={14} /> {t.support}
         </button>
 
+        <LangToggle />
         <ThemeToggle />
 
         {/* Login / Username */}
@@ -558,7 +562,7 @@ export default function HomePage() {
           }}
         >
           <User size={14} />
-          {user ? (user as any).display_name : "Connect iRacing"}
+          {user ? (user as any).display_name : "{t.connectIRacing}"}
         </button>
       </header>
 
@@ -595,7 +599,7 @@ export default function HomePage() {
               whiteSpace: "nowrap",
             }}
           >
-            Connect iRacing →
+            {t.connectIRacing} →
           </button>
         </div>
       )}
@@ -639,8 +643,8 @@ export default function HomePage() {
             }}
           >
             {currentSeason
-              ? `Season ${currentSeason.season_quarter} · ${currentSeason.season_year}`
-              : "Loading..."}
+              ? `${t.season} ${currentSeason.season_quarter} · ${currentSeason.season_year}`
+              : t.loading}
           </h1>
           <span
             style={{
@@ -665,7 +669,7 @@ export default function HomePage() {
                 letterSpacing: "0.1em",
               }}
             >
-              LIVE
+              {t.live}
             </span>
           )}
           <div
@@ -684,17 +688,17 @@ export default function HomePage() {
                 {
                   mode: "grid",
                   icon: <LayoutGrid size={15} />,
-                  label: "Cards",
+                  label: t.cards,
                 },
                 {
                   mode: "calendar",
                   icon: <LayoutList size={15} />,
-                  label: "Calendar",
+                  label: t.calendar,
                 },
                 {
                   mode: "schedule",
                   icon: <CalendarClock size={15} />,
-                  label: "Schedule",
+                  label: t.schedule,
                   badge: scheduledIds.length || undefined,
                 },
               ] as const
@@ -1104,7 +1108,7 @@ export default function HomePage() {
                 whiteSpace: "nowrap",
               }}
             >
-              Made with ♥ by Victor
+              {t.madeBy}
             </p>
           </div>
         </div>

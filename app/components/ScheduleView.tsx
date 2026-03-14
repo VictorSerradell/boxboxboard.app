@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "../lib/i18n";
 // /app/components/ScheduleView.tsx
 // Vista de horario personal — series marcadas por el usuario ordenadas por semana
 
@@ -47,6 +48,7 @@ export default function ScheduleView({
   onSeriesClick,
 }: Props) {
   const { theme } = useTheme();
+  const { t } = useT();
   const isDark = theme === "dark";
 
   const T = {
@@ -282,7 +284,7 @@ export default function ScheduleView({
                     padding: "1px 6px",
                   }}
                 >
-                  RACING NOW
+                  {t.racingNow}
                 </span>
               )}
               {week.isPast && (
@@ -293,7 +295,7 @@ export default function ScheduleView({
                     color: T.textFaint,
                   }}
                 >
-                  Past
+                  {t.past}
                 </span>
               )}
               <span
@@ -541,7 +543,7 @@ export default function ScheduleView({
                         e.stopPropagation();
                         onRemove(s.series_id);
                       }}
-                      title="Remove from schedule"
+                      title={t.removeFromSchedule}
                       style={{
                         display: "flex",
                         alignItems: "center",

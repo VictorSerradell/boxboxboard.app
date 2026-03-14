@@ -1,6 +1,7 @@
 "use client";
 // /app/components/CalendarView.tsx
 // Vista de calendario global — filas = semanas, columnas = series
+import { useT } from "../lib/i18n";
 
 import { useState } from "react";
 import { Flag } from "lucide-react";
@@ -31,6 +32,7 @@ interface Props {
 
 export default function CalendarView({ series, onSeriesClick }: Props) {
   const { theme } = useTheme();
+  const { t } = useT();
   const isDark = theme === "dark";
   const [hoveredCol, setHoveredCol] = useState<number | null>(null);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
@@ -228,7 +230,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                     letterSpacing: "0.1em",
                   }}
                 >
-                  Week
+                  {t.calendarWeek}
                 </span>
               </th>
 

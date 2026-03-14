@@ -38,9 +38,12 @@ const STATUSES: { label: string; value: SessionType; color: string }[] = [
   { label: "Unranked", value: "UNRANKED", color: "#64748B" },
 ];
 
+import { useT } from "../lib/i18n";
+
 export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { t } = useT();
 
   const T = {
     barBg: isDark ? "rgba(6,12,24,0.94)" : "rgba(248,250,252,0.96)",
@@ -199,9 +202,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
             letterSpacing: "0.12em",
             whiteSpace: "nowrap",
           }}
-        >
-          Type
-        </span>
+        >{`${t.filterType}`}</span>
         {CATEGORIES.map((cat) =>
           chip({
             label: cat.label,
@@ -242,9 +243,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
             letterSpacing: "0.12em",
             whiteSpace: "nowrap",
           }}
-        >
-          License
-        </span>
+        >{`${t.filterLicense}`}</span>
         {LICENSES.map((lic) =>
           chip({
             label: lic.label,
@@ -274,9 +273,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
             letterSpacing: "0.12em",
             whiteSpace: "nowrap",
           }}
-        >
-          Status
-        </span>
+        >{`${t.filterStatus}`}</span>
         {STATUSES.map((s) =>
           chip({
             label: s.label,
@@ -298,7 +295,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
 
         {/* Favorites */}
         {chip({
-          label: "Favorites",
+          label: t.filterFavorites,
           active: filters.favoritesOnly,
           color: "#EF4444",
           onClick: () =>
@@ -313,7 +310,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
 
         {/* Owned */}
         {chip({
-          label: "Owned",
+          label: t.filterOwned,
           active: filters.ownedOnly,
           color: "#F97316",
           onClick: () =>
@@ -355,7 +352,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
                 "transparent";
             }}
           >
-            <RotateCcw size={11} /> Reset
+            <RotateCcw size={11} /> {t.filterReset}
           </button>
         )}
 
@@ -374,7 +371,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
           />
           <input
             type="text"
-            placeholder="Search series..."
+            placeholder={t.searchPlaceholder}
             value={filters.searchQuery}
             onChange={(e) =>
               onChange({ ...filters, searchQuery: e.target.value })

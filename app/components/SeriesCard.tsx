@@ -18,6 +18,7 @@ import type { SeriesSeason } from "../types/iracing";
 import { toggleFavoriteSeries } from "../lib/iracing-client";
 import { getCurrentRaceWeek } from "../lib/season-week";
 import { useTheme } from "../lib/theme";
+import { useT } from "../lib/i18n";
 
 interface SeriesCardProps {
   series: SeriesSeason;
@@ -99,6 +100,7 @@ export default function SeriesCard({
   const [hovered, setHovered] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { t } = useT();
 
   const catStyle =
     CATEGORY_STYLE[series.category ?? ""] ?? CATEGORY_STYLE["Sports Car"];
@@ -255,7 +257,7 @@ export default function SeriesCard({
                     display: "inline-block",
                   }}
                 />
-                WK {currentWeek + 1} LIVE
+                {t.wkLive(currentWeek + 1)}
               </span>
             )}
           </div>
@@ -411,7 +413,7 @@ export default function SeriesCard({
             }}
           >
             <Wrench size={10} strokeWidth={2.5} />{" "}
-            {series.fixed_setup ? "Fixed" : "Open"}
+            {series.fixed_setup ? t.fixed : t.open}
           </span>
           {series.official && (
             <span
@@ -429,7 +431,7 @@ export default function SeriesCard({
                 color: "#EAB308",
               }}
             >
-              <Trophy size={10} strokeWidth={2.5} /> Official
+              <Trophy size={10} strokeWidth={2.5} /> {t.official}
             </span>
           )}
         </div>
@@ -461,7 +463,7 @@ export default function SeriesCard({
               textTransform: "uppercase",
             }}
           >
-            Track Rotation
+            {t.trackRotation}
           </span>
           <span
             style={{
@@ -584,7 +586,7 @@ export default function SeriesCard({
                   color: T.moreTracksText,
                 }}
               >
-                +{tracks.length - 6} more tracks
+                {t.moreWeeks(tracks.length - 6)}
               </span>
             </div>
           )}

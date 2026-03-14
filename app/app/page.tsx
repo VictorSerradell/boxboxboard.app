@@ -20,6 +20,8 @@ import LoginModal from "../components/LoginModal";
 import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
 import LangToggle from "../components/LangToggle";
+import DriverStats from "../components/DriverStats";
+import CompareBar from "../components/CompareBar";
 import CalendarView from "../components/CalendarView";
 import ScheduleView from "../components/ScheduleView";
 import WeekChangeBanner from "../components/WeekChangeBanner";
@@ -36,7 +38,6 @@ import {
   getFavoriteSeriesIds,
 } from "../lib/iracing-client";
 import { useTheme } from "../lib/theme";
-import CompareBar from "../components/Comparebar";
 
 function SkeletonCard() {
   const { theme } = useTheme();
@@ -453,12 +454,12 @@ export default function HomePage() {
             [
               {
                 id: "favorites",
-                label: "Favorites",
+                label: t.favorites,
                 icon: <Heart size={14} />,
               },
               {
                 id: "myContent",
-                label: "My Content",
+                label: t.myContent,
                 icon: <LayoutGrid size={14} />,
               },
             ] as const
@@ -534,37 +535,41 @@ export default function HomePage() {
         </button>
 
         <LangToggle />
+        <div style={{ width: 6 }} />
         <ThemeToggle />
+        <div style={{ width: 6 }} />
 
         {/* Login / Username */}
-        <button
-          onClick={() =>
-            user
-              ? (window.location.href = "/api/auth/logout")
-              : setShowLogin(true)
-          }
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "8px 18px",
-            borderRadius: 10,
-            border: "none",
-            cursor: "pointer",
-            fontFamily: "Syne, sans-serif",
-            fontWeight: 700,
-            fontSize: 13,
-            background: user
-              ? "rgba(34,197,94,0.15)"
-              : "linear-gradient(135deg, #3B9EFF, #2563EB)",
-            color: user ? "#22C55E" : "var(--text-primary)",
-            boxShadow: user ? "none" : "0 0 20px rgba(59,158,255,0.25)",
-            transition: "all 0.15s",
-          }}
-        >
-          <User size={14} />
-          {user ? (user as any).display_name : "{t.connectIRacing}"}
-        </button>
+        {user ? (
+          <DriverStats
+            user={user}
+            memberSince={(user as any).member_since}
+            onLogout={() => (window.location.href = "/api/auth/logout")}
+          />
+        ) : (
+          <button
+            onClick={() => setShowLogin(true)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "8px 18px",
+              borderRadius: 10,
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 700,
+              fontSize: 13,
+              background: "linear-gradient(135deg, #3B9EFF, #2563EB)",
+              color: "white",
+              boxShadow: "0 0 20px rgba(59,158,255,0.25)",
+              transition: "all 0.15s",
+            }}
+          >
+            <User size={14} />
+            {t.connectIRacing}
+          </button>
+        )}
       </header>
 
       {/* ── DEMO BANNER ─────────────────────────────────────── */}
@@ -952,8 +957,7 @@ export default function HomePage() {
                   margin: 0,
                 }}
               >
-                Season planner and schedule browser for iRacing drivers. Track
-                rotations, license requirements, and owned content at a glance.
+                {t.footerDesc}
               </p>
             </div>
 
@@ -971,7 +975,7 @@ export default function HomePage() {
                     margin: "0 0 12px",
                   }}
                 >
-                  Project
+                  {t.project}
                 </p>
                 <div
                   style={{ display: "flex", flexDirection: "column", gap: 8 }}
@@ -983,7 +987,7 @@ export default function HomePage() {
                       icon: <Github size={13} />,
                     },
                     {
-                      label: "Support on Ko-fi",
+                      label: "Ko-fi",
                       href: "https://ko-fi.com",
                       icon: <Coffee size={13} />,
                     },
@@ -1097,9 +1101,7 @@ export default function HomePage() {
                 lineHeight: 1.5,
               }}
             >
-              PitBoard is not affiliated with, endorsed by, or associated with
-              iRacing.com Motorsport Simulations. iRacing is a registered
-              trademark of iRacing.com Motorsport Simulations.
+              {t.notAffiliated}
             </p>
             <p
               style={{

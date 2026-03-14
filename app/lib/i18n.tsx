@@ -104,6 +104,15 @@ export interface Translations {
   weekChangedNoSchedule: string;
   yourSchedule: string;
   racingThisWeek: string;
+  memberSince: string;
+  statsPerCategory: string;
+  catRoad: string;
+  catOval: string;
+  catDirtRoad: string;
+  catDirtOval: string;
+  starts: string;
+  demoStatsNote: string;
+  logout: string;
 }
 
 // ── Translations ──────────────────────────────────────────────
@@ -252,6 +261,16 @@ const translations: Record<Lang, Translations> = {
     weekChangedNoSchedule: "New circuits this week",
     yourSchedule: "Your schedule",
     racingThisWeek: "Racing this week",
+    // Driver stats
+    memberSince: "Member since",
+    statsPerCategory: "Stats by category",
+    catRoad: "Road",
+    catOval: "Oval",
+    catDirtRoad: "Dirt Road",
+    catDirtOval: "Dirt Oval",
+    starts: "starts",
+    demoStatsNote: "Demo data — connect iRacing for real stats",
+    logout: "Disconnect iRacing",
     // Stats bar
     seriesPerSeason: "Series per season",
     activeDrivers: "Active drivers",
@@ -431,6 +450,16 @@ const translations: Record<Lang, Translations> = {
     weekChangedNoSchedule: "Nuevos circuitos esta semana",
     yourSchedule: "Tu horario",
     racingThisWeek: "Corriendo esta semana",
+    // Driver stats
+    memberSince: "Miembro desde",
+    statsPerCategory: "Stats por categoría",
+    catRoad: "Carretera",
+    catOval: "Óvalo",
+    catDirtRoad: "Tierra/Carretera",
+    catDirtOval: "Tierra/Óvalo",
+    starts: "salidas",
+    demoStatsNote: "Datos demo — conecta iRacing para stats reales",
+    logout: "Desconectar iRacing",
     // Stats bar
     seriesPerSeason: "Series por temporada",
     activeDrivers: "Pilotos activos",

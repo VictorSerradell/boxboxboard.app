@@ -109,17 +109,12 @@ export default function ScheduleView({
             margin: 0,
           }}
         >
-          No series in your schedule
+          {t.noSchedule}
         </p>
         <p
           style={{ fontSize: 14, color: T.textFaint, margin: 0, maxWidth: 320 }}
         >
-          Click the{" "}
-          <CalendarClock
-            size={13}
-            style={{ display: "inline", verticalAlign: "middle" }}
-          />{" "}
-          icon on any series card to add it here.
+          {t.noScheduleHint}
         </p>
       </div>
     );

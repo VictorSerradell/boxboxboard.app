@@ -5,8 +5,109 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 export type Lang = "en" | "es";
 
+// ── Translations type ─────────────────────────────────────────
+export interface Translations {
+  openApp: string;
+  appName: string;
+  connectIRacing: string;
+  support: string;
+  favorites: string;
+  myContent: string;
+  season: string;
+  loading: string;
+  live: string;
+  series: string;
+  cards: string;
+  calendar: string;
+  schedule: string;
+  filterType: string;
+  filterLicense: string;
+  filterStatus: string;
+  filterFavorites: string;
+  filterOwned: string;
+  filterReset: string;
+  searchPlaceholder: string;
+  trackRotation: string;
+  moreWeeks: (n: number) => string;
+  duration: string;
+  weeks: string;
+  official: string;
+  fixed: string;
+  open: string;
+  wkLive: (n: number) => string;
+  now: string;
+  noSeriesFound: string;
+  noSeriesHint: string;
+  resetFilters: string;
+  mySchedule: string;
+  activeWeeks: (s: number, w: number) => string;
+  racingNow: string;
+  past: string;
+  noSchedule: string;
+  noScheduleHint: string;
+  removeFromSchedule: string;
+  comparing: (n: number) => string;
+  clearAll: string;
+  filterAll: (n: number) => string;
+  calendarWeek: string;
+  stats: string;
+  avgSof: string;
+  avgDrivers: string;
+  splits: string;
+  raceTime: string;
+  allowedCars: string;
+  raceSchedule: string;
+  fullCalendar: string;
+  seriesInfo: string;
+  seasonLabel: string;
+  minLicense: string;
+  teamDriving: string;
+  multiclass: string;
+  yes: string;
+  no: string;
+  free: string;
+  contentOwned: string;
+  missingContent: string;
+  copyLink: string;
+  notAffiliated: string;
+  madeBy: string;
+  footerDesc: string;
+  project: string;
+  heroTitle1: string;
+  heroTitle2: string;
+  heroSubtitle: string;
+  openPitBoard: string;
+  viewOnGithub: string;
+  freeOpenSource: string;
+  everythingTitle: string;
+  everythingSubtitle: string;
+  howItWorksTitle: string;
+  howItWorksSubtitle: string;
+  faqTitle: string;
+  readyTitle: string;
+  readyCta: string;
+  step1Title: string;
+  step1Desc: string;
+  step2Title: string;
+  step2Desc: string;
+  step3Title: string;
+  step3Desc: string;
+  faq: { q: string; a: string }[];
+  seriesPerSeason: string;
+  activeDrivers: string;
+  trackConfigs: string;
+  seasonsTracked: string;
+  features: { title: string; desc: string }[];
+  weekChangedTitle: string;
+  weekLabel: string;
+  weekChangedScheduled: (n: number) => string;
+  weekChangedNoSchedule: string;
+  yourSchedule: string;
+  racingThisWeek: string;
+}
+
 // ── Translations ──────────────────────────────────────────────
-const translations = {
+const translations: Record<Lang, Translations> = {
   en: {
     // Nav
     openApp: "Open App",
@@ -151,6 +252,8 @@ const translations = {
     weekChangedNoSchedule: "New circuits this week",
     yourSchedule: "Your schedule",
     racingThisWeek: "Racing this week",
+    // Stats bar
+    seriesPerSeason: "Series per season",
     activeDrivers: "Active drivers",
     trackConfigs: "Track configs",
     seasonsTracked: "Seasons tracked",
@@ -328,6 +431,8 @@ const translations = {
     weekChangedNoSchedule: "Nuevos circuitos esta semana",
     yourSchedule: "Tu horario",
     racingThisWeek: "Corriendo esta semana",
+    // Stats bar
+    seriesPerSeason: "Series por temporada",
     activeDrivers: "Pilotos activos",
     trackConfigs: "Configs de circuito",
     seasonsTracked: "Temporadas",
@@ -359,9 +464,7 @@ const translations = {
       },
     ],
   },
-} as const;
-
-export type Translations = typeof translations.en;
+};
 
 // ── Context ───────────────────────────────────────────────────
 interface I18nContextValue {

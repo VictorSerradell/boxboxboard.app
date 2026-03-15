@@ -128,6 +128,7 @@ export interface Translations {
   loginBenefit3: string;
   loginCta: string;
   loginFinePrint: string;
+  languageLabel: string;
 }
 
 // ── Translations ──────────────────────────────────────────────
@@ -303,6 +304,7 @@ const translations: Record<Lang, Translations> = {
     loginCta: "Continue with iRacing",
     loginFinePrint:
       "You'll be taken to oauth.iracing.com to sign in securely. PitBoard only requests read-only access.",
+    languageLabel: "Language",
     // Stats bar
     seriesPerSeason: "Series per season",
     activeDrivers: "Active drivers",
@@ -509,6 +511,7 @@ const translations: Record<Lang, Translations> = {
     loginCta: "Continuar con iRacing",
     loginFinePrint:
       "Serás llevado a oauth.iracing.com para iniciar sesión de forma segura. PitBoard solo solicita acceso de lectura.",
+    languageLabel: "Idioma",
     // Stats bar
     seriesPerSeason: "Series por temporada",
     activeDrivers: "Pilotos activos",

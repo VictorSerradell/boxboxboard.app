@@ -1,5 +1,4 @@
 /* /app/globals.css */
-/* eslint-disable */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -62,6 +61,7 @@ body {
   transition: background 0.25s ease, color 0.25s ease;
   position: relative;
   margin: 0;
+  font-family: var(--font-dm-sans), 'DM Sans', system-ui, sans-serif;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────── */
@@ -91,4 +91,12 @@ body {
     from { opacity: 0; transform: translateY(-16px) scale(0.98); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
+}
+
+/* ── Font family aliases via next/font CSS variables ────── */
+/* Allows inline styles using fontFamily: "Syne, sans-serif" to work */
+:root {
+  --font-family-syne:    var(--font-syne, 'Syne', system-ui, sans-serif);
+  --font-family-mono:    var(--font-dm-mono, 'DM Mono', 'Courier New', monospace);
+  --font-family-sans:    var(--font-dm-sans, 'DM Sans', system-ui, sans-serif);
 }

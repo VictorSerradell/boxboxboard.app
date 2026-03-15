@@ -620,20 +620,20 @@ export default function SeriesCard({
         {[
           {
             icon: <Clock size={12} strokeWidth={2} />,
-            label: "Duration",
+            label: t.duration,
             value: duration,
             accent: true,
           },
           {
             icon: <Calendar size={12} strokeWidth={2} />,
-            label: "Weeks",
+            label: t.weeks,
             value: String(weekCount),
             accent: false,
           },
           {
             icon: <Trophy size={12} strokeWidth={2} />,
-            label: "Official",
-            value: series.official ? "Yes" : "No",
+            label: t.official,
+            value: series.official ? t.yes : t.no,
             accent: false,
           },
         ].map((stat, i) => (

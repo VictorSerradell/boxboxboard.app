@@ -1,7 +1,6 @@
-// next.config.ts
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
+// next.config.mjs
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // Allow iRacing S3 images
   images: {
     remotePatterns: [
@@ -9,7 +8,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '*.s3.amazonaws.com' },
     ],
   },
-  // Security headers
+  // Security & PWA headers
   async headers() {
     return [
       {

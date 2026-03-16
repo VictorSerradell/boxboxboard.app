@@ -1,5 +1,5 @@
 "use client";
-// /app/page.tsx — PitBoard main page
+// /app/page.tsx — BoxBoxBoard main page
 
 import { useState, useEffect, useCallback } from "react";
 import {
@@ -163,7 +163,7 @@ export default function HomePage() {
   const [comparingSeries, setComparingSeries] = useState<SeriesSeason[]>([]);
   const [scheduledIds, setScheduledIds] = useState<number[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem("pitboard_schedule") ?? "[]");
+      return JSON.parse(localStorage.getItem("boxboxboard_schedule") ?? "[]");
     } catch {
       return [];
     }
@@ -281,7 +281,7 @@ export default function HomePage() {
         ? prev.filter((x) => x !== id)
         : [...prev, id];
       try {
-        localStorage.setItem("pitboard_schedule", JSON.stringify(next));
+        localStorage.setItem("boxboxboard_schedule", JSON.stringify(next));
       } catch {}
       return next;
     });
@@ -402,7 +402,7 @@ export default function HomePage() {
               boxShadow: "0 0 20px rgba(59,158,255,0.3)",
             }}
           >
-            PB
+            B3
           </div>
           {!isMobile && (
             <span
@@ -414,7 +414,7 @@ export default function HomePage() {
                 letterSpacing: "-0.5px",
               }}
             >
-              PitBoard
+              BoxBoxBoard
             </span>
           )}
         </a>
@@ -1196,7 +1196,7 @@ export default function HomePage() {
                     color: "var(--text-primary)",
                   }}
                 >
-                  PitBoard
+                  BoxBoxBoard
                 </span>
               </div>
               <p
@@ -1233,7 +1233,7 @@ export default function HomePage() {
                   {[
                     {
                       label: "GitHub",
-                      href: "https://github.com/VictorSerradell/simplan.app",
+                      href: "https://github.com/VictorSerradell/boxboxboard",
                       icon: <Github size={13} />,
                     },
                     {

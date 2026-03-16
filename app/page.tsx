@@ -1,5 +1,5 @@
 "use client";
-// /app/page.tsx — PitBoard landing page
+// /app/page.tsx — BoxBoxBoard landing page
 
 import { useState, useEffect, useRef } from "react";
 import {
@@ -386,7 +386,7 @@ export default function LandingPage() {
               color: "white",
             }}
           >
-            PB
+            B3
           </div>
           <span
             style={{
@@ -397,7 +397,7 @@ export default function LandingPage() {
               letterSpacing: "-0.4px",
             }}
           >
-            PitBoard
+            BoxBoxBoard
           </span>
         </div>
         <div style={{ flex: 1 }} />
@@ -405,7 +405,7 @@ export default function LandingPage() {
           <LangToggle />
           <ThemeToggle />
           <a
-            href="https://github.com/VictorSerradell/simplan.app"
+            href="https://github.com/VictorSerradell/boxboxboard"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -591,7 +591,7 @@ export default function LandingPage() {
             {t.openPitBoard} <ArrowRight size={16} />
           </a>
           <a
-            href="https://github.com/VictorSerradell/simplan.app"
+            href="https://github.com/VictorSerradell/boxboxboard"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -1071,7 +1071,7 @@ export default function LandingPage() {
         </span>
         <div style={{ display: "flex", gap: 16 }}>
           <a
-            href="https://github.com/VictorSerradell/simplan.app"
+            href="https://github.com/VictorSerradell/boxboxboard"
             target="_blank"
             rel="noopener noreferrer"
             style={{

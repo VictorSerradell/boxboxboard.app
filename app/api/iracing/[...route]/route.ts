@@ -50,7 +50,7 @@ async function iracingFetch(
   const res = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      "User-Agent": "SimPlan/1.0",
+      "User-Agent": "boxboxboard /1.0",
       Accept: "application/json",
     },
   });

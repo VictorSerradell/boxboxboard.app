@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "SimPlan/1.0",
+        "User-Agent": "boxboxboard /1.0",
       },
       body: params.toString(),
     });
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       const memberRes = await fetch(`${DATA_BASE}/data/member/info`, {
         headers: {
           Authorization: `Bearer ${access_token}`,
-          "User-Agent": "SimPlan/1.0",
+          "User-Agent": "boxboxboard /1.0",
         },
       });
       if (memberRes.ok) {

@@ -60,10 +60,20 @@ export default function FiltersBar({
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // Guard after hooks — filters can arrive undefined during SSR hydration
+  const safeFilters = filters ?? {
+    categories: [],
+    licenses: [],
+    statuses: [],
+    favoritesOnly: false,
+    ownedOnly: false,
+    searchQuery: "",
+    myLicense: null,
+  };
+
   // If account is connected, auto-license overrides manual
-  // Safe fallback in case myLicense is undefined (old FilterState without the field)
   const effectiveLicense =
-    autoLicense !== undefined ? autoLicense : (filters.myLicense ?? null);
+    autoLicense !== undefined ? autoLicense : (safeFilters.myLicense ?? null);
 
   const T = {
     barBg: isDark ? "rgba(6,12,24,0.94)" : "rgba(248,250,252,0.96)",
@@ -96,23 +106,23 @@ export default function FiltersBar({
   };
 
   function toggleCategory(cat: CarCategory) {
-    const cats = filters.categories.includes(cat)
-      ? filters.categories.filter((c) => c !== cat)
-      : [...filters.categories, cat];
+    const cats = safeFilters.categories.includes(cat)
+      ? safeFilters.categories.filter((c) => c !== cat)
+      : [...safeFilters.categories, cat];
     onChange({ ...filters, categories: cats });
   }
 
   function toggleLicense(lic: LicenseLevel) {
-    const lics = filters.licenses.includes(lic)
-      ? filters.licenses.filter((l) => l !== lic)
-      : [...filters.licenses, lic];
+    const lics = safeFilters.licenses.includes(lic)
+      ? safeFilters.licenses.filter((l) => l !== lic)
+      : [...safeFilters.licenses, lic];
     onChange({ ...filters, licenses: lics });
   }
 
   function toggleStatus(s: SessionType) {
-    const stats = filters.statuses.includes(s)
-      ? filters.statuses.filter((x) => x !== s)
-      : [...filters.statuses, s];
+    const stats = safeFilters.statuses.includes(s)
+      ? safeFilters.statuses.filter((x) => x !== s)
+      : [...safeFilters.statuses, s];
     onChange({ ...filters, statuses: stats });
   }
 
@@ -129,13 +139,13 @@ export default function FiltersBar({
   }
 
   const hasActiveFilters =
-    filters.categories.length > 0 ||
-    filters.licenses.length > 0 ||
-    filters.statuses.length > 0 ||
-    filters.favoritesOnly ||
-    filters.ownedOnly ||
-    filters.searchQuery.length > 0 ||
-    (filters.myLicense ?? null) !== null;
+    safeFilters.categories.length > 0 ||
+    safeFilters.licenses.length > 0 ||
+    safeFilters.statuses.length > 0 ||
+    safeFilters.favoritesOnly ||
+    safeFilters.ownedOnly ||
+    safeFilters.searchQuery.length > 0 ||
+    (safeFilters.myLicense ?? null) !== null;
 
   // Chip helper
   function chip({
@@ -219,7 +229,7 @@ export default function FiltersBar({
         <div key={cat.value}>
           {chip({
             label: cat.label,
-            active: filters.categories.includes(cat.value),
+            active: safeFilters.categories.includes(cat.value),
             onClick: () => toggleCategory(cat.value),
             children: (
               <span
@@ -262,7 +272,7 @@ export default function FiltersBar({
         <div key={lic.value}>
           {chip({
             label: lic.label,
-            active: filters.licenses.includes(lic.value),
+            active: safeFilters.licenses.includes(lic.value),
             color: lic.color,
             onClick: () => toggleLicense(lic.value),
           })}
@@ -294,7 +304,7 @@ export default function FiltersBar({
         <div key={s.value}>
           {chip({
             label: s.label,
-            active: filters.statuses.includes(s.value),
+            active: safeFilters.statuses.includes(s.value),
             color: s.color,
             onClick: () => toggleStatus(s.value),
           })}
@@ -313,26 +323,27 @@ export default function FiltersBar({
 
       {chip({
         label: t.filterFavorites,
-        active: filters.favoritesOnly,
+        active: safeFilters.favoritesOnly,
         color: "#EF4444",
         onClick: () =>
-          onChange({ ...filters, favoritesOnly: !filters.favoritesOnly }),
+          onChange({ ...filters, favoritesOnly: !safeFilters.favoritesOnly }),
         children: (
           <Heart
             size={12}
-            fill={filters.favoritesOnly ? "currentColor" : "none"}
+            fill={safeFilters.favoritesOnly ? "currentColor" : "none"}
           />
         ),
       })}
       {chip({
         label: t.filterOwned,
-        active: filters.ownedOnly,
+        active: safeFilters.ownedOnly,
         color: "#F97316",
-        onClick: () => onChange({ ...filters, ownedOnly: !filters.ownedOnly }),
+        onClick: () =>
+          onChange({ ...filters, ownedOnly: !safeFilters.ownedOnly }),
         children: (
           <Shield
             size={12}
-            fill={filters.ownedOnly ? "currentColor" : "none"}
+            fill={safeFilters.ownedOnly ? "currentColor" : "none"}
           />
         ),
       })}
@@ -380,57 +391,70 @@ export default function FiltersBar({
               margin: "0 2px",
             }}
           />
-          <span
+          <div
             style={{
-              fontFamily: "DM Mono, monospace",
-              fontSize: 10,
-              color: T.groupLabel,
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              whiteSpace: "nowrap",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              flexWrap: "nowrap",
             }}
           >
-            {t.myLicenseLabel}
-          </span>
-          {LICENSES.map((lic) => {
-            const active = filters.myLicense === lic.value;
-            return (
-              <button
-                key={lic.value}
-                onClick={() =>
-                  onChange({ ...filters, myLicense: active ? null : lic.value })
-                }
-                title={t.myLicenseTooltip}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 5,
-                  padding: "4px 10px",
-                  borderRadius: 20,
-                  border: `1px solid ${active ? lic.color + "60" : T.chipDefault.border}`,
-                  background: active ? lic.color + "18" : "transparent",
-                  color: active ? lic.color : T.chipDefault.color,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  fontFamily: "DM Mono, monospace",
-                  cursor: "pointer",
-                  transition: "all 0.15s",
-                }}
-              >
-                {active && (
-                  <span
-                    style={{
-                      width: 5,
-                      height: 5,
-                      borderRadius: "50%",
-                      background: lic.color,
-                    }}
-                  />
-                )}
-                {lic.label}
-              </button>
-            );
-          })}
+            <span
+              style={{
+                fontFamily: "DM Mono, monospace",
+                fontSize: 10,
+                color: T.groupLabel,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.myLicenseLabel}
+            </span>
+            {LICENSES.map((lic) => {
+              const active = safeFilters.myLicense === lic.value;
+              return (
+                <button
+                  key={lic.value}
+                  onClick={() =>
+                    onChange({
+                      ...filters,
+                      myLicense: active ? null : lic.value,
+                    })
+                  }
+                  title={t.myLicenseTooltip}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    padding: "4px 10px",
+                    borderRadius: 20,
+                    border: `1px solid ${active ? lic.color + "60" : T.chipDefault.border}`,
+                    background: active ? lic.color + "18" : "transparent",
+                    color: active ? lic.color : T.chipDefault.color,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    fontFamily: "DM Mono, monospace",
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                    flexShrink: 0,
+                  }}
+                >
+                  {active && (
+                    <span
+                      style={{
+                        width: 5,
+                        height: 5,
+                        borderRadius: "50%",
+                        background: lic.color,
+                      }}
+                    />
+                  )}
+                  {lic.label}
+                </button>
+              );
+            })}
+          </div>
         </>
       )}
       {autoLicense !== undefined &&
@@ -495,7 +519,7 @@ export default function FiltersBar({
           <input
             type="text"
             placeholder={t.searchPlaceholder}
-            value={filters.searchQuery}
+            value={safeFilters.searchQuery}
             onChange={(e) =>
               onChange({ ...filters, searchQuery: e.target.value })
             }
@@ -531,12 +555,12 @@ export default function FiltersBar({
   // ── Mobile: compact bar + drawer ─────────────────────────────
   if (isMobile) {
     const activeCount =
-      filters.categories.length +
-      filters.licenses.length +
-      filters.statuses.length +
-      (filters.favoritesOnly ? 1 : 0) +
-      (filters.ownedOnly ? 1 : 0) +
-      (filters.myLicense !== null ? 1 : 0);
+      safeFilters.categories.length +
+      safeFilters.licenses.length +
+      safeFilters.statuses.length +
+      (safeFilters.favoritesOnly ? 1 : 0) +
+      (safeFilters.ownedOnly ? 1 : 0) +
+      (safeFilters.myLicense !== null ? 1 : 0);
     return (
       <>
         {/* Compact mobile bar: search + filter button */}
@@ -568,7 +592,7 @@ export default function FiltersBar({
             <input
               type="text"
               placeholder={t.searchPlaceholder}
-              value={filters.searchQuery}
+              value={safeFilters.searchQuery}
               onChange={(e) =>
                 onChange({ ...filters, searchQuery: e.target.value })
               }

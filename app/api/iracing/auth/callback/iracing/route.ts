@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
     const memberRes = await fetch(`${DATA_BASE}/data/member/info`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
-        "User-Agent": "PitBoard/1.0",
+        "User-Agent": "boxboxboard/1.0",
       },
     });
 

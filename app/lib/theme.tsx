@@ -20,7 +20,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   // On mount: read saved preference or system preference
   useEffect(() => {
-    const saved = localStorage.getItem("pitboard_theme") as Theme | null;
+    const saved = localStorage.getItem("boxboxboard_theme") as Theme | null;
     if (saved) {
       setTheme(saved);
       document.documentElement.setAttribute("data-theme", saved);
@@ -37,7 +37,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   function toggle() {
     setTheme((prev) => {
       const next: Theme = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("pitboard_theme", next);
+      localStorage.setItem("boxboxboard_theme", next);
       document.documentElement.setAttribute("data-theme", next);
       return next;
     });

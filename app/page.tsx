@@ -588,7 +588,7 @@ export default function LandingPage() {
               boxShadow: "0 0 40px rgba(59,158,255,0.28)",
             }}
           >
-            {t.openPitBoard} <ArrowRight size={16} />
+            {t.openboxboxboard} <ArrowRight size={16} />
           </a>
           <a
             href="https://github.com/VictorSerradell/boxboxboard"
@@ -1049,7 +1049,7 @@ export default function LandingPage() {
             transition: "opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s",
           }}
         >
-          {t.openPitBoard} <ArrowRight size={16} />
+          {t.openboxboxboard} <ArrowRight size={16} />
         </a>
       </section>
 

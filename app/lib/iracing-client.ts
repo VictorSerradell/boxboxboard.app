@@ -155,7 +155,10 @@ export async function getSeriesSeasons(
       return getDemoSeries(seasonYear, seasonQuarter);
     }
     // Any other error (network, etc) → also fall back to demo
-    console.warn("[PitBoard] iRacing API unavailable, using demo data:", err);
+    console.warn(
+      "[boxboxboard] iRacing API unavailable, using demo data:",
+      err,
+    );
     return getDemoSeries(seasonYear, seasonQuarter);
   }
 }
@@ -228,7 +231,7 @@ export async function getSeriesAssets() {
 
 // ─── Favorites (localStorage) ────────────────────────────────────────────────
 
-const FAVORITES_KEY = "pitboard_favorites";
+const FAVORITES_KEY = "boxboxboard_favorites";
 
 export function getFavoriteSeriesIds(): number[] {
   if (typeof window === "undefined") return [];

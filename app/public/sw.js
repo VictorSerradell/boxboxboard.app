@@ -1,6 +1,6 @@
-// /public/sw.js — PitBoard Service Worker
+// /public/sw.js — boxboxboard Service Worker
 
-const CACHE_NAME = "pitboard-v1";
+const CACHE_NAME = "boxboxboard-v1";
 
 // Assets to cache on install
 const PRECACHE_URLS = [

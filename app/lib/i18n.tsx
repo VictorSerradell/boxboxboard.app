@@ -76,7 +76,7 @@ export interface Translations {
   heroTitle1: string;
   heroTitle2: string;
   heroSubtitle: string;
-  openPitBoard: string;
+  openboxboxboard: string;
   viewOnGithub: string;
   freeOpenSource: string;
   everythingTitle: string;
@@ -138,7 +138,7 @@ const translations: Record<Lang, Translations> = {
     // Nav
     openApp: "Open App",
     // Header planner
-    appName: "PitBoard",
+    appName: "boxboxboard",
     connectIRacing: "Connect iRacing",
     support: "Support",
     favorites: "Favorites",
@@ -211,7 +211,7 @@ const translations: Record<Lang, Translations> = {
     copyLink: "Copy share link",
     // Footer
     notAffiliated:
-      "PitBoard · Not affiliated with iRacing.com Motorsport Simulations",
+      "boxboxboard · Not affiliated with iRacing.com Motorsport Simulations",
     madeBy: "Made with ♥ by Victor",
     footerDesc:
       "Season planner and schedule browser for iRacing drivers. Track rotations, license requirements, and owned content at a glance.",
@@ -221,12 +221,12 @@ const translations: Record<Lang, Translations> = {
     heroTitle2: "iRacing season",
     heroSubtitle:
       "Browse every series, track rotation and schedule for the current iRacing season. Filter by license, category, and owned content.",
-    openPitBoard: "Open PitBoard",
+    openboxboxboard: "Open boxboxboard",
     viewOnGithub: "View on GitHub",
     freeOpenSource: "Free & open source",
     everythingTitle: "Everything you need to plan",
     everythingSubtitle:
-      "No more digging through PDFs or the iRacing member site. PitBoard puts it all in one place.",
+      "No more digging through PDFs or the iRacing member site. boxboxboard puts it all in one place.",
     howItWorksTitle: "How it works",
     howItWorksSubtitle: "Up and running in seconds. No setup required.",
     faqTitle: "Frequently asked questions",
@@ -236,7 +236,7 @@ const translations: Record<Lang, Translations> = {
     // How it works steps
     step1Title: "Browse without an account",
     step1Desc:
-      "Open PitBoard and immediately see every iRacing series for the current season. No login needed to explore.",
+      "Open boxboxboard and immediately see every iRacing series for the current season. No login needed to explore.",
     step2Title: "Filter to your situation",
     step2Desc:
       "Use the filter bar to narrow down by license class, category, fixed/open setup, or just search by name.",
@@ -246,8 +246,8 @@ const translations: Record<Lang, Translations> = {
     // FAQ
     faq: [
       {
-        q: "Is PitBoard free?",
-        a: "Yes, completely free. PitBoard is an open source project with no ads, no subscriptions, and no paywalls.",
+        q: "Is boxboxboard free?",
+        a: "Yes, completely free. boxboxboard is an open source project with no ads, no subscriptions, and no paywalls.",
       },
       {
         q: "Do I need an iRacing account to use it?",
@@ -255,7 +255,7 @@ const translations: Record<Lang, Translations> = {
       },
       {
         q: "Is my iRacing password safe?",
-        a: "PitBoard uses the official iRacing OAuth2 authorization flow. Your credentials go directly to iRacing — PitBoard never sees your password.",
+        a: "boxboxboard uses the official iRacing OAuth2 authorization flow. Your credentials go directly to iRacing — boxboxboard never sees your password.",
       },
       {
         q: "How often is the data updated?",
@@ -291,20 +291,20 @@ const translations: Record<Lang, Translations> = {
     eligible: "Eligible",
     myLicenseLabel: "My License",
     myLicenseTooltip: "Mark your license to see eligible series",
-    installTitle: "Install PitBoard",
+    installTitle: "Install boxboxboard",
     installDesc: "Add to home screen for quick access",
     installBtn: "Install",
     exportIcal: "Export .ics",
     exportedIcal: "Downloaded!",
     exportGcal: "Google Calendar",
     loginRedirect:
-      "You'll be redirected to iRacing's official login page. PitBoard never sees your password.",
+      "You'll be redirected to iRacing's official login page. boxboxboard never sees your password.",
     loginBenefit1: "Real season schedules & track rotations",
     loginBenefit2: "See which cars & tracks you own",
     loginBenefit3: "Sync favorites across devices",
     loginCta: "Continue with iRacing",
     loginFinePrint:
-      "You'll be taken to oauth.iracing.com to sign in securely. PitBoard only requests read-only access.",
+      "You'll be taken to oauth.iracing.com to sign in securely. boxboxboard only requests read-only access.",
     languageLabel: "Language",
     demoBannerText:
       "Showing demo data — connect your iRacing account for live schedules and owned content.",
@@ -346,7 +346,7 @@ const translations: Record<Lang, Translations> = {
     // Nav
     openApp: "Abrir App",
     // Header planner
-    appName: "PitBoard",
+    appName: "boxboxboard",
     connectIRacing: "Conectar iRacing",
     support: "Apoyar",
     favorites: "Favoritos",
@@ -420,7 +420,7 @@ const translations: Record<Lang, Translations> = {
     copyLink: "Copiar enlace",
     // Footer
     notAffiliated:
-      "PitBoard · No afiliado a iRacing.com Motorsport Simulations",
+      "boxboxboard · No afiliado a iRacing.com Motorsport Simulations",
     madeBy: "Hecho con ♥ por Victor",
     footerDesc:
       "Planificador de temporada y explorador de calendarios para pilotos de iRacing. Rotaciones de circuitos, licencias y contenido propio de un vistazo.",
@@ -430,12 +430,12 @@ const translations: Record<Lang, Translations> = {
     heroTitle2: "temporada de iRacing",
     heroSubtitle:
       "Explora todas las series, rotaciones de circuitos y horarios de la temporada actual. Filtra por licencia, categoría y contenido propio.",
-    openPitBoard: "Abrir PitBoard",
+    openboxboxboard: "Abrir boxboxboard",
     viewOnGithub: "Ver en GitHub",
     freeOpenSource: "Gratis y open source",
     everythingTitle: "Todo lo que necesitas para planificar",
     everythingSubtitle:
-      "Sin buscar en PDFs ni en el member site de iRacing. PitBoard lo tiene todo en un mismo lugar.",
+      "Sin buscar en PDFs ni en el member site de iRacing. boxboxboard lo tiene todo en un mismo lugar.",
     howItWorksTitle: "Cómo funciona",
     howItWorksSubtitle: "Listo en segundos. Sin configuración.",
     faqTitle: "Preguntas frecuentes",
@@ -445,7 +445,7 @@ const translations: Record<Lang, Translations> = {
     // How it works steps
     step1Title: "Explora sin cuenta",
     step1Desc:
-      "Abre PitBoard y ve todas las series de la temporada actual al instante. No necesitas iniciar sesión.",
+      "Abre boxboxboard y ve todas las series de la temporada actual al instante. No necesitas iniciar sesión.",
     step2Title: "Filtra según tu situación",
     step2Desc:
       "Usa la barra de filtros para acotar por clase de licencia, categoría, setup fijo/libre o busca por nombre.",
@@ -455,8 +455,8 @@ const translations: Record<Lang, Translations> = {
     // FAQ
     faq: [
       {
-        q: "¿Es gratuito PitBoard?",
-        a: "Sí, completamente gratis. PitBoard es un proyecto open source sin anuncios, suscripciones ni muros de pago.",
+        q: "¿Es gratuito boxboxboard?",
+        a: "Sí, completamente gratis. boxboxboard es un proyecto open source sin anuncios, suscripciones ni muros de pago.",
       },
       {
         q: "¿Necesito una cuenta de iRacing para usarlo?",
@@ -464,7 +464,7 @@ const translations: Record<Lang, Translations> = {
       },
       {
         q: "¿Es segura mi contraseña de iRacing?",
-        a: "PitBoard usa el flujo oficial OAuth2 de iRacing. Tus credenciales van directamente a iRacing — PitBoard nunca ve tu contraseña.",
+        a: "boxboxboard usa el flujo oficial OAuth2 de iRacing. Tus credenciales van directamente a iRacing — boxboxboard nunca ve tu contraseña.",
       },
       {
         q: "¿Con qué frecuencia se actualizan los datos?",
@@ -500,20 +500,20 @@ const translations: Record<Lang, Translations> = {
     eligible: "Elegible",
     myLicenseLabel: "Mi Licencia",
     myLicenseTooltip: "Selecciona tu licencia para ver series elegibles",
-    installTitle: "Instalar PitBoard",
+    installTitle: "Instalar boxboxboard",
     installDesc: "Añadir a pantalla de inicio",
     installBtn: "Instalar",
     exportIcal: "Exportar .ics",
     exportedIcal: "¡Descargado!",
     exportGcal: "Google Calendar",
     loginRedirect:
-      "Serás redirigido a la página oficial de iRacing. PitBoard nunca ve tu contraseña.",
+      "Serás redirigido a la página oficial de iRacing. boxboxboard nunca ve tu contraseña.",
     loginBenefit1: "Calendarios y rotaciones de circuitos en tiempo real",
     loginBenefit2: "Ver qué coches y circuitos ya tienes",
     loginBenefit3: "Sincronizar favoritos entre dispositivos",
     loginCta: "Continuar con iRacing",
     loginFinePrint:
-      "Serás llevado a oauth.iracing.com para iniciar sesión de forma segura. PitBoard solo solicita acceso de lectura.",
+      "Serás llevado a oauth.iracing.com para iniciar sesión de forma segura. boxboxboard solo solicita acceso de lectura.",
     languageLabel: "Idioma",
     demoBannerText:
       "Mostrando datos demo — conecta tu cuenta de iRacing para ver calendarios reales y contenido propio.",
@@ -569,7 +569,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("en");
 
   useEffect(() => {
-    const saved = localStorage.getItem("pitboard_lang") as Lang | null;
+    const saved = localStorage.getItem("boxboxboard_lang") as Lang | null;
     if (saved === "en" || saved === "es") {
       setLangState(saved);
     } else {
@@ -577,13 +577,13 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       const browser = navigator.language.toLowerCase();
       const detected: Lang = browser.startsWith("es") ? "es" : "en";
       setLangState(detected);
-      localStorage.setItem("pitboard_lang", detected);
+      localStorage.setItem("boxboxboard_lang", detected);
     }
   }, []);
 
   function setLang(l: Lang) {
     setLangState(l);
-    localStorage.setItem("pitboard_lang", l);
+    localStorage.setItem("boxboxboard_lang", l);
   }
 
   return (

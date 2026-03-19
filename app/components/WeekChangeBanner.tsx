@@ -17,7 +17,7 @@ const CATEGORY_ACCENT: Record<string, string> = {
   "Dirt Road": "#22C55E",
 };
 
-const STORAGE_KEY = "pitboard_last_seen_week";
+const STORAGE_KEY = "boxboxboard_last_seen_week";
 
 interface Props {
   series: SeriesSeason[]; // todas las series cargadas

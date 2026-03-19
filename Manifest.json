@@ -1,6 +1,6 @@
 {
-  "name": "PitBoard — iRacing Season Planner",
-  "short_name": "PitBoard",
+  "name": "boxboxboard — iRacing Season Planner",
+  "short_name": "boxboxboard",
   "description": "Browse every iRacing series, track rotation and schedule. Filter by license, category and owned content.",
   "start_url": "/app",
   "display": "standalone",
@@ -37,7 +37,7 @@
       "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "PitBoard season planner"
+      "label": "boxboxboard season planner"
     }
   ],
   "categories": ["sports", "utilities"],

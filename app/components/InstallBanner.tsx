@@ -17,7 +17,7 @@ export default function InstallBanner() {
 
   useEffect(() => {
     // Don't show if already dismissed this session
-    if (sessionStorage.getItem("pitboard_install_dismissed")) return;
+    if (sessionStorage.getItem("boxboxboard_install_dismissed")) return;
 
     function handler(e: Event) {
       e.preventDefault();
@@ -39,7 +39,7 @@ export default function InstallBanner() {
   function dismiss() {
     setVisible(false);
     setDismissed(true);
-    sessionStorage.setItem("pitboard_install_dismissed", "1");
+    sessionStorage.setItem("boxboxboard_install_dismissed", "1");
   }
 
   if (!visible || dismissed) return null;

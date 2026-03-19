@@ -73,15 +73,15 @@ export function generateICS(events: CalendarEvent[]): string {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//PitBoard//iRacing Season Planner//EN",
+    "PRODID:-//boxboxboard//iRacing Season Planner//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
-    "X-WR-CALNAME:PitBoard — My iRacing Schedule",
+    "X-WR-CALNAME:boxboxboard — My iRacing Schedule",
     "X-WR-TIMEZONE:UTC",
   ];
 
   for (const event of events) {
-    const uid = `pitboard-${event.start.getTime()}-${Math.random().toString(36).slice(2)}@pitboard.app`;
+    const uid = `boxboxboard-${event.start.getTime()}-${Math.random().toString(36).slice(2)}@boxboxboard.app`;
     lines.push(
       "BEGIN:VEVENT",
       `UID:${uid}`,
@@ -107,7 +107,7 @@ export function downloadICS(series: SeriesSeason[]): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "pitboard-schedule.ics";
+  a.download = "boxboxboard-schedule.ics";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

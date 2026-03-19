@@ -27,7 +27,7 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://pitboard.app";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://boxboxboard.app";
 
 export const viewport: Viewport = {
   themeColor: "#3B9EFF",
@@ -37,7 +37,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "PitBoard — iRacing Season Planner",
+  title: "boxboxboard — iRacing Season Planner",
   description:
     "Browse every iRacing series, track rotation and schedule. Filter by license, category and owned content.",
   keywords: [
@@ -52,10 +52,10 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "PitBoard",
+    title: "boxboxboard",
   },
   openGraph: {
-    title: "PitBoard — iRacing Season Planner",
+    title: "boxboxboard — iRacing Season Planner",
     description:
       "Browse every iRacing series, track rotation and schedule. Filter by license, category and owned content.",
     type: "website",
@@ -65,13 +65,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "PitBoard — iRacing Season Planner",
+        alt: "boxboxboard — iRacing Season Planner",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "PitBoard — iRacing Season Planner",
+    title: "boxboxboard — iRacing Season Planner",
     description: "Browse every iRacing series, track rotation and schedule.",
     images: ["/og-image.png"],
   },
@@ -104,7 +104,7 @@ export default function RootLayout({
             __html: `
           (function() {
             try {
-              var t = localStorage.getItem('pitboard_theme');
+              var t = localStorage.getItem('boxboxboard_theme');
               if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
               document.documentElement.setAttribute('data-theme', t);
             } catch(e) {}

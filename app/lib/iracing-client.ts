@@ -45,15 +45,32 @@ async function apiFetch<T>(
 
 // ─── Season list ──────────────────────────────────────────────────────────────
 
+// ─── Season list ──────────────────────────────────────────────────────────────
+
 export async function getSeasonList(): Promise<SeasonInfo[]> {
-  const now = new Date();
-  const year = now.getFullYear();
-  const quarter = Math.ceil((now.getMonth() + 1) / 3);
+  try {
+    const res = await fetch("/api/iracing/current-season", {
+      credentials: "include",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return [
+        {
+          season_year: data.season_year,
+          season_quarter: data.season_quarter,
+          label: `Season ${data.season_quarter} ${data.season_year}`,
+          active: true,
+        },
+      ];
+    }
+  } catch {}
+
+  // Hard fallback — S2 2026
   return [
     {
-      season_year: year,
-      season_quarter: quarter,
-      label: `Season ${quarter} ${year}`,
+      season_year: 2026,
+      season_quarter: 2,
+      label: "Season 2 2026",
       active: true,
     },
   ];

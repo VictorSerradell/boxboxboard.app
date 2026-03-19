@@ -319,7 +319,7 @@ const translations: Record<Lang, Translations> = {
       "You'll be taken to oauth.iracing.com to sign in securely. BoxBoxBoard only requests read-only access.",
     languageLabel: "Language",
     demoBannerText:
-      "Showing demo data — connect your iRacing account for live schedules and owned content.",
+      "Connect your iRacing account to see your owned content and personal stats.",
     // Stats bar
     seriesPerSeason: "Series per season",
     activeDrivers: "Active drivers",
@@ -534,7 +534,7 @@ const translations: Record<Lang, Translations> = {
       "Serás llevado a oauth.iracing.com para iniciar sesión de forma segura. BoxBoxBoard solo solicita acceso de lectura.",
     languageLabel: "Idioma",
     demoBannerText:
-      "Mostrando datos demo — conecta tu cuenta de iRacing para ver calendarios reales y contenido propio.",
+      "Conecta tu cuenta de iRacing para ver tu contenido propio y estadísticas personales.",
     // Stats bar
     seriesPerSeason: "Series por temporada",
     activeDrivers: "Pilotos activos",

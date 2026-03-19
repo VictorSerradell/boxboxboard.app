@@ -831,7 +831,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ── DEMO BANNER ─────────────────────────────────────── */}
+      {/* ── CONNECT BANNER ─────────────────────────────────────── */}
       {!user && (
         <div
           style={{

@@ -36,7 +36,7 @@ function generateState(): string {
   return randomBytes(32).toString("hex");
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const clientId = process.env.IRACING_CLIENT_ID;
 
   if (!clientId) {
@@ -47,6 +47,12 @@ export async function GET() {
       },
       { status: 503 },
     );
+  }
+
+  // Force www subdomain to ensure cookies are consistent throughout OAuth flow
+  const host = request.headers.get("host") ?? "";
+  if (process.env.NODE_ENV === "production" && !host.startsWith("www.")) {
+    return NextResponse.redirect(`https://www.${host}/api/auth/login`);
   }
 
   const redirectUri =
@@ -88,4 +94,3 @@ export async function GET() {
 
   return response;
 }
-  

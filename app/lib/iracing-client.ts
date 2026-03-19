@@ -49,27 +49,14 @@ export async function getSeasonList(): Promise<SeasonInfo[]> {
   const now = new Date();
   const year = now.getFullYear();
   const quarter = Math.ceil((now.getMonth() + 1) / 3);
-  const seasons: SeasonInfo[] = [];
-
-  for (let i = -2; i <= 1; i++) {
-    let y = year,
-      q = quarter + i;
-    while (q <= 0) {
-      q += 4;
-      y -= 1;
-    }
-    while (q > 4) {
-      q -= 4;
-      y += 1;
-    }
-    seasons.push({
-      season_year: y,
-      season_quarter: q,
-      label: `Season ${q} ${y}`,
-      active: i === 0,
-    });
-  }
-  return seasons.reverse();
+  return [
+    {
+      season_year: year,
+      season_quarter: quarter,
+      label: `Season ${quarter} ${year}`,
+      active: true,
+    },
+  ];
 }
 
 // ─── Series seasons ───────────────────────────────────────────────────────────

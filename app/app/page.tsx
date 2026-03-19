@@ -442,8 +442,8 @@ export default function HomePage() {
           )}
         </a>
 
-        {/* Season selector — hidden on mobile (shown in menu) */}
-        {!isMobile && (
+        {/* Season selector — hidden on mobile or when only one season */}
+        {!isMobile && seasons.length > 1 && (
           <>
             <div
               style={{
@@ -666,52 +666,54 @@ export default function HomePage() {
             gap: 12,
           }}
         >
-          {/* Season selector */}
-          <div>
-            <p
-              style={{
-                fontFamily: "DM Mono, monospace",
-                fontSize: 10,
-                color: "var(--text-muted)",
-                textTransform: "uppercase",
-                letterSpacing: "0.12em",
-                margin: "0 0 8px",
-              }}
-            >
-              {t.season}
-            </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {seasons.map((s) => {
-                const active =
-                  currentSeason?.season_year === s.season_year &&
-                  currentSeason?.season_quarter === s.season_quarter;
-                return (
-                  <button
-                    key={`${s.season_year}-${s.season_quarter}`}
-                    onClick={() => {
-                      setCurrentSeason(s);
-                      setMenuOpen(false);
-                    }}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: 10,
-                      border: `1px solid ${active ? "rgba(59,158,255,0.4)" : "var(--border)"}`,
-                      background: active
-                        ? "rgba(59,158,255,0.12)"
-                        : "var(--bg-card)",
-                      color: active ? "#3B9EFF" : "var(--text-muted)",
-                      fontFamily: "Syne, sans-serif",
-                      fontWeight: 700,
-                      fontSize: 14,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {s.label}
-                  </button>
-                );
-              })}
+          {/* Season selector — only show if multiple seasons */}
+          {seasons.length > 1 && (
+            <div>
+              <p
+                style={{
+                  fontFamily: "DM Mono, monospace",
+                  fontSize: 10,
+                  color: "var(--text-muted)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.12em",
+                  margin: "0 0 8px",
+                }}
+              >
+                {t.season}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {seasons.map((s) => {
+                  const active =
+                    currentSeason?.season_year === s.season_year &&
+                    currentSeason?.season_quarter === s.season_quarter;
+                  return (
+                    <button
+                      key={`${s.season_year}-${s.season_quarter}`}
+                      onClick={() => {
+                        setCurrentSeason(s);
+                        setMenuOpen(false);
+                      }}
+                      style={{
+                        padding: "8px 16px",
+                        borderRadius: 10,
+                        border: `1px solid ${active ? "rgba(59,158,255,0.4)" : "var(--border)"}`,
+                        background: active
+                          ? "rgba(59,158,255,0.12)"
+                          : "var(--bg-card)",
+                        color: active ? "#3B9EFF" : "var(--text-muted)",
+                        fontFamily: "Syne, sans-serif",
+                        fontWeight: 700,
+                        fontSize: 14,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           <div style={{ height: 1, background: "var(--border)" }} />
 

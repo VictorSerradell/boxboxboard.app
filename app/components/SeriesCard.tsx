@@ -313,7 +313,7 @@ export default function SeriesCard({
                   e.stopPropagation();
                   onCompare();
                 }}
-                title={isComparing ? "Remove from compare" : "Add to compare"}
+                title={isComparing ? t.removeFromCompare : t.addToCompare}
                 style={{
                   width: 30,
                   height: 30,
@@ -339,9 +339,7 @@ export default function SeriesCard({
                   e.stopPropagation();
                   onSchedule();
                 }}
-                title={
-                  isScheduled ? "Remove from schedule" : "Add to my schedule"
-                }
+                title={isScheduled ? t.removeFromSchedule : t.addToSchedule}
                 style={{
                   width: 30,
                   height: 30,

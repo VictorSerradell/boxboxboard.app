@@ -156,7 +156,7 @@ export async function getSeriesSeasons(
     }
     // Any other error (network, etc) → also fall back to demo
     console.warn(
-      "[boxboxboard] iRacing API unavailable, using demo data:",
+      "[BoxBoxBoard] iRacing API unavailable, using demo data:",
       err,
     );
     return getDemoSeries(seasonYear, seasonQuarter);
@@ -168,8 +168,21 @@ export async function getSeriesSeasons(
 export async function getMemberInfo(): Promise<Member | null> {
   try {
     const raw = await apiFetch<any>("member/info");
-    // Normalize licenses array
-    const licenses = (raw.licenses ?? raw.license_data ?? []).map((l: any) => ({
+    console.log("[getMemberInfo] raw response keys:", Object.keys(raw));
+    console.log(
+      "[getMemberInfo] licenses field:",
+      raw.licenses ?? raw.license_data ?? raw.member?.licenses ?? "not found",
+    );
+
+    // iRacing wraps data in a `member` field sometimes
+    const data = raw.member ?? raw;
+
+    // Normalize licenses array — iRacing uses `licenses` array with category info
+    const rawLicenses =
+      data.licenses ?? data.license_data ?? raw.licenses ?? [];
+    console.log("[getMemberInfo] rawLicenses:", rawLicenses);
+
+    const licenses = rawLicenses.map((l: any) => ({
       category_id: l.category_id,
       category: l.category ?? "",
       license_level: l.license_level ?? 0,
@@ -183,19 +196,20 @@ export async function getMemberInfo(): Promise<Member | null> {
     }));
 
     return {
-      cust_id: raw.cust_id,
-      username: raw.username ?? raw.display_name ?? "",
-      display_name: raw.display_name ?? raw.username ?? "",
-      club_name: raw.club_name,
+      cust_id: data.cust_id ?? raw.cust_id,
+      username: data.username ?? data.display_name ?? "",
+      display_name: data.display_name ?? data.username ?? "",
+      club_name: data.club_name,
       licenses,
       profile: {
-        cust_id: raw.cust_id,
-        display_name: raw.display_name ?? "",
-        member_since: raw.member_since,
-        last_login: raw.last_login,
+        cust_id: data.cust_id ?? raw.cust_id,
+        display_name: data.display_name ?? "",
+        member_since: data.member_since,
+        last_login: data.last_login,
       },
     };
-  } catch {
+  } catch (e) {
+    console.error("[getMemberInfo] error:", e);
     return null;
   }
 }

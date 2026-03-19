@@ -59,8 +59,11 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
       : "0 -8px 32px rgba(0,0,0,0.10)",
   };
 
-  // Max weeks across all selected series
-  const maxWeeks = Math.max(...series.map((s) => s.schedules?.length ?? 0));
+  // Max weeks across all selected series — guard against empty array
+  const weekCounts = series.map((s) =>
+    Array.isArray(s.schedules) ? s.schedules.length : 0,
+  );
+  const maxWeeks = weekCounts.length > 0 ? Math.max(...weekCounts, 1) : 1;
 
   return (
     <div
@@ -380,8 +383,8 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                             flex: 1,
                           }}
                         >
-                          {isEmpty ? "—" : week.track.track_name}
-                          {!isEmpty && week.track.config_name && (
+                          {isEmpty ? "—" : (week.track?.track_name ?? "—")}
+                          {!isEmpty && week.track?.config_name && (
                             <span
                               style={{
                                 color: T.textMuted,
@@ -389,7 +392,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                                 marginLeft: 5,
                               }}
                             >
-                              {week.track.config_name}
+                              {week.track?.config_name}
                             </span>
                           )}
                         </span>

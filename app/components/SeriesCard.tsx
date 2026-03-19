@@ -19,6 +19,7 @@ import { toggleFavoriteSeries } from "../lib/iracing-client";
 import { getCurrentRaceWeek } from "../lib/season-week";
 import { useTheme } from "../lib/theme";
 import { useT } from "../lib/i18n";
+import { useIsMobile } from "../lib/useBreakpoint";
 
 interface SeriesCardProps {
   series: SeriesSeason;
@@ -285,7 +286,7 @@ export default function SeriesCard({
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             <div
-              title={series.isOwned ? "All content owned" : "Missing content"}
+              title={series.isOwned ? t.allContentOwned : t.missingContent}
               style={{
                 width: 30,
                 height: 30,

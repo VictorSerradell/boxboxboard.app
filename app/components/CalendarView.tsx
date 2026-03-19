@@ -175,7 +175,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
             marginLeft: "auto",
           }}
         >
-          {filtered.length} series · {maxWeeks} weeks
+          {filtered.length} {t.seriesLabel} · {maxWeeks} {t.weeksLabel}
         </span>
       </div>
 

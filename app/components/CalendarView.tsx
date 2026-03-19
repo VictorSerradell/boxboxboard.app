@@ -69,18 +69,18 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
     const ai = CATEGORY_ORDER.indexOf(a.category ?? "");
     const bi = CATEGORY_ORDER.indexOf(b.category ?? "");
     if (ai !== bi) return ai - bi;
-    return a.series_name.localeCompare(b.series_name);
+    return (a.series_name ?? "").localeCompare(b.series_name ?? "");
   });
 
   const filtered = activeCategory
     ? sorted.filter((s) => s.category === activeCategory)
     : sorted;
 
-  // Max weeks across all series
-  const maxWeeks = Math.max(
-    ...filtered.map((s) => s.schedules?.length ?? 0),
-    12,
+  // Max weeks across all series — guard against empty/invalid schedules
+  const weekCounts = filtered.map((s) =>
+    Array.isArray(s.schedules) ? s.schedules.length : 0,
   );
+  const maxWeeks = weekCounts.length > 0 ? Math.max(...weekCounts, 1) : 12;
 
   // Current week for highlighting
   const currentWeek =
@@ -464,9 +464,9 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                                   textOverflow: "ellipsis",
                                 }}
                               >
-                                {week.track.track_name}
+                                {week.track?.track_name ?? "—"}
                               </div>
-                              {week.track.config_name && (
+                              {week.track?.config_name && (
                                 <div
                                   style={{
                                     fontSize: isMobile ? 9 : 10,

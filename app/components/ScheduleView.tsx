@@ -136,10 +136,10 @@ export default function ScheduleView({
   }
 
   // Build week-by-week view
-  const maxWeeks = Math.max(
-    ...scheduled.map((s) => s.schedules?.length ?? 0),
-    0,
+  const weekCounts = scheduled.map((s) =>
+    Array.isArray(s.schedules) ? s.schedules.length : 0,
   );
+  const maxWeeks = weekCounts.length > 0 ? Math.max(...weekCounts, 1) : 0;
   const currentWeek =
     scheduled.length > 0
       ? getCurrentRaceWeek(
@@ -512,8 +512,8 @@ export default function ScheduleView({
                             textOverflow: "ellipsis",
                           }}
                         >
-                          {track.track_name}
-                          {track.config_name && (
+                          {track?.track_name ?? "—"}
+                          {track?.config_name && (
                             <span
                               style={{
                                 color: T.textMuted,

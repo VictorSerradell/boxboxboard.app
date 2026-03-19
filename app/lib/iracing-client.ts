@@ -167,20 +167,19 @@ export async function getSeriesSeasons(
 
 export async function getMemberInfo(): Promise<Member | null> {
   try {
-    // member/get with include_licenses=true returns current iRating, SR and license per category
-    const raw = await apiFetch<any>("member/get", { include_licenses: "true" });
-    console.log("[getMemberInfo] raw keys:", Object.keys(raw ?? {}));
+    const raw = await apiFetch<any>("member/info");
+    console.log("[getMemberInfo] raw:", JSON.stringify(raw).slice(0, 500));
 
-    // iRacing wraps response in S3 redirect or direct — proxy handles S3
+    // iRacing member/info wraps data — try different structures
     const data = raw?.member ?? raw;
-    console.log("[getMemberInfo] data keys:", Object.keys(data ?? {}));
+    const rawLicenses =
+      data?.licenses ?? raw?.licenses ?? data?.license_data ?? [];
     console.log(
-      "[getMemberInfo] licenses:",
-      JSON.stringify(data?.licenses ?? raw?.licenses ?? "none"),
+      "[getMemberInfo] licenses count:",
+      rawLicenses.length,
+      "sample:",
+      JSON.stringify(rawLicenses[0]),
     );
-
-    const rawLicenses = data?.licenses ?? raw?.licenses ?? [];
-    console.log("[getMemberInfo] rawLicenses count:", rawLicenses.length);
 
     const licenses = rawLicenses.map((l: any) => ({
       category_id: l.category_id,

@@ -46,8 +46,6 @@ export interface Translations {
   noSchedule: string;
   noScheduleHint: string;
   removeFromSchedule: string;
-  comparing: (n: number) => string;
-  clearAll: string;
   filterAll: (n: number) => string;
   calendarWeek: string;
   stats: string;
@@ -71,6 +69,8 @@ export interface Translations {
   allContentOwned: string;
   seriesLabel: string;
   weeksLabel: string;
+  comparing: string;
+  clearAll: string;
   copyLink: string;
   notAffiliated: string;
   madeBy: string;
@@ -187,8 +187,6 @@ const translations: Record<Lang, Translations> = {
     noScheduleHint: "Click the clock icon on any series card to add it here.",
     removeFromSchedule: "Remove from schedule",
     // Compare bar
-    comparing: (n: number) => `Comparing ${n} series`,
-    clearAll: "Clear all",
     // Calendar view
     filterAll: (n: number) => `All (${n})`,
     calendarWeek: "Week",
@@ -214,6 +212,8 @@ const translations: Record<Lang, Translations> = {
     allContentOwned: "All content owned",
     seriesLabel: "series",
     weeksLabel: "weeks",
+    comparing: "Comparing",
+    clearAll: "Clear all",
     copyLink: "Copy share link",
     // Footer
     notAffiliated:
@@ -399,8 +399,6 @@ const translations: Record<Lang, Translations> = {
       "Pulsa el icono del reloj en cualquier tarjeta para añadirla aquí.",
     removeFromSchedule: "Quitar del horario",
     // Compare bar
-    comparing: (n: number) => `Comparando ${n} series`,
-    clearAll: "Limpiar todo",
     // Calendar view
     filterAll: (n: number) => `Todas (${n})`,
     calendarWeek: "Semana",
@@ -426,6 +424,8 @@ const translations: Record<Lang, Translations> = {
     allContentOwned: "Todo el contenido comprado",
     seriesLabel: "series",
     weeksLabel: "semanas",
+    comparing: "Comparando",
+    clearAll: "Limpiar todo",
     copyLink: "Copiar enlace",
     // Footer
     notAffiliated:

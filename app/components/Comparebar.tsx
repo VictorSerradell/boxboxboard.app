@@ -102,7 +102,8 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
               color: "#3B9EFF",
             }}
           >
-            Comparing {series.length} serie{series.length > 1 ? "s" : ""}
+            {t.comparing} {series.length}{" "}
+            {series.length > 1 ? t.seriesLabel : t.seriesLabel}
           </span>
           <div style={{ display: "flex", gap: 6 }}>
             {series.map((s) => {
@@ -125,7 +126,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                   }}
                 >
                   {s.series_short_name ??
-                    s.series_name.split(" ").slice(0, 2).join(" ")}
+                    (s.series_name ?? "").split(" ").slice(0, 2).join(" ")}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -169,7 +170,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
               fontWeight: 600,
             }}
           >
-            Clear all
+            {t.clearAll}
           </button>
           <div style={{ color: T.textMuted }}>
             {expanded ? <ChevronDown size={16} /> : <ChevronUp size={16} />}

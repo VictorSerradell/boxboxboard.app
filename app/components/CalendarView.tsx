@@ -1,8 +1,8 @@
 "use client";
-// /app/components/CalendarView.tsx
-// Vista de calendario global — filas = semanas, columnas = series
 import { useT } from "../lib/i18n";
 import { useIsMobile } from "../lib/useBreakpoint";
+// /app/components/CalendarView.tsx
+// Vista de calendario global — filas = semanas, columnas = series
 
 import { useState } from "react";
 import { Flag } from "lucide-react";

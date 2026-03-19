@@ -223,6 +223,7 @@ export default function HomePage() {
     autoLicense !== undefined ? autoLicense : (filters.myLicense ?? null);
 
   useEffect(() => {
+    // Detect session from URL params (just after OAuth callback)
     const params = new URLSearchParams(window.location.search);
     if (params.get("auth") === "success") {
       const name = document.cookie.match(/iracing_display_name=([^;]+)/)?.[1];
@@ -233,10 +234,22 @@ export default function HomePage() {
           cust_id: Number(cid),
         } as unknown as AppUser);
       window.history.replaceState({}, "", "/app");
+      return;
     }
     if (params.get("auth_error")) {
       console.error("Auth error:", params.get("auth_error"));
       window.history.replaceState({}, "", "/app");
+      return;
+    }
+
+    // Detect persistent session from cookies (page refresh, back navigation)
+    const name = document.cookie.match(/iracing_display_name=([^;]+)/)?.[1];
+    const cid = document.cookie.match(/iracing_cust_id=([^;]+)/)?.[1];
+    if (name) {
+      setUser({
+        display_name: decodeURIComponent(name),
+        cust_id: Number(cid),
+      } as unknown as AppUser);
     }
   }, []);
 

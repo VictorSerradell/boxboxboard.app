@@ -1,7 +1,7 @@
-// /app/components/SeriesDetailPanel.tsx
 "use client";
 import { useT } from "../lib/i18n";
 import { useIsMobile } from "../lib/useBreakpoint";
+// /app/components/SeriesDetailPanel.tsx
 
 import { useEffect, useState } from "react";
 import {

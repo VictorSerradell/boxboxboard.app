@@ -20,6 +20,7 @@ export interface Translations {
   cards: string;
   calendar: string;
   schedule: string;
+  map: string;
   filterType: string;
   filterLicense: string;
   filterStatus: string;
@@ -158,6 +159,7 @@ const translations: Record<Lang, Translations> = {
     cards: "Cards",
     calendar: "Calendar",
     schedule: "Schedule",
+    map: "Map",
     // Filters
     filterType: "Type",
     filterLicense: "License",
@@ -372,6 +374,7 @@ const translations: Record<Lang, Translations> = {
     cards: "Tarjetas",
     calendar: "Calendario",
     schedule: "Mi Horario",
+    map: "Mapa",
     // Filters
     filterType: "Tipo",
     filterLicense: "Licencia",

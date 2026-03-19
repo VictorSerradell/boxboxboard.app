@@ -26,11 +26,16 @@ const DEMO_STATS = {
 
 const LICENSE_COLORS: Record<string, string> = {
   Rookie: "#FF4444",
+  "Class D": "#F97316",
+  "Class C": "#EAB308",
+  "Class B": "#22C55E",
+  "Class A": "#3B9EFF",
+  PRO: "#A855F7",
+  // Short versions as fallback
   D: "#F97316",
   C: "#EAB308",
   B: "#22C55E",
   A: "#3B9EFF",
-  PRO: "#A855F7",
 };
 
 const SR_COLOR = (sr: number) =>
@@ -69,19 +74,25 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
   const licenses = (user as any).licenses as any[] | undefined;
   const stats = licenses?.length
     ? licenses.reduce((acc: any, l: any) => {
-        acc[l.category?.toLowerCase().replace(" ", "_") ?? "road"] = {
+        // iRacing category keys: oval, sports_car, formula_car, dirt_oval, dirt_road
+        const key = l.category?.toLowerCase().replace(" ", "_") ?? "sports_car";
+        acc[key] = {
           irating: l.irating ?? 0,
           sr: l.safety_rating ?? 0,
           license: l.group_name ?? "?",
-          starts: (l as any).starts ?? 0,
+          starts: l.mpr_num_races ?? 0,
+          color: l.color,
         };
         return acc;
       }, {})
     : DEMO_STATS;
 
-  // Pick primary category (road / sports car)
+  // Pick primary category — iRacing uses sports_car as main road category
   const primary =
-    stats["road"] ?? stats["sports_car"] ?? (Object.values(stats)[0] as any);
+    stats["sports_car"] ??
+    stats["road"] ??
+    stats["formula_car"] ??
+    (Object.values(stats)[0] as any);
   const licColor = LICENSE_COLORS[primary?.license ?? "D"] ?? "#64748B";
 
   const T = {
@@ -100,8 +111,9 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
   };
 
   const categories = [
-    { key: "road", label: t.catRoad },
+    { key: "sports_car", label: t.catRoad },
     { key: "oval", label: t.catOval },
+    { key: "formula_car", label: "Formula" },
     { key: "dirt_road", label: t.catDirtRoad },
     { key: "dirt_oval", label: t.catDirtOval },
   ];

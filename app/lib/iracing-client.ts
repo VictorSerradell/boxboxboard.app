@@ -168,43 +168,33 @@ export async function getSeriesSeasons(
 export async function getMemberInfo(): Promise<Member | null> {
   try {
     const raw = await apiFetch<any>("member/info");
-    console.log("[getMemberInfo] raw:", JSON.stringify(raw).slice(0, 500));
 
-    // iRacing member/info wraps data — try different structures
-    const data = raw?.member ?? raw;
-    const rawLicenses =
-      data?.licenses ?? raw?.licenses ?? data?.license_data ?? [];
-    console.log(
-      "[getMemberInfo] licenses count:",
-      rawLicenses.length,
-      "sample:",
-      JSON.stringify(rawLicenses[0]),
-    );
-
-    const licenses = rawLicenses.map((l: any) => ({
+    // licenses is an OBJECT with keys: oval, sports_car, formula_car, dirt_oval, dirt_road
+    const licensesObj = raw?.licenses ?? {};
+    const licenses = Object.values(licensesObj).map((l: any) => ({
       category_id: l.category_id,
       category: l.category ?? "",
       license_level: l.license_level ?? 0,
       safety_rating: l.safety_rating ?? 0,
       irating: l.irating ?? 0,
       color: l.color ?? "#64748B",
-      group_name: mapGroupName(l.license_level ?? 0),
+      group_name: l.group_name ?? mapGroupName(l.license_level ?? 0),
       group_id: l.group_id ?? 0,
       pro_promotable: l.pro_promotable ?? false,
       supersession_in_use: l.supersession_in_use ?? false,
     }));
 
     return {
-      cust_id: data?.cust_id ?? raw?.cust_id,
-      username: data?.display_name ?? data?.username ?? "",
-      display_name: data?.display_name ?? data?.username ?? "",
-      club_name: data?.club_name,
+      cust_id: raw.cust_id,
+      username: raw.display_name ?? "",
+      display_name: raw.display_name ?? "",
+      club_name: raw.flair_name ?? "",
       licenses,
       profile: {
-        cust_id: data?.cust_id ?? raw?.cust_id,
-        display_name: data?.display_name ?? "",
-        member_since: data?.member_since,
-        last_login: data?.last_login,
+        cust_id: raw.cust_id,
+        display_name: raw.display_name ?? "",
+        member_since: raw.member_since,
+        last_login: raw.last_login,
       },
     };
   } catch (e) {

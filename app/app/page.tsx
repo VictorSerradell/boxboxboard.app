@@ -39,6 +39,7 @@ import {
   getSeasonList,
   getSeriesSeasons,
   getFavoriteSeriesIds,
+  getMemberInfo,
 } from "../lib/iracing-client";
 import { useTheme } from "../lib/theme";
 import CompareBar from "../components/Comparebar";
@@ -234,24 +235,31 @@ export default function HomePage() {
           cust_id: Number(cid),
         } as unknown as AppUser);
       window.history.replaceState({}, "", "/app");
-      return;
-    }
-    if (params.get("auth_error")) {
+    } else if (params.get("auth_error")) {
       console.error("Auth error:", params.get("auth_error"));
       window.history.replaceState({}, "", "/app");
       return;
-    }
-
-    // Detect persistent session from cookies (page refresh, back navigation)
-    const name = document.cookie.match(/iracing_display_name=([^;]+)/)?.[1];
-    const cid = document.cookie.match(/iracing_cust_id=([^;]+)/)?.[1];
-    if (name) {
-      setUser({
-        display_name: decodeURIComponent(name),
-        cust_id: Number(cid),
-      } as unknown as AppUser);
+    } else {
+      // Detect persistent session from cookies (page refresh, back navigation)
+      const name = document.cookie.match(/iracing_display_name=([^;]+)/)?.[1];
+      const cid = document.cookie.match(/iracing_cust_id=([^;]+)/)?.[1];
+      if (name)
+        setUser({
+          display_name: decodeURIComponent(name),
+          cust_id: Number(cid),
+        } as unknown as AppUser);
     }
   }, []);
+
+  // Fetch real member info (licenses, iRating, SR) once session is detected
+  useEffect(() => {
+    if (!user) return;
+    getMemberInfo()
+      .then((member) => {
+        if (member) setUser(member as unknown as AppUser);
+      })
+      .catch(() => {});
+  }, [!!user]);
 
   // Open panel from URL param ?series=ID once series data is loaded
   useEffect(() => {

@@ -5,7 +5,7 @@
 // redirige al usuario a la pantalla oficial de login de iRacing.
 // ─────────────────────────────────────────────────────────────────
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { randomBytes, createHash } from "crypto";
 
 const OAUTH_AUTHORIZE_URL = "https://oauth.iracing.com/oauth2/authorize";

@@ -23,7 +23,6 @@ import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
 import LangToggle from "../components/LangToggle";
 import DriverStats from "../components/DriverStats";
-
 import CalendarView from "../components/CalendarView";
 import ScheduleView from "../components/ScheduleView";
 import WeekChangeBanner from "../components/WeekChangeBanner";
@@ -255,12 +254,14 @@ export default function HomePage() {
   // Fetch real member info (licenses, iRating, SR) once session is detected
   useEffect(() => {
     if (!user) return;
+    console.log("[BoxBoxBoard] Fetching member info for:", user.display_name);
     getMemberInfo()
       .then((member) => {
+        console.log("[BoxBoxBoard] getMemberInfo result:", member);
         if (member) setUser(member as unknown as AppUser);
       })
-      .catch(() => {});
-  }, [!!user]);
+      .catch((e) => console.error("[BoxBoxBoard] getMemberInfo failed:", e));
+  }, [user?.cust_id]);
 
   // Open panel from URL param ?series=ID once series data is loaded
   useEffect(() => {

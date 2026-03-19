@@ -167,20 +167,20 @@ export async function getSeriesSeasons(
 
 export async function getMemberInfo(): Promise<Member | null> {
   try {
-    const raw = await apiFetch<any>("member/info");
-    console.log("[getMemberInfo] raw response keys:", Object.keys(raw));
+    // member/get with include_licenses=true returns current iRating, SR and license per category
+    const raw = await apiFetch<any>("member/get", { include_licenses: "true" });
+    console.log("[getMemberInfo] raw keys:", Object.keys(raw ?? {}));
+
+    // iRacing wraps response in S3 redirect or direct — proxy handles S3
+    const data = raw?.member ?? raw;
+    console.log("[getMemberInfo] data keys:", Object.keys(data ?? {}));
     console.log(
-      "[getMemberInfo] licenses field:",
-      raw.licenses ?? raw.license_data ?? raw.member?.licenses ?? "not found",
+      "[getMemberInfo] licenses:",
+      JSON.stringify(data?.licenses ?? raw?.licenses ?? "none"),
     );
 
-    // iRacing wraps data in a `member` field sometimes
-    const data = raw.member ?? raw;
-
-    // Normalize licenses array — iRacing uses `licenses` array with category info
-    const rawLicenses =
-      data.licenses ?? data.license_data ?? raw.licenses ?? [];
-    console.log("[getMemberInfo] rawLicenses:", rawLicenses);
+    const rawLicenses = data?.licenses ?? raw?.licenses ?? [];
+    console.log("[getMemberInfo] rawLicenses count:", rawLicenses.length);
 
     const licenses = rawLicenses.map((l: any) => ({
       category_id: l.category_id,
@@ -196,16 +196,16 @@ export async function getMemberInfo(): Promise<Member | null> {
     }));
 
     return {
-      cust_id: data.cust_id ?? raw.cust_id,
-      username: data.username ?? data.display_name ?? "",
-      display_name: data.display_name ?? data.username ?? "",
-      club_name: data.club_name,
+      cust_id: data?.cust_id ?? raw?.cust_id,
+      username: data?.display_name ?? data?.username ?? "",
+      display_name: data?.display_name ?? data?.username ?? "",
+      club_name: data?.club_name,
       licenses,
       profile: {
-        cust_id: data.cust_id ?? raw.cust_id,
-        display_name: data.display_name ?? "",
-        member_since: data.member_since,
-        last_login: data.last_login,
+        cust_id: data?.cust_id ?? raw?.cust_id,
+        display_name: data?.display_name ?? "",
+        member_since: data?.member_since,
+        last_login: data?.last_login,
       },
     };
   } catch (e) {

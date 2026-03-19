@@ -72,12 +72,15 @@ export async function GET() {
 
   // Guardar verifier y state en cookies httpOnly temporales
   // (solo duran el tiempo del flujo de login ~10 min)
+  const isProduction = process.env.NODE_ENV === "production";
   const cookieOpts = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isProduction,
     sameSite: "lax" as const,
     maxAge: 60 * 10,
     path: "/",
+    // Share cookies across apex and www subdomain in production
+    ...(isProduction && { domain: ".boxboxboard.app" }),
   };
 
   response.cookies.set("pkce_verifier", codeVerifier, cookieOpts);
@@ -85,3 +88,4 @@ export async function GET() {
 
   return response;
 }
+  

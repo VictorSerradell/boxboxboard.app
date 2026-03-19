@@ -11,7 +11,7 @@ import { createHash } from "crypto";
 
 const OAUTH_TOKEN_URL = "https://oauth.iracing.com/oauth2/token";
 const DATA_BASE = "https://members-ng.iracing.com";
-const APP_BASE = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+const APP_BASE = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
 
 // Mismo masking que iRacing requiere para client_secret
 function mask(secret: string, id: string): string {
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
     const memberRes = await fetch(`${DATA_BASE}/data/member/info`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
-        "User-Agent": "boxboxboard/1.0",
+        "User-Agent": "BoxBoxBoard/1.0",
       },
     });
 

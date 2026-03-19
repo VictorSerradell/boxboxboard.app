@@ -154,11 +154,23 @@ export default function ScheduleView({
     isActive: currentWeek === wi,
     isPast: currentWeek !== null && wi < currentWeek,
     entries: scheduled
-      .filter((s) => s.schedules?.[wi])
-      .map((s) => ({
-        series: s,
-        track: s.schedules[wi].track,
-      })),
+      .filter((s) => {
+        if (!Array.isArray(s.schedules)) return false;
+        // Try by index first, then by race_week_num
+        return (
+          s.schedules[wi] ??
+          s.schedules.find((w: any) => w.race_week_num === wi)
+        );
+      })
+      .map((s) => {
+        const week =
+          s.schedules[wi] ??
+          s.schedules.find((w: any) => w.race_week_num === wi);
+        return {
+          series: s,
+          track: week?.track ?? null,
+        };
+      }),
   })).filter((w) => w.entries.length > 0); // only show weeks with something scheduled
 
   return (
@@ -219,7 +231,7 @@ export default function ScheduleView({
                 }}
               >
                 {s.series_short_name ??
-                  s.series_name.split(" ").slice(0, 2).join(" ")}
+                  (s.series_name ?? "").split(" ").slice(0, 2).join(" ")}
                 <button
                   onClick={() => onRemove(s.series_id)}
                   style={{

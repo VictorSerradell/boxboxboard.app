@@ -44,19 +44,20 @@ export function buildEvents(scheduledSeries: SeriesSeason[]): CalendarEvent[] {
   const events: CalendarEvent[] = [];
 
   for (const series of scheduledSeries) {
-    if (!series.schedules?.length) continue;
+    if (!Array.isArray(series.schedules) || !series.schedules.length) continue;
 
     series.schedules.forEach((week, wi) => {
+      if (!week) return;
       const start = getWeekStartDate(series, wi);
       const end = getWeekEndDate(series, wi);
 
       const trackName =
-        week.track.track_name +
-        (week.track.config_name ? ` — ${week.track.config_name}` : "");
+        (week.track?.track_name ?? "TBD") +
+        (week.track?.config_name ? ` — ${week.track.config_name}` : "");
 
       events.push({
-        title: `${series.series_name} — W${wi + 1}`,
-        description: `iRacing ${series.series_name}\nWeek ${wi + 1} of ${series.schedules.length}\nCircuit: ${trackName}\nSeason ${series.season_quarter} ${series.season_year}`,
+        title: `${series.series_name ?? "Series"} — W${wi + 1}`,
+        description: `iRacing ${series.series_name ?? ""}\nWeek ${wi + 1} of ${series.schedules.length}\nCircuit: ${trackName}\nSeason ${series.season_quarter} ${series.season_year}`,
         start,
         end,
         location: trackName,
@@ -64,7 +65,6 @@ export function buildEvents(scheduledSeries: SeriesSeason[]): CalendarEvent[] {
     });
   }
 
-  // Sort by start date
   return events.sort((a, b) => a.start.getTime() - b.start.getTime());
 }
 
@@ -73,10 +73,10 @@ export function generateICS(events: CalendarEvent[]): string {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//boxboxboard//iRacing Season Planner//EN",
+    "PRODID:-//BoxBoxBoard//iRacing Season Planner//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
-    "X-WR-CALNAME:boxboxboard — My iRacing Schedule",
+    "X-WR-CALNAME:BoxBoxBoard — My iRacing Schedule",
     "X-WR-TIMEZONE:UTC",
   ];
 

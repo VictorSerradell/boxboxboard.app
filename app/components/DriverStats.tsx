@@ -385,7 +385,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
               borderTop: `1px solid ${T.divider}`,
             }}
           >
-            {!licenses?.length && (
+            {!licenses?.length && !(user as any).cust_id && (
               <p
                 style={{
                   fontFamily: "DM Mono, monospace",

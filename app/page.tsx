@@ -405,29 +405,6 @@ export default function LandingPage() {
           <LangToggle />
           <ThemeToggle />
           <a
-            href="https://github.com/VictorSerradell/boxboxboard"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 7,
-              padding: "7px 12px",
-              borderRadius: 8,
-              border: `1px solid ${T.githubBtnBorder}`,
-              background: T.githubBtn,
-              color: T.githubBtnColor,
-              textDecoration: "none",
-              fontSize: 13,
-              fontFamily: "Syne, sans-serif",
-              fontWeight: 600,
-              whiteSpace: "nowrap",
-            }}
-            className="hide-mobile"
-          >
-            <Github size={14} /> GitHub
-          </a>
-          <a
             href="/app"
             style={{
               display: "flex",
@@ -484,36 +461,6 @@ export default function LandingPage() {
             pointerEvents: "none",
           }}
         />
-
-        {/* Badge */}
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "6px 16px",
-            borderRadius: 20,
-            marginBottom: 28,
-            background: "rgba(59,158,255,0.1)",
-            border: "1px solid rgba(59,158,255,0.25)",
-            opacity: heroVisible ? 1 : 0,
-            transform: heroVisible ? "translateY(0)" : "translateY(8px)",
-            transition: "opacity 0.5s ease, transform 0.5s ease",
-          }}
-        >
-          <Star size={12} color="#3B9EFF" fill="#3B9EFF" />
-          <span
-            style={{
-              fontFamily: "DM Mono, monospace",
-              fontSize: 12,
-              fontWeight: 600,
-              color: "#3B9EFF",
-              letterSpacing: "0.06em",
-            }}
-          >
-            {t.freeOpenSource}
-          </span>
-        </div>
 
         {/* Headline */}
         <h1
@@ -588,28 +535,7 @@ export default function LandingPage() {
               boxShadow: "0 0 40px rgba(59,158,255,0.28)",
             }}
           >
-            {t.openboxboxboard} <ArrowRight size={16} />
-          </a>
-          <a
-            href="https://github.com/VictorSerradell/boxboxboard"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "14px 30px",
-              borderRadius: 12,
-              background: T.githubBtn,
-              border: `1px solid ${T.githubBtnBorder}`,
-              color: T.githubBtnColor,
-              textDecoration: "none",
-              fontFamily: "Syne, sans-serif",
-              fontWeight: 700,
-              fontSize: 16,
-            }}
-          >
-            <Github size={16} /> {t.viewOnGithub}
+            {t.openApp} <ArrowRight size={16} />
           </a>
         </div>
 
@@ -1049,7 +975,7 @@ export default function LandingPage() {
             transition: "opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s",
           }}
         >
-          {t.openboxboxboard} <ArrowRight size={16} />
+          {t.openApp} <ArrowRight size={16} />
         </a>
       </section>
 
@@ -1070,21 +996,6 @@ export default function LandingPage() {
           {t.notAffiliated}
         </span>
         <div style={{ display: "flex", gap: 16 }}>
-          <a
-            href="https://github.com/VictorSerradell/boxboxboard"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              fontSize: 13,
-              color: T.textMuted,
-              textDecoration: "none",
-            }}
-          >
-            <Github size={13} /> GitHub
-          </a>
           <a
             href="https://ko-fi.com"
             target="_blank"

@@ -30,24 +30,39 @@ export async function GET(request: NextRequest) {
   if (error) {
     const desc = searchParams.get("error_description") ?? error;
     return NextResponse.redirect(
-      `${APP_BASE}/?auth_error=${encodeURIComponent(desc)}`,
+      `${APP_BASE}/app?auth_error=${encodeURIComponent(desc)}`,
     );
   }
 
   if (!code) {
-    return NextResponse.redirect(`${APP_BASE}/?auth_error=no_code`);
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=no_code`);
   }
 
   // ── Validar state (CSRF) ────────────────────────────────────
   const savedState = request.cookies.get("oauth_state")?.value;
+
+  // Debug log para diagnosticar
+  console.log("[OAuth callback] returnedState:", returnedState);
+  console.log("[OAuth callback] savedState:", savedState);
+  console.log(
+    "[OAuth callback] cookies:",
+    request.cookies.getAll().map((c) => c.name),
+  );
+
   if (!savedState || savedState !== returnedState) {
-    return NextResponse.redirect(`${APP_BASE}/?auth_error=invalid_state`);
+    console.error(
+      "[OAuth callback] State mismatch — savedState:",
+      savedState,
+      "returnedState:",
+      returnedState,
+    );
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=invalid_state`);
   }
 
   // ── Recuperar code_verifier ─────────────────────────────────
   const codeVerifier = request.cookies.get("pkce_verifier")?.value;
   if (!codeVerifier) {
-    return NextResponse.redirect(`${APP_BASE}/?auth_error=missing_verifier`);
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=missing_verifier`);
   }
 
   const clientId = process.env.IRACING_CLIENT_ID!;
@@ -57,7 +72,7 @@ export async function GET(request: NextRequest) {
     "http://localhost:3000/api/auth/callback/iracing";
 
   if (!clientId || !clientSecret) {
-    return NextResponse.redirect(`${APP_BASE}/?auth_error=not_configured`);
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=not_configured`);
   }
 
   // ── Canjear code por tokens ─────────────────────────────────
@@ -88,21 +103,21 @@ export async function GET(request: NextRequest) {
       const errText = await tokenRes.text();
       console.error("Token exchange error:", tokenRes.status, errText);
       return NextResponse.redirect(
-        `${APP_BASE}/?auth_error=token_exchange_failed`,
+        `${APP_BASE}/app?auth_error=token_exchange_failed`,
       );
     }
 
     tokenData = await tokenRes.json();
   } catch (e) {
     console.error("Token fetch error:", e);
-    return NextResponse.redirect(`${APP_BASE}/?auth_error=network_error`);
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=network_error`);
   }
 
   const { access_token, refresh_token, expires_in, refresh_token_expires_in } =
     tokenData;
 
   if (!access_token) {
-    return NextResponse.redirect(`${APP_BASE}/?auth_error=no_token`);
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=no_token`);
   }
 
   // ── Obtener info del miembro ────────────────────────────────
@@ -132,7 +147,7 @@ export async function GET(request: NextRequest) {
   }
 
   // ── Guardar tokens en cookies httpOnly y redirigir al inicio ─
-  const response = NextResponse.redirect(`${APP_BASE}/?auth=success`);
+  const response = NextResponse.redirect(`${APP_BASE}/app?auth=success`);
 
   const secureCookie = {
     httpOnly: true,

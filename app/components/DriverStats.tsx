@@ -93,7 +93,10 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
     stats["road"] ??
     stats["formula_car"] ??
     (Object.values(stats)[0] as any);
-  const licColor = LICENSE_COLORS[primary?.license ?? "D"] ?? "#64748B";
+  const licColor =
+    LICENSE_COLORS[primary?.license ?? "D"] ??
+    LICENSE_COLORS[(primary?.license ?? "").replace("Class ", "")] ??
+    "#64748B";
 
   const T = {
     bg: isDark ? "#0A1221" : "#FFFFFF",
@@ -152,7 +155,9 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
             color: licColor,
           }}
         >
-          {primary?.license ?? "A"}
+          {(primary?.license ?? "A")
+            .replace("Class ", "")
+            .replace("Rookie", "R")}
         </span>
 
         {/* Name */}
@@ -284,7 +289,10 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
               {categories.map(({ key, label }) => {
                 const s = stats[key];
                 if (!s) return null;
-                const lc = LICENSE_COLORS[s.license] ?? "#64748B";
+                const lc =
+                  LICENSE_COLORS[s.license] ??
+                  LICENSE_COLORS[s.license?.replace("Class ", "")] ??
+                  "#64748B";
                 return (
                   <div
                     key={key}
@@ -316,7 +324,9 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
                         flexShrink: 0,
                       }}
                     >
-                      {s.license}
+                      {(s.license ?? "?")
+                        .replace("Class ", "")
+                        .replace("Rookie", "R")}
                     </span>
                     {/* Category */}
                     <span

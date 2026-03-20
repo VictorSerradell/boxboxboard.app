@@ -34,7 +34,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
       style={{
         position: "fixed",
         inset: 0,
-        zIndex: 200,
+        zIndex: 2000,
         background: "rgba(0,0,0,0.7)",
         backdropFilter: "blur(12px)",
         display: "flex",

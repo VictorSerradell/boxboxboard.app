@@ -367,7 +367,7 @@ export default function TrackMap({
       </div>
 
       {/* Map container */}
-      <div style={{ position: "relative" }}>
+      <div style={{ position: "relative", zIndex: 1 }}>
         <div
           ref={mapRef}
           style={{

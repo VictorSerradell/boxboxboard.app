@@ -264,6 +264,35 @@ export default function HomePage() {
       .catch((e) => console.error("[BoxBoxBoard] getMemberInfo failed:", e));
   }, [user?.cust_id]);
 
+  // Sync favorites and schedule from DB when user logs in
+  useEffect(() => {
+    if (!user?.cust_id) return;
+
+    // Load favorites from DB
+    fetch("/api/user/favorites", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.favorites?.length) {
+          setFavorites(data.favorites);
+        }
+      })
+      .catch(() => {});
+
+    // Load schedule from DB
+    fetch("/api/user/schedule", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.schedule?.length) {
+          setScheduledIds(data.schedule);
+          localStorage.setItem(
+            "boxboxboard_schedule",
+            JSON.stringify(data.schedule),
+          );
+        }
+      })
+      .catch(() => {});
+  }, [user?.cust_id]);
+
   // Open panel from URL param ?series=ID once series data is loaded
   useEffect(() => {
     if (series.length === 0) return;
@@ -307,6 +336,15 @@ export default function HomePage() {
       try {
         localStorage.setItem("boxboxboard_schedule", JSON.stringify(next));
       } catch {}
+      // Sync to DB if logged in
+      if (user?.cust_id) {
+        fetch("/api/user/schedule", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ schedule: next }),
+        }).catch(() => {});
+      }
       return next;
     });
   }
@@ -1164,7 +1202,17 @@ export default function HomePage() {
                     effectiveLicense !== null &&
                     (s.minLicenseLevel ?? 0) <= effectiveLicense
                   }
-                  onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
+                  onFavoriteToggle={(_, newFavs) => {
+                    setFavorites(newFavs);
+                    if ((user as any)?.cust_id) {
+                      fetch("/api/user/favorites", {
+                        method: "POST",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ favorites: newFavs }),
+                      }).catch(() => {});
+                    }
+                  }}
                   onClick={() => openSeries(s)}
                   onCompare={() => toggleCompare(s)}
                   onSchedule={() => toggleSchedule(s.series_id)}
@@ -1397,7 +1445,17 @@ export default function HomePage() {
           selectedSeries ? favorites.includes(selectedSeries.series_id) : false
         }
         onClose={() => closeSeries()}
-        onFavoriteToggle={(_, newFavs) => setFavorites(newFavs)}
+        onFavoriteToggle={(_, newFavs) => {
+          setFavorites(newFavs);
+          if ((user as any)?.cust_id) {
+            fetch("/api/user/favorites", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ favorites: newFavs }),
+            }).catch(() => {});
+          }
+        }}
       />
 
       <WeekChangeBanner

@@ -293,7 +293,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                         color: s.fixed_setup ? "#3B9EFF" : "#22C55E",
                       }}
                     >
-                      {s.fixed_setup ? "Fixed" : "Open"}
+                      {s.fixed_setup ? t.fixed : t.open}
                     </span>
                     <span
                       style={{

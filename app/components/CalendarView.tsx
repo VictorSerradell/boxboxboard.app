@@ -113,7 +113,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
             letterSpacing: "0.12em",
           }}
         >
-          Filter
+          {t.filterType}
         </span>
         <button
           onClick={() => setActiveCategory(null)}
@@ -129,7 +129,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
             cursor: "pointer",
           }}
         >
-          All ({series.length})
+          {t.filterAll(series.length)}
         </button>
         {categories.map((cat) => {
           const accent = CATEGORY_ACCENT[cat] ?? "#3B9EFF";

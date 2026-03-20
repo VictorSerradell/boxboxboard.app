@@ -345,7 +345,7 @@ export default function ScheduleView({
                   color: week.isActive ? "#22C55E" : T.textMuted,
                 }}
               >
-                Week {week.weekNum + 1}
+                {t.calendarWeek} {week.weekNum + 1}
               </span>
               {week.isActive && (
                 <span
@@ -382,7 +382,7 @@ export default function ScheduleView({
                   marginLeft: "auto",
                 }}
               >
-                {week.entries.length} series
+                {week.entries.length} {t.seriesLabel}
               </span>
             </div>
 
@@ -572,7 +572,7 @@ export default function ScheduleView({
                             color: T.textMuted,
                           }}
                         >
-                          <Wrench size={9} /> {s.fixed_setup ? "Fixed" : "Open"}
+                          <Wrench size={9} /> {s.fixed_setup ? t.fixed : t.open}
                         </span>
                         <span
                           style={{

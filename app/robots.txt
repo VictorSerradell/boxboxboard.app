@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /app
+
+Disallow: /api/
+
+Sitemap: https://www.boxboxboard.app/sitemap.xml

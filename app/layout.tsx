@@ -5,21 +5,18 @@ import "./globals.css";
 import { ThemeProvider } from "./lib/theme";
 import { I18nProvider } from "./lib/i18n";
 
-// ── Fonts via next/font (optimized, self-hosted by Vercel) ────
 const syne = Syne({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-syne",
   display: "swap",
 });
-
 const dmMono = DM_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-dm-mono",
   display: "swap",
 });
-
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500"],
@@ -27,54 +24,112 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://boxboxboard.app";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.boxboxboard.app";
+const TITLE = "BoxBoxBoard — iRacing Season Planner";
+const DESCRIPTION =
+  "Plan your iRacing season with BoxBoxBoard. Browse all series, track rotations, license requirements and owned content. Filter by category, license and setup type. Free, no login required.";
 
 export const viewport: Viewport = {
-  themeColor: "#3B9EFF",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#060C18" },
+    { media: "(prefers-color-scheme: light)", color: "#F1F5F9" },
+  ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
 };
 
 export const metadata: Metadata = {
-  title: "boxboxboard — iRacing Season Planner",
-  description:
-    "Browse every iRacing series, track rotation and schedule. Filter by license, category and owned content.",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: TITLE,
+    template: "%s | BoxBoxBoard",
+  },
+  description: DESCRIPTION,
   keywords: [
     "iRacing",
-    "sim racing",
-    "season planner",
-    "race schedule",
-    "track rotation",
+    "iRacing season planner",
+    "iRacing schedule",
+    "iRacing series",
+    "iRacing track rotation",
+    "sim racing calendar",
+    "iRacing 2026",
+    "iRacing season 2 2026",
+    "iRacing license",
+    "iRacing owned content",
+    "sim racing planner",
+    "iRacing app",
+    "iRacing tools",
   ],
-  metadataBase: new URL(BASE_URL),
+  authors: [{ name: "Victor Serradell", url: BASE_URL }],
+  creator: "Victor Serradell",
+  publisher: "BoxBoxBoard",
+  category: "Sports / Sim Racing",
   manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "boxboxboard",
+
+  // Canonical
+  alternates: {
+    canonical: BASE_URL,
+    languages: {
+      en: `${BASE_URL}`,
+      es: `${BASE_URL}`,
+    },
   },
+
+  // Robots
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+
+  // Open Graph
   openGraph: {
-    title: "boxboxboard — iRacing Season Planner",
-    description:
-      "Browse every iRacing series, track rotation and schedule. Filter by license, category and owned content.",
+    title: TITLE,
+    description: DESCRIPTION,
     type: "website",
     url: BASE_URL,
+    siteName: "BoxBoxBoard",
+    locale: "en_US",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "boxboxboard — iRacing Season Planner",
+        alt: "BoxBoxBoard — iRacing Season Planner",
+        type: "image/png",
       },
     ],
   },
+
+  // Twitter / X
   twitter: {
     card: "summary_large_image",
-    title: "boxboxboard — iRacing Season Planner",
-    description: "Browse every iRacing series, track rotation and schedule.",
-    images: ["/og-image.png"],
+    title: TITLE,
+    description:
+      "Plan your iRacing season — browse all series, track rotations and schedules. Free, no login required.",
+    images: [
+      { url: "/og-image.png", alt: "BoxBoxBoard — iRacing Season Planner" },
+    ],
+    creator: "@boxboxboard",
   },
+
+  // PWA / Apple
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "BoxBoxBoard",
+    startupImage: "/icon.png",
+  },
+
+  // Icons
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -83,7 +138,37 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
     shortcut: "/favicon.ico",
+    other: [{ rel: "mask-icon", url: "/favicon.ico", color: "#3B9EFF" }],
   },
+
+  // Verification (add when available)
+  // verification: { google: 'xxx' },
+};
+
+// JSON-LD Structured Data
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "BoxBoxBoard",
+  url: BASE_URL,
+  description: DESCRIPTION,
+  applicationCategory: "SportsApplication",
+  operatingSystem: "Web, iOS, Android",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  author: { "@type": "Person", name: "Victor Serradell" },
+  screenshot: `${BASE_URL}/og-image.png`,
+  featureList: [
+    "iRacing season schedule browser",
+    "Track rotation calendar",
+    "License requirement filter",
+    "Owned content indicator",
+    "Personal schedule planner",
+    "iCal and Google Calendar export",
+    "World track map",
+    "Series comparator",
+    "Dark and light mode",
+    "Spanish and English support",
+  ],
 };
 
 export default function RootLayout({
@@ -98,32 +183,21 @@ export default function RootLayout({
       className={`${syne.variable} ${dmMono.variable} ${dmSans.variable}`}
     >
       <head>
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {/* No-flash theme script */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-          (function() {
-            try {
-              var t = localStorage.getItem('boxboxboard_theme');
-              if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-              document.documentElement.setAttribute('data-theme', t);
-            } catch(e) {}
-          })();
-        `,
+            __html: `(function(){try{var t=localStorage.getItem('boxboxboard_theme');if(!t)t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
           }}
         />
-        {/* PWA service worker registration */}
+        {/* PWA service worker */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js').catch(function(err) {
-                console.log('SW registration failed:', err);
-              });
-            });
-          }
-        `,
+            __html: `if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}`,
           }}
         />
       </head>

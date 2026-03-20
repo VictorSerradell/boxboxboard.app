@@ -40,6 +40,7 @@ function buildTrackPins(
   ownedTrackIds: number[],
 ): TrackPin[] {
   const pinMap = new Map<string, TrackPin>();
+  const missing = new Set<string>();
 
   for (const s of series) {
     if (!s.schedules?.length) continue;
@@ -49,7 +50,10 @@ function buildTrackPins(
       if (!week?.track) return;
       const { track_name, config_name, track_id } = week.track;
       const coords = findTrackCoords(track_name);
-      if (!coords) return;
+      if (!coords) {
+        missing.add(track_name);
+        return;
+      }
 
       const key = `${coords.lat},${coords.lng}`;
       const isActive = currentWeek === wi;
@@ -78,6 +82,13 @@ function buildTrackPins(
         pin.categories.push(s.category);
       }
     });
+  }
+
+  if (missing.size > 0) {
+    console.log(
+      "[TrackMap] Missing coordinates for:",
+      Array.from(missing).sort().join("\n"),
+    );
   }
 
   return Array.from(pinMap.values());

@@ -41,21 +41,7 @@ export async function GET(request: NextRequest) {
   // ── Validar state (CSRF) ────────────────────────────────────
   const savedState = request.cookies.get("oauth_state")?.value;
 
-  // Debug log para diagnosticar
-  console.log("[OAuth callback] returnedState:", returnedState);
-  console.log("[OAuth callback] savedState:", savedState);
-  console.log(
-    "[OAuth callback] cookies:",
-    request.cookies.getAll().map((c) => c.name),
-  );
-
   if (!savedState || savedState !== returnedState) {
-    console.error(
-      "[OAuth callback] State mismatch — savedState:",
-      savedState,
-      "returnedState:",
-      returnedState,
-    );
     return NextResponse.redirect(`${APP_BASE}/app?auth_error=invalid_state`);
   }
 
@@ -169,13 +155,15 @@ export async function GET(request: NextRequest) {
   }
 
   if (custId) {
-    // cust_id no es sensible — el frontend lo necesita
     response.cookies.set("iracing_cust_id", String(custId), {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: refresh_token_expires_in ?? 3600,
       path: "/",
+      ...(process.env.NODE_ENV === "production" && {
+        domain: ".boxboxboard.app",
+      }),
     });
   }
 

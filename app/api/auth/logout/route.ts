@@ -18,10 +18,7 @@ export async function GET() {
 
   response.cookies.set("iracing_access_token", "", cookieOpts);
   response.cookies.set("iracing_refresh_token", "", cookieOpts);
-  response.cookies.set("iracing_cust_id", "", {
-    ...cookieOpts,
-    httpOnly: false,
-  });
+  response.cookies.set("iracing_cust_id", "", cookieOpts);
   response.cookies.set("iracing_display_name", "", {
     ...cookieOpts,
     httpOnly: false,

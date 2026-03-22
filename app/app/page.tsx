@@ -23,6 +23,7 @@ import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
 import LangToggle from "../components/LangToggle";
 import DriverStats from "../components/DriverStats";
+import CompareBar from "../components/CompareBar";
 import CalendarView from "../components/CalendarView";
 import ScheduleView from "../components/ScheduleView";
 import WeekChangeBanner from "../components/WeekChangeBanner";
@@ -43,7 +44,6 @@ import {
   getMemberInfo,
 } from "../lib/iracing-client";
 import { useTheme } from "../lib/theme";
-import CompareBar from "../components/Comparebar";
 
 function SkeletonCard() {
   const { theme } = useTheme();
@@ -225,31 +225,27 @@ export default function HomePage() {
     autoLicense !== undefined ? autoLicense : (filters.myLicense ?? null);
 
   useEffect(() => {
-    // Detect session from URL params (just after OAuth callback)
     const params = new URLSearchParams(window.location.search);
     if (params.get("auth") === "success") {
-      const name = document.cookie.match(/iracing_display_name=([^;]+)/)?.[1];
-      const cid = document.cookie.match(/iracing_cust_id=([^;]+)/)?.[1];
-      if (name)
-        setUser({
-          display_name: decodeURIComponent(name),
-          cust_id: Number(cid),
-        } as unknown as AppUser);
       window.history.replaceState({}, "", "/app");
-    } else if (params.get("auth_error")) {
+    }
+    if (params.get("auth_error")) {
       console.error("Auth error:", params.get("auth_error"));
       window.history.replaceState({}, "", "/app");
-      return;
-    } else {
-      // Detect persistent session from cookies (page refresh, back navigation)
-      const name = document.cookie.match(/iracing_display_name=([^;]+)/)?.[1];
-      const cid = document.cookie.match(/iracing_cust_id=([^;]+)/)?.[1];
-      if (name)
-        setUser({
-          display_name: decodeURIComponent(name),
-          cust_id: Number(cid),
-        } as unknown as AppUser);
     }
+
+    // Detect session securely via server endpoint
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.authenticated) {
+          setUser({
+            display_name: data.display_name,
+            cust_id: data.cust_id,
+          } as unknown as AppUser);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Fetch real member info (licenses, iRating, SR) once session is detected

@@ -427,7 +427,7 @@ export default function HomePage() {
           left: 0,
           right: 0,
           height: 64,
-          zIndex: 100,
+          zIndex: 1000,
           background: "var(--bg-header)",
           backdropFilter: "blur(20px)",
           borderBottom: "1px solid var(--border)",
@@ -448,24 +448,16 @@ export default function HomePage() {
             flexShrink: 0,
           }}
         >
-          <div
+          <img
+            src="/icon.png"
+            alt="BoxBoxBoard"
             style={{
               width: 34,
               height: 34,
               borderRadius: 10,
-              background: "linear-gradient(135deg, #3B9EFF 0%, #A855F7 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "Syne, sans-serif",
-              fontWeight: 900,
-              fontSize: 13,
-              color: "white",
               boxShadow: "0 0 20px rgba(59,158,255,0.3)",
             }}
-          >
-            B3
-          </div>
+          />
           {!isMobile && (
             <span
               style={{
@@ -696,7 +688,7 @@ export default function HomePage() {
             left: 0,
             right: 0,
             bottom: 0,
-            zIndex: 99,
+            zIndex: 999,
             background: "var(--bg-base)",
             overflowY: "auto",
             padding: "20px 16px",
@@ -1260,17 +1252,13 @@ export default function HomePage() {
                     width: 30,
                     height: 30,
                     borderRadius: 8,
-                    background: "linear-gradient(135deg, #3B9EFF, #A855F7)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontFamily: "Syne, sans-serif",
-                    fontWeight: 900,
-                    fontSize: 12,
-                    color: "white",
                   }}
                 >
-                  PB
+                  <img
+                    src="/icon.png"
+                    alt="BoxBoxBoard"
+                    style={{ width: 30, height: 30, borderRadius: 8 }}
+                  />
                 </div>
                 <span
                   style={{

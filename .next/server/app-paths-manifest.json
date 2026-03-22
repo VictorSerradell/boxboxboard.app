@@ -1,7 +1,4 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/app/page": "app/app/page.js",
-  "/api/iracing/current-season/route": "app/api/iracing/current-season/route.js",
-  "/api/iracing/[...route]/route": "app/api/iracing/[...route]/route.js"
+  "/page": "app/page.js"
 }

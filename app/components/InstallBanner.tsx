@@ -51,7 +51,7 @@ export default function InstallBanner() {
         bottom: 80,
         left: "50%",
         transform: "translateX(-50%)",
-        zIndex: 500,
+        zIndex: 1500,
         width: "min(380px, calc(100vw - 32px))",
         background: isDark ? "#0A1628" : "#FFFFFF",
         border: `1px solid rgba(59,158,255,0.35)`,
@@ -78,24 +78,11 @@ export default function InstallBanner() {
         }}
       >
         {/* Icon */}
-        <div
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 10,
-            background: "linear-gradient(135deg, #3B9EFF, #A855F7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            fontFamily: "Syne, sans-serif",
-            fontWeight: 900,
-            fontSize: 14,
-            color: "white",
-          }}
-        >
-          PB
-        </div>
+        <img
+          src="/icon.png"
+          alt="BoxBoxBoard"
+          style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0 }}
+        />
         {/* Text */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <p

@@ -72,7 +72,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
         bottom: 0,
         left: 0,
         right: 0,
-        zIndex: 300,
+        zIndex: 1300,
         background: T.bg,
         borderTop: `2px solid ${series[0] ? (CATEGORY_ACCENT[series[0].category ?? ""] ?? "#3B9EFF") + "60" : "rgba(59,158,255,0.4)"}`,
         boxShadow: T.shadow,
@@ -249,7 +249,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                         letterSpacing: "0.12em",
                       }}
                     >
-                      {s.category ?? "Road"}
+                      {s.category ?? t.catRoad}
                     </span>
                   </div>
                   <p

@@ -1,9 +1,9 @@
+// /app/components/CalendarView.tsx
+// Vista de calendario global — filas = semanas, columnas = series
 "use client";
 import { useT } from "../lib/i18n";
 import { useIsMobile } from "../lib/useBreakpoint";
-// /app/components/CalendarView.tsx
-// Vista de calendario global — filas = semanas, columnas = series
-
+import React, { ReactElement } from "react";
 import { useState } from "react";
 import { Flag } from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
@@ -299,7 +299,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                           textOverflow: "ellipsis",
                         }}
                       >
-                        {s.category ?? "Road"}
+                        {s.category ?? t.catRoad}
                       </span>
                     </div>
                     <p

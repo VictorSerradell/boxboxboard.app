@@ -467,7 +467,7 @@ export default function ScheduleView({
                             letterSpacing: "0.1em",
                           }}
                         >
-                          {s.category ?? "Road"}
+                          {s.category ?? t.catRoad}
                         </span>
                       </div>
                       <p

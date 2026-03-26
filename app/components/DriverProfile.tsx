@@ -169,10 +169,14 @@ export default function DriverProfile({
         }),
       ]);
       const [pData, rData] = await Promise.all([pRes.json(), rRes.json()]);
+      console.log("[DriverProfile] profile data:", pData);
+      console.log("[DriverProfile] races data:", rData);
+      if (pData.error) throw new Error(pData.error);
       setProfile(pData);
       setRaces(rData.races ?? []);
       setQuery(pData.display_name ?? "");
-    } catch {
+    } catch (e: any) {
+      console.error("[DriverProfile] loadProfile error:", e);
     } finally {
       setLoading(false);
     }
@@ -612,83 +616,97 @@ export default function DriverProfile({
                   gap: 8,
                 }}
               >
-                {Object.entries(profile.licenses).map(([key, lic]) => {
-                  const color = LICENSE_COLORS[lic.group_name] ?? "#64748B";
-                  return (
-                    <div
-                      key={key}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                        padding: "12px 14px",
-                        borderRadius: 12,
-                        background: T.card,
-                        border: `1px solid ${T.border}`,
-                      }}
-                    >
-                      {/* License badge */}
+                {Object.entries(profile.licenses ?? {}).map(
+                  ([key, lic]: [string, any]) => {
+                    if (!lic) return null;
+                    const color =
+                      LICENSE_COLORS[lic.group_name ?? ""] ?? "#64748B";
+                    return (
                       <div
+                        key={key}
                         style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 8,
-                          background: color + "20",
-                          border: `1px solid ${color}40`,
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0,
+                          gap: 12,
+                          padding: "12px 14px",
+                          borderRadius: 12,
+                          background: T.card,
+                          border: `1px solid ${T.border}`,
                         }}
                       >
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 8,
+                            background: color + "20",
+                            border: `1px solid ${color}40`,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontSize: 11,
+                              fontWeight: 800,
+                              color,
+                            }}
+                          >
+                            {shortLicense(lic.group_name ?? "?")}
+                          </span>
+                        </div>
                         <span
                           style={{
-                            fontFamily: "DM Mono, monospace",
-                            fontSize: 11,
-                            fontWeight: 800,
-                            color,
+                            fontFamily: "Syne, sans-serif",
+                            fontWeight: 600,
+                            fontSize: 13,
+                            color: T.text,
+                            flex: 1,
                           }}
                         >
-                          {shortLicense(lic.group_name)}
+                          {CATEGORY_LABELS[key] ?? key}
                         </span>
-                      </div>
-                      {/* Category */}
-                      <span
-                        style={{
-                          fontFamily: "Syne, sans-serif",
-                          fontWeight: 600,
-                          fontSize: 13,
-                          color: T.text,
-                          flex: 1,
-                        }}
-                      >
-                        {CATEGORY_LABELS[key] ?? key}
-                      </span>
-                      {/* iRating */}
-                      <div style={{ textAlign: "right" }}>
-                        <div
-                          style={{
-                            fontFamily: "DM Mono, monospace",
-                            fontWeight: 700,
-                            fontSize: 15,
-                            color: "#3B9EFF",
-                          }}
-                        >
-                          {lic.irating.toLocaleString()}
-                        </div>
-                        <div
-                          style={{
-                            fontFamily: "DM Mono, monospace",
-                            fontSize: 10,
-                            color,
-                          }}
-                        >
-                          SR {lic.safety_rating.toFixed(2)}
+                        <div style={{ textAlign: "right" }}>
+                          <div
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontWeight: 700,
+                              fontSize: 15,
+                              color: "#3B9EFF",
+                            }}
+                          >
+                            {(lic.irating ?? 0).toLocaleString()}
+                          </div>
+                          <div
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontSize: 10,
+                              color,
+                            }}
+                          >
+                            SR {(lic.safety_rating ?? 0).toFixed(2)}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  },
+                )}
+                {Object.keys(profile.licenses ?? {}).length === 0 && (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "32px 0",
+                      color: T.muted,
+                      fontFamily: "DM Mono, monospace",
+                      fontSize: 13,
+                    }}
+                  >
+                    No license data available
+                  </div>
+                )}
               </div>
             )}
 

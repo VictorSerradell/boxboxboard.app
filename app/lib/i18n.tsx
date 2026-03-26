@@ -76,6 +76,12 @@ export interface Translations {
   addToSchedule: string;
   removeFromSchedule: string;
   copyLink: string;
+  driverSearch: string;
+  searchDriverPlaceholder: string;
+  searchDriverHint: string;
+  searchDriverDesc: string;
+  licenseStats: string;
+  recentRaces: string;
   notAffiliated: string;
   madeBy: string;
   footerDesc: string;
@@ -223,6 +229,13 @@ const translations: Record<Lang, Translations> = {
     addToSchedule: "Add to my schedule",
     removeFromSchedule: "Remove from schedule",
     copyLink: "Copy share link",
+    driverSearch: "Driver Search",
+    searchDriverPlaceholder: "Search by driver name...",
+    searchDriverHint: "Search any iRacing driver",
+    searchDriverDesc:
+      "Type a driver name to see their iRating, Safety Rating and recent races",
+    licenseStats: "Licenses & Stats",
+    recentRaces: "Recent Races",
     // Footer
     notAffiliated:
       "BoxBoxBoard · Not affiliated with iRacing.com Motorsport Simulations",
@@ -439,6 +452,13 @@ const translations: Record<Lang, Translations> = {
     addToSchedule: "Añadir a mi horario",
     removeFromSchedule: "Quitar del horario",
     copyLink: "Copiar enlace",
+    driverSearch: "Buscar Piloto",
+    searchDriverPlaceholder: "Buscar por nombre de piloto...",
+    searchDriverHint: "Busca cualquier piloto de iRacing",
+    searchDriverDesc:
+      "Escribe un nombre para ver su iRating, Safety Rating y últimas carreras",
+    licenseStats: "Licencias y Stats",
+    recentRaces: "Últimas Carreras",
     // Footer
     notAffiliated:
       "BoxBoxBoard · No afiliado a iRacing.com Motorsport Simulations",

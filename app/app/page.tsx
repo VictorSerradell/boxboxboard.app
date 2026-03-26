@@ -10,6 +10,7 @@ import {
   LayoutList,
   CalendarClock,
   MapPin,
+  Users,
   ExternalLink,
   ChevronDown,
   User,
@@ -28,6 +29,7 @@ import ScheduleView from "../components/ScheduleView";
 import WeekChangeBanner from "../components/WeekChangeBanner";
 import InstallBanner from "../components/InstallBanner";
 import TrackMap from "../components/TrackMap";
+import DriverProfile from "../components/DriverProfile";
 import { useBreakpoint } from "../lib/useBreakpoint";
 import { useT } from "../lib/i18n";
 import type {
@@ -174,6 +176,7 @@ export default function HomePage() {
     "grid" | "calendar" | "schedule" | "map"
   >("grid");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [driverProfileOpen, setDriverProfileOpen] = useState(false);
   const bp = useBreakpoint();
   const isMobile = bp === "mobile";
   const isTablet = bp === "tablet";
@@ -574,6 +577,39 @@ export default function HomePage() {
                 </button>
               );
             })}
+            {/* Driver search button — only when logged in */}
+            {user && (
+              <button
+                onClick={() => setDriverProfileOpen(true)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 7,
+                  padding: "8px 14px",
+                  borderRadius: 10,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "Syne, sans-serif",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  background: "transparent",
+                  color: "#64748B",
+                  transition: "all 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "#3B9EFF";
+                  (e.currentTarget as HTMLElement).style.background =
+                    "rgba(59,158,255,0.08)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "#64748B";
+                  (e.currentTarget as HTMLElement).style.background =
+                    "transparent";
+                }}
+              >
+                <Users size={14} /> {t.driverSearch}
+              </button>
+            )}
           </nav>
         )}
 
@@ -1422,6 +1458,12 @@ export default function HomePage() {
       </footer>
 
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+
+      {/* Driver Profile Modal */}
+      <DriverProfile
+        open={driverProfileOpen}
+        onClose={() => setDriverProfileOpen(false)}
+      />
 
       <SeriesDetailPanel
         series={selectedSeries}

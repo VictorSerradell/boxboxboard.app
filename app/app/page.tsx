@@ -24,6 +24,7 @@ import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
 import LangToggle from "../components/LangToggle";
 import DriverStats from "../components/DriverStats";
+
 import CalendarView from "../components/CalendarView";
 import ScheduleView from "../components/ScheduleView";
 import WeekChangeBanner from "../components/WeekChangeBanner";

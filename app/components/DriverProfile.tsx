@@ -1,171 +1,1199 @@
-// /app/api/iracing/driver/route.ts
-// Endpoints: search drivers by name, get driver profile
+"use client";
+// /app/components/DriverProfile.tsx — Two-phase UX: search modal → fullscreen profile
 
-import { NextRequest, NextResponse } from "next/server";
+import { useState, useEffect, useRef } from "react";
+import {
+  X,
+  Search,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Trophy,
+  Flag,
+  Shield,
+  User,
+  Car,
+  ChevronLeft,
+} from "lucide-react";
+import { useTheme } from "../lib/theme";
+import { useT } from "../lib/i18n";
 
-const BASE = "https://members-ng.iracing.com/data";
-
-async function iracingFetch(path: string, token: string) {
-  const res = await fetch(`${BASE}/${path}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "User-Agent": "BoxBoxBoard/1.0",
-    },
-  });
-  if (!res.ok) throw new Error(`iRacing ${res.status}: ${path}`);
-  const raw = await res.json();
-  if (raw?.link) return fetch(raw.link).then((r) => r.json());
-  return raw;
+interface SearchResult {
+  cust_id: number;
+  display_name: string;
+  club_name: string;
+}
+interface License {
+  safety_rating: number;
+  irating: number;
+  color: string;
+  group_name: string;
+}
+interface Race {
+  subsession_id: number;
+  series_name: string;
+  track_name: string;
+  car_name: string;
+  finish_position: number;
+  incidents: number;
+  irating_change: number;
+  sof: number;
+}
+interface Profile {
+  cust_id: number;
+  display_name: string;
+  club_name: string;
+  member_since: string;
+  licenses: Record<string, License>;
+  helmet: {
+    pattern: number;
+    color1: string;
+    color2: string;
+    color3: string;
+  } | null;
+  summary: {
+    total_starts: number;
+    total_wins: number;
+    total_top5: number;
+    win_pct: string;
+  } | null;
 }
 
-export async function GET(request: NextRequest) {
-  const token = request.cookies.get("iracing_access_token")?.value;
-  if (!token)
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+const LICENSE_COLORS: Record<string, string> = {
+  Rookie: "#FF4444",
+  "Class D": "#F97316",
+  "Class C": "#EAB308",
+  "Class B": "#22C55E",
+  "Class A": "#3B9EFF",
+  PRO: "#A855F7",
+};
+const CATEGORY_LABELS: Record<string, string> = {
+  oval: "Oval",
+  sports_car: "Sports Car",
+  formula_car: "Formula",
+  dirt_oval: "Dirt Oval",
+  dirt_road: "Dirt Road",
+};
+const CATEGORY_COLORS: Record<string, string> = {
+  oval: "#F97316",
+  sports_car: "#3B9EFF",
+  formula_car: "#A855F7",
+  dirt_oval: "#EAB308",
+  dirt_road: "#22C55E",
+};
 
-  const { searchParams } = request.nextUrl;
-  const action = searchParams.get("action"); // 'search' | 'profile' | 'races' | 'summary'
-  const query = searchParams.get("q");
-  const custId = searchParams.get("cust_id");
+function shortLicense(name: string) {
+  return (name ?? "?").replace("Class ", "").replace("Rookie", "R");
+}
 
-  try {
-    // ── Search by name ───────────────────────────────────────
-    if (action === "search" && query) {
-      const data = await iracingFetch(
-        `lookup/drivers?search_term=${encodeURIComponent(query)}&lowerbound=1&upperbound=10`,
-        token,
-      );
-      const drivers = Array.isArray(data) ? data : (data?.drivers ?? []);
-      return NextResponse.json({
-        drivers: drivers.slice(0, 10).map((d: any) => ({
-          cust_id: d.cust_id,
-          display_name: d.display_name,
-          club_name: d.club_name ?? "",
-          helmet: d.helmet ?? null,
-        })),
-      });
+interface Props {
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function DriverProfile({ open, onClose }: Props) {
+  const { theme } = useTheme();
+  const { t } = useT();
+  const isDark = theme === "dark";
+
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const searchTimeout = useRef<any>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [races, setRaces] = useState<Race[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState<"stats" | "races">("stats");
+
+  const T = {
+    bg: isDark ? "#060C18" : "#F8FAFC",
+    card: isDark ? "#0A1221" : "#FFFFFF",
+    border: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
+    input: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
+    text: isDark ? "#E2E8F0" : "#1E293B",
+    muted: isDark ? "#64748B" : "#94A3B8",
+    row: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+    hover: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
+  };
+
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 100);
+    if (!open) {
+      setProfile(null);
+      setRaces([]);
+      setQuery("");
+      setResults([]);
     }
+  }, [open]);
 
-    // ── Full profile ─────────────────────────────────────────
-    if (action === "profile" && custId) {
-      const [memberData, summaryData] = await Promise.all([
-        iracingFetch(
-          `member/get?cust_ids=${custId}&include_licenses=true`,
-          token,
-        ),
-        iracingFetch(`stats/member_summary?cust_id=${custId}`, token).catch(
-          () => null,
-        ),
-      ]);
-
-      const member = Array.isArray(memberData?.members)
-        ? memberData.members[0]
-        : (memberData?.member ?? memberData);
-
-      // iRacing category_id mapping
-      const CATEGORY_BY_ID: Record<number, string> = {
-        1: "oval",
-        2: "sports_car",
-        3: "dirt_oval",
-        4: "dirt_road",
-        5: "sports_car",
-        6: "formula_car",
-      };
-      // For member/get the category field itself contains the key name
-      const VALID_CATS = new Set([
-        "oval",
-        "sports_car",
-        "formula_car",
-        "dirt_oval",
-        "dirt_road",
-        "road",
-      ]);
-
-      const rawLicenses = member?.licenses ?? {};
-      const licenses: Record<string, any> = {};
-
-      if (Array.isArray(rawLicenses)) {
-        for (const l of rawLicenses) {
-          const key = VALID_CATS.has(l.category)
-            ? l.category
-            : (CATEGORY_BY_ID[l.category_id] ?? String(l.category_id));
-          licenses[key] = l;
-        }
-      } else {
-        for (const [key, lic] of Object.entries(rawLicenses)) {
-          const l = lic as any;
-          // If key is numeric, use category_id from the license object
-          const catKey = VALID_CATS.has(key)
-            ? key
-            : VALID_CATS.has(l?.category)
-              ? l.category
-              : (CATEGORY_BY_ID[l?.category_id] ??
-                CATEGORY_BY_ID[Number(key)] ??
-                key);
-          licenses[catKey] = l;
-        }
+  function handleSearch(val: string) {
+    setQuery(val);
+    clearTimeout(searchTimeout.current);
+    if (val.length < 2) {
+      setResults([]);
+      return;
+    }
+    searchTimeout.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const res = await fetch(
+          `/api/iracing/driver?action=search&q=${encodeURIComponent(val)}`,
+          { credentials: "include" },
+        );
+        const data = await res.json();
+        setResults(data.drivers ?? []);
+      } catch {
+      } finally {
+        setSearching(false);
       }
-
-      // Helmet — iRacing stores helmet config, we build an SVG color preview
-      const helmet = member?.helmet ?? null;
-      const summary = summaryData?.stats ?? summaryData ?? null;
-
-      return NextResponse.json({
-        cust_id: member?.cust_id,
-        display_name: member?.display_name,
-        club_name: member?.club_name ?? member?.flair_name ?? "",
-        member_since: member?.member_since,
-        helmet,
-        licenses,
-        summary: summary
-          ? {
-              total_starts: summary.num_official_sessions ?? 0,
-              total_wins: summary.num_official_wins ?? 0,
-              total_top5: summary.num_official_top5 ?? 0,
-              total_poles: summary.num_official_poles ?? 0,
-              win_pct:
-                summary.num_official_sessions > 0
-                  ? (
-                      (summary.num_official_wins /
-                        summary.num_official_sessions) *
-                      100
-                    ).toFixed(1)
-                  : "0.0",
-            }
-          : null,
-      });
-    }
-
-    // ── Recent races ─────────────────────────────────────────
-    if (action === "races" && custId) {
-      const data = await iracingFetch(
-        `stats/member_recent_races?cust_id=${custId}`,
-        token,
-      );
-      const races = data?.races ?? data ?? [];
-      return NextResponse.json({
-        races: races.slice(0, 15).map((r: any) => ({
-          subsession_id: r.subsession_id,
-          series_name: r.series_name,
-          season_year: r.season_year,
-          season_quarter: r.season_quarter,
-          race_week_num: r.race_week_num,
-          track_name: r.track?.track_name ?? r.track_name ?? "",
-          car_name: r.car_name ?? "",
-          start_position: r.start_position,
-          finish_position: r.finish_position,
-          incidents: r.incidents,
-          irating_change: r.newi_rating - r.oldi_rating,
-          sof: r.event_strength_of_field ?? 0,
-          event_type: r.event_type_name ?? "Race",
-          session_start_time: r.session_start_time,
-        })),
-      });
-    }
-
-    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  } catch (e: any) {
-    console.error("[driver API]", e.message);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    }, 350);
   }
+
+  async function loadProfile(custId: number) {
+    setLoading(true);
+    setProfile(null);
+    setRaces([]);
+    setResults([]);
+    setQuery("");
+    try {
+      const [pRes, rRes] = await Promise.all([
+        fetch(`/api/iracing/driver?action=profile&cust_id=${custId}`, {
+          credentials: "include",
+        }),
+        fetch(`/api/iracing/driver?action=races&cust_id=${custId}`, {
+          credentials: "include",
+        }),
+      ]);
+      const [pData, rData] = await Promise.all([pRes.json(), rRes.json()]);
+      console.log(
+        "[DriverProfile] profile:",
+        JSON.stringify(pData).slice(0, 500),
+      );
+      if (pData?.cust_id) {
+        setProfile(pData);
+        setRaces(rData.races ?? []);
+      }
+    } catch (e) {
+      console.error("[DriverProfile]", e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (!open) return null;
+
+  // Helmet SVG — renders the 3 iRacing helmet colors as a simple visual
+  function HelmetBadge({
+    helmet,
+    size = 72,
+    fallbackColor = "#3B9EFF",
+    fallbackLabel = "?",
+  }: {
+    helmet: any;
+    size?: number;
+    fallbackColor?: string;
+    fallbackLabel?: string;
+  }) {
+    if (!helmet)
+      return (
+        <div
+          style={{
+            width: size,
+            height: size,
+            borderRadius: size * 0.25,
+            background: fallbackColor + "20",
+            border: `2px solid ${fallbackColor}40`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 900,
+              fontSize: size * 0.38,
+              color: fallbackColor,
+            }}
+          >
+            {fallbackLabel}
+          </span>
+        </div>
+      );
+    const c1 = `#${helmet.color1 ?? "3B9EFF"}`;
+    const c2 = `#${helmet.color2 ?? "A855F7"}`;
+    const c3 = `#${helmet.color3 ?? "22C55E"}`;
+    return (
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderRadius: size * 0.25,
+          overflow: "hidden",
+          flexShrink: 0,
+          border: `2px solid rgba(255,255,255,0.1)`,
+          position: "relative",
+        }}
+      >
+        <svg
+          viewBox="0 0 72 72"
+          width={size}
+          height={size}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Helmet shape */}
+          <defs>
+            <clipPath id="helmet-clip">
+              <path d="M36 4 C18 4 8 18 8 32 C8 50 20 66 36 68 C52 66 64 50 64 32 C64 18 54 4 36 4Z" />
+            </clipPath>
+          </defs>
+          {/* Base color */}
+          <rect width="72" height="72" fill={c1} clipPath="url(#helmet-clip)" />
+          {/* Stripe 1 */}
+          <rect
+            x="0"
+            y="28"
+            width="72"
+            height="14"
+            fill={c2}
+            clipPath="url(#helmet-clip)"
+          />
+          {/* Stripe 2 */}
+          <rect
+            x="0"
+            y="42"
+            width="72"
+            height="8"
+            fill={c3}
+            clipPath="url(#helmet-clip)"
+          />
+          {/* Visor */}
+          <ellipse
+            cx="36"
+            cy="38"
+            rx="22"
+            ry="10"
+            fill="rgba(0,0,0,0.35)"
+            clipPath="url(#helmet-clip)"
+          />
+          <ellipse
+            cx="36"
+            cy="37"
+            rx="20"
+            ry="8"
+            fill="rgba(100,200,255,0.15)"
+            clipPath="url(#helmet-clip)"
+          />
+          {/* Outline */}
+          <path
+            d="M36 4 C18 4 8 18 8 32 C8 50 20 66 36 68 C52 66 64 50 64 32 C64 18 54 4 36 4Z"
+            fill="none"
+            stroke="rgba(255,255,255,0.15)"
+            strokeWidth="1.5"
+          />
+        </svg>
+      </div>
+    );
+  }
+
+  // ── FULLSCREEN PROFILE ────────────────────────────────────────
+  if (profile || loading) {
+    const licenses = Object.entries(profile?.licenses ?? {});
+    const primary =
+      profile?.licenses?.sports_car ??
+      profile?.licenses?.oval ??
+      (Object.values(profile?.licenses ?? {})[0] as License | undefined);
+    const primaryColor = LICENSE_COLORS[primary?.group_name ?? ""] ?? "#3B9EFF";
+
+    return (
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 2000,
+          background: T.bg,
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+        }}
+      >
+        {/* Sticky top bar */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "16px 24px",
+            borderBottom: `1px solid ${T.border}`,
+            background: T.card,
+            flexShrink: 0,
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+          }}
+        >
+          <button
+            onClick={() => {
+              setProfile(null);
+              setRaces([]);
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: T.muted,
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 600,
+              fontSize: 13,
+              padding: "6px 10px",
+              borderRadius: 8,
+            }}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLElement).style.background = T.hover)
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLElement).style.background = "none")
+            }
+          >
+            <ChevronLeft size={16} /> {t.driverSearch}
+          </button>
+          <span style={{ color: T.border }}>|</span>
+          <span
+            style={{
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 800,
+              fontSize: 16,
+              color: T.text,
+            }}
+          >
+            {loading ? "..." : profile?.display_name}
+          </span>
+          <button
+            onClick={onClose}
+            style={{
+              marginLeft: "auto",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: T.muted,
+              display: "flex",
+              padding: 6,
+            }}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {loading && (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: T.muted,
+              fontFamily: "DM Mono, monospace",
+              fontSize: 14,
+            }}
+          >
+            Loading profile...
+          </div>
+        )}
+
+        {!loading && profile && (
+          <div
+            style={{
+              maxWidth: 900,
+              width: "100%",
+              margin: "0 auto",
+              padding: "32px 24px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 28,
+            }}
+          >
+            {/* Hero */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 20,
+                padding: "28px 32px",
+                borderRadius: 20,
+                border: `1px solid ${T.border}`,
+                background: isDark
+                  ? `linear-gradient(135deg, ${primaryColor}12 0%, #0A1221 100%)`
+                  : `linear-gradient(135deg, ${primaryColor}08 0%, #FFFFFF 100%)`,
+              }}
+            >
+              <HelmetBadge
+                helmet={(profile as any).helmet}
+                size={72}
+                fallbackColor={primaryColor}
+                fallbackLabel={shortLicense(primary?.group_name ?? "R")}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h1
+                  style={{
+                    fontFamily: "Syne, sans-serif",
+                    fontWeight: 900,
+                    fontSize: 28,
+                    color: T.text,
+                    margin: "0 0 6px",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {profile.display_name}
+                </h1>
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                  {profile.club_name && (
+                    <span
+                      style={{
+                        fontFamily: "DM Mono, monospace",
+                        fontSize: 12,
+                        color: T.muted,
+                      }}
+                    >
+                      {profile.club_name}
+                    </span>
+                  )}
+                  {profile.member_since && (
+                    <span
+                      style={{
+                        fontFamily: "DM Mono, monospace",
+                        fontSize: 12,
+                        color: T.muted,
+                      }}
+                    >
+                      · Since {new Date(profile.member_since).getFullYear()}
+                    </span>
+                  )}
+                  <span
+                    style={{
+                      fontFamily: "DM Mono, monospace",
+                      fontSize: 12,
+                      color: T.muted,
+                    }}
+                  >
+                    · #{profile.cust_id}
+                  </span>
+                </div>
+              </div>
+              {primary && (
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div
+                    style={{
+                      fontFamily: "DM Mono, monospace",
+                      fontWeight: 800,
+                      fontSize: 36,
+                      color: "#3B9EFF",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {(primary.irating ?? 0).toLocaleString()}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "DM Mono, monospace",
+                      fontSize: 12,
+                      color: primaryColor,
+                      marginTop: 4,
+                    }}
+                  >
+                    SR {(primary.safety_rating ?? 0).toFixed(2)}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "DM Mono, monospace",
+                      fontSize: 11,
+                      color: T.muted,
+                      marginTop: 2,
+                    }}
+                  >
+                    {CATEGORY_LABELS[
+                      Object.keys(profile.licenses).find(
+                        (k) => profile.licenses[k] === primary,
+                      ) ?? ""
+                    ] ?? "Sports Car"}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Summary */}
+            {profile.summary && profile.summary.total_starts > 0 && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                  gap: 12,
+                }}
+              >
+                {[
+                  {
+                    label: "Total Starts",
+                    value: profile.summary.total_starts.toLocaleString(),
+                    icon: <Flag size={16} color="#3B9EFF" />,
+                  },
+                  {
+                    label: "Wins",
+                    value: profile.summary.total_wins.toLocaleString(),
+                    icon: <Trophy size={16} color="#EAB308" />,
+                  },
+                  {
+                    label: "Top 5",
+                    value: profile.summary.total_top5.toLocaleString(),
+                    icon: <Shield size={16} color="#22C55E" />,
+                  },
+                  {
+                    label: "Win %",
+                    value: `${profile.summary.win_pct}%`,
+                    icon: <TrendingUp size={16} color="#A855F7" />,
+                  },
+                ].map((s) => (
+                  <div
+                    key={s.label}
+                    style={{
+                      padding: "16px 20px",
+                      background: T.card,
+                      borderRadius: 14,
+                      border: `1px solid ${T.border}`,
+                    }}
+                  >
+                    <div style={{ marginBottom: 8 }}>{s.icon}</div>
+                    <div
+                      style={{
+                        fontFamily: "DM Mono, monospace",
+                        fontWeight: 800,
+                        fontSize: 22,
+                        color: T.text,
+                      }}
+                    >
+                      {s.value}
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: "DM Mono, monospace",
+                        fontSize: 11,
+                        color: T.muted,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.1em",
+                        marginTop: 4,
+                      }}
+                    >
+                      {s.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Tabs */}
+            <div
+              style={{ display: "flex", borderBottom: `1px solid ${T.border}` }}
+            >
+              {(["stats", "races"] as const).map((tabId) => (
+                <button
+                  key={tabId}
+                  onClick={() => setTab(tabId)}
+                  style={{
+                    padding: "10px 20px",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "Syne, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    color: tab === tabId ? "#3B9EFF" : T.muted,
+                    borderBottom: `2px solid ${tab === tabId ? "#3B9EFF" : "transparent"}`,
+                    marginBottom: -1,
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {tabId === "stats" ? t.licenseStats : t.recentRaces}
+                </button>
+              ))}
+            </div>
+
+            {/* Stats tab */}
+            {tab === "stats" && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                  gap: 12,
+                }}
+              >
+                {licenses.length === 0 && (
+                  <p
+                    style={{
+                      color: T.muted,
+                      fontFamily: "DM Mono, monospace",
+                      fontSize: 13,
+                    }}
+                  >
+                    No license data
+                  </p>
+                )}
+                {licenses.map(([key, lic]: [string, any]) => {
+                  if (!lic) return null;
+                  const color =
+                    LICENSE_COLORS[lic.group_name ?? ""] ?? "#64748B";
+                  return (
+                    <div
+                      key={key}
+                      style={{
+                        padding: "20px",
+                        background: T.card,
+                        borderRadius: 16,
+                        border: `1px solid ${T.border}`,
+                        display: "flex",
+                        gap: 16,
+                        alignItems: "center",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 12,
+                          background: color + "20",
+                          border: `2px solid ${color}40`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontFamily: "DM Mono, monospace",
+                            fontSize: 16,
+                            fontWeight: 900,
+                            color,
+                          }}
+                        >
+                          {shortLicense(lic.group_name ?? "?")}
+                        </span>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{
+                            fontFamily: "Syne, sans-serif",
+                            fontWeight: 700,
+                            fontSize: 14,
+                            color: CATEGORY_COLORS[key] ?? "#3B9EFF",
+                            marginBottom: 8,
+                          }}
+                        >
+                          {CATEGORY_LABELS[key] ?? key}
+                        </div>
+                        <div style={{ display: "flex", gap: 20 }}>
+                          <div>
+                            <div
+                              style={{
+                                fontFamily: "DM Mono, monospace",
+                                fontWeight: 800,
+                                fontSize: 20,
+                                color: "#3B9EFF",
+                              }}
+                            >
+                              {(lic.irating ?? 0).toLocaleString()}
+                            </div>
+                            <div
+                              style={{
+                                fontFamily: "DM Mono, monospace",
+                                fontSize: 10,
+                                color: T.muted,
+                              }}
+                            >
+                              iRATING
+                            </div>
+                          </div>
+                          <div>
+                            <div
+                              style={{
+                                fontFamily: "DM Mono, monospace",
+                                fontWeight: 800,
+                                fontSize: 20,
+                                color,
+                              }}
+                            >
+                              {(lic.safety_rating ?? 0).toFixed(2)}
+                            </div>
+                            <div
+                              style={{
+                                fontFamily: "DM Mono, monospace",
+                                fontSize: 10,
+                                color: T.muted,
+                              }}
+                            >
+                              SAFETY
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Races tab */}
+            {tab === "races" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {races.length === 0 && (
+                  <p
+                    style={{
+                      color: T.muted,
+                      fontFamily: "DM Mono, monospace",
+                      fontSize: 13,
+                      textAlign: "center",
+                      padding: "40px 0",
+                    }}
+                  >
+                    No recent races
+                  </p>
+                )}
+                {races.map((race) => {
+                  const iRatingColor =
+                    race.irating_change > 0
+                      ? "#22C55E"
+                      : race.irating_change < 0
+                        ? "#EF4444"
+                        : T.muted;
+                  const isPodium = race.finish_position <= 3;
+                  return (
+                    <div
+                      key={race.subsession_id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 16,
+                        padding: "16px 20px",
+                        background: T.card,
+                        borderRadius: 14,
+                        border: `1px solid ${race.finish_position === 1 ? "rgba(234,179,8,0.3)" : T.border}`,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 12,
+                          flexShrink: 0,
+                          background: isPodium ? "rgba(234,179,8,0.12)" : T.row,
+                          border: `1px solid ${isPodium ? "rgba(234,179,8,0.3)" : T.border}`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontFamily: "DM Mono, monospace",
+                            fontWeight: 900,
+                            fontSize: 15,
+                            color: isPodium ? "#EAB308" : T.muted,
+                          }}
+                        >
+                          {race.finish_position === 1
+                            ? "🏆"
+                            : `P${race.finish_position}`}
+                        </span>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontFamily: "Syne, sans-serif",
+                            fontWeight: 700,
+                            fontSize: 14,
+                            color: T.text,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {race.series_name}
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 10,
+                            marginTop: 4,
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontSize: 11,
+                              color: T.muted,
+                            }}
+                          >
+                            {race.track_name}
+                          </span>
+                          {race.car_name && (
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 4,
+                                fontFamily: "DM Mono, monospace",
+                                fontSize: 11,
+                                color: T.muted,
+                              }}
+                            >
+                              <Car size={10} />
+                              {race.car_name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 20,
+                          flexShrink: 0,
+                          alignItems: "center",
+                        }}
+                      >
+                        <div style={{ textAlign: "center" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                              justifyContent: "center",
+                            }}
+                          >
+                            {race.irating_change > 0 ? (
+                              <TrendingUp size={12} color="#22C55E" />
+                            ) : race.irating_change < 0 ? (
+                              <TrendingDown size={12} color="#EF4444" />
+                            ) : (
+                              <Minus size={12} color={T.muted} />
+                            )}
+                            <span
+                              style={{
+                                fontFamily: "DM Mono, monospace",
+                                fontWeight: 800,
+                                fontSize: 14,
+                                color: iRatingColor,
+                              }}
+                            >
+                              {race.irating_change > 0 ? "+" : ""}
+                              {race.irating_change}
+                            </span>
+                          </div>
+                          <div
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontSize: 10,
+                              color: T.muted,
+                            }}
+                          >
+                            iRating
+                          </div>
+                        </div>
+                        <div style={{ textAlign: "center" }}>
+                          <div
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontWeight: 700,
+                              fontSize: 14,
+                              color: T.text,
+                            }}
+                          >
+                            {race.sof.toLocaleString()}
+                          </div>
+                          <div
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontSize: 10,
+                              color: T.muted,
+                            }}
+                          >
+                            SOF
+                          </div>
+                        </div>
+                        {race.incidents > 0 && (
+                          <div style={{ textAlign: "center" }}>
+                            <div
+                              style={{
+                                fontFamily: "DM Mono, monospace",
+                                fontWeight: 700,
+                                fontSize: 14,
+                                color: "#F97316",
+                              }}
+                            >
+                              {race.incidents}x
+                            </div>
+                            <div
+                              style={{
+                                fontFamily: "DM Mono, monospace",
+                                fontSize: 10,
+                                color: T.muted,
+                              }}
+                            >
+                              Inc
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── SEARCH MODAL ──────────────────────────────────────────────
+  return (
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 2000,
+        background: "rgba(0,0,0,0.7)",
+        backdropFilter: "blur(12px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 520,
+          background: T.card,
+          borderRadius: 20,
+          border: `1px solid ${T.border}`,
+          boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            padding: "20px 20px 16px",
+            borderBottom: `1px solid ${T.border}`,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 16,
+            }}
+          >
+            <User size={18} color="#3B9EFF" />
+            <span
+              style={{
+                fontFamily: "Syne, sans-serif",
+                fontWeight: 800,
+                fontSize: 17,
+                color: T.text,
+              }}
+            >
+              {t.driverSearch}
+            </span>
+            <button
+              onClick={onClose}
+              style={{
+                marginLeft: "auto",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: T.muted,
+                display: "flex",
+              }}
+            >
+              <X size={18} />
+            </button>
+          </div>
+          <div style={{ position: "relative" }}>
+            <Search
+              size={15}
+              color={T.muted}
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            />
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder={t.searchDriverPlaceholder}
+              style={{
+                width: "100%",
+                padding: "12px 12px 12px 38px",
+                borderRadius: 12,
+                background: T.input,
+                border: `1px solid ${T.border}`,
+                color: T.text,
+                fontFamily: "DM Sans, sans-serif",
+                fontSize: 15,
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+            {searching && (
+              <span
+                style={{
+                  position: "absolute",
+                  right: 14,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontSize: 12,
+                  color: T.muted,
+                }}
+              >
+                ···
+              </span>
+            )}
+          </div>
+        </div>
+
+        {results.length > 0 && (
+          <div style={{ maxHeight: 420, overflowY: "auto" }}>
+            {results.map((r, i) => (
+              <button
+                key={r.cust_id}
+                onClick={() => loadProfile(r.cust_id)}
+                style={{
+                  width: "100%",
+                  padding: "14px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  background: "none",
+                  border: "none",
+                  borderBottom:
+                    i < results.length - 1 ? `1px solid ${T.border}` : "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "background 0.1s",
+                }}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLElement).style.background = T.hover)
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLElement).style.background = "none")
+                }
+              >
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 10,
+                    background: "rgba(59,158,255,0.1)",
+                    border: "1px solid rgba(59,158,255,0.2)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <User size={16} color="#3B9EFF" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontFamily: "Syne, sans-serif",
+                      fontWeight: 700,
+                      fontSize: 14,
+                      color: T.text,
+                    }}
+                  >
+                    {r.display_name}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "DM Mono, monospace",
+                      fontSize: 11,
+                      color: T.muted,
+                    }}
+                  >
+                    {r.club_name}
+                  </div>
+                </div>
+                <span
+                  style={{
+                    fontFamily: "DM Mono, monospace",
+                    fontSize: 11,
+                    color: T.muted,
+                  }}
+                >
+                  #{r.cust_id}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {results.length === 0 && query.length < 2 && (
+          <div style={{ padding: "48px 24px", textAlign: "center" }}>
+            <User
+              size={40}
+              strokeWidth={1}
+              color={T.muted}
+              style={{ marginBottom: 16 }}
+            />
+            <p
+              style={{
+                fontFamily: "Syne, sans-serif",
+                fontWeight: 700,
+                fontSize: 15,
+                color: T.text,
+                margin: "0 0 8px",
+              }}
+            >
+              {t.searchDriverHint}
+            </p>
+            <p
+              style={{
+                fontFamily: "DM Sans, sans-serif",
+                fontSize: 13,
+                color: T.muted,
+                margin: 0,
+              }}
+            >
+              {t.searchDriverDesc}
+            </p>
+          </div>
+        )}
+
+        {results.length === 0 && query.length >= 2 && !searching && (
+          <div
+            style={{
+              padding: "32px 24px",
+              textAlign: "center",
+              color: T.muted,
+              fontFamily: "DM Mono, monospace",
+              fontSize: 13,
+            }}
+          >
+            No drivers found for "{query}"
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

@@ -2,6 +2,7 @@
 // /app/components/DriverProfile.tsx
 
 import { useState, useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 import {
   X,
   Search,
@@ -182,6 +183,14 @@ export default function DriverProfile({ open, onClose }: Props) {
   }
 
   if (!open) return null;
+
+  const shimmer = (dark: boolean): CSSProperties => ({
+    background: dark
+      ? "linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%)"
+      : "linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 75%)",
+    backgroundSize: "600px 100%",
+    animation: "shimmer 1.4s infinite linear",
+  });
 
   // ── FULLSCREEN PROFILE ────────────────────────────────────────
   if (profile || loading) {
@@ -408,16 +417,175 @@ export default function DriverProfile({ open, onClose }: Props) {
         {loading && (
           <div
             style={{
-              flex: 1,
+              maxWidth: 920,
+              width: "100%",
+              margin: "0 auto",
+              padding: "36px 28px",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: T.muted,
-              fontFamily: "DM Mono, monospace",
-              fontSize: 15,
+              flexDirection: "column",
+              gap: 32,
             }}
           >
-            Loading profile...
+            <style>{`
+              @keyframes shimmer {
+                0% { background-position: -600px 0; }
+                100% { background-position: 600px 0; }
+              }
+            `}</style>
+
+            {/* Hero skeleton */}
+            <div
+              style={{
+                padding: "40px",
+                borderRadius: 28,
+                border: `1px solid ${T.border}`,
+                background: T.card,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 32,
+              }}
+            >
+              {/* Helmet */}
+              <div
+                style={{
+                  width: 112,
+                  height: 112,
+                  borderRadius: 22,
+                  flexShrink: 0,
+                  ...shimmer(isDark),
+                }}
+              />
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                  paddingTop: 8,
+                }}
+              >
+                <div
+                  style={{
+                    height: 36,
+                    width: "55%",
+                    borderRadius: 10,
+                    ...shimmer(isDark),
+                  }}
+                />
+                <div
+                  style={{
+                    height: 16,
+                    width: "35%",
+                    borderRadius: 8,
+                    ...shimmer(isDark),
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  textAlign: "right",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                  alignItems: "flex-end",
+                  paddingTop: 4,
+                }}
+              >
+                <div
+                  style={{
+                    height: 46,
+                    width: 120,
+                    borderRadius: 10,
+                    ...shimmer(isDark),
+                  }}
+                />
+                <div
+                  style={{
+                    height: 16,
+                    width: 80,
+                    borderRadius: 8,
+                    ...shimmer(isDark),
+                  }}
+                />
+                <div
+                  style={{
+                    height: 14,
+                    width: 60,
+                    borderRadius: 8,
+                    ...shimmer(isDark),
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* License cards skeleton */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                gap: 14,
+              }}
+            >
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: "22px",
+                    background: T.card,
+                    borderRadius: 18,
+                    border: `1px solid ${T.border}`,
+                    display: "flex",
+                    gap: 18,
+                    alignItems: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 52,
+                      height: 52,
+                      borderRadius: 14,
+                      flexShrink: 0,
+                      ...shimmer(isDark),
+                    }}
+                  />
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 10,
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: 14,
+                        width: "50%",
+                        borderRadius: 6,
+                        ...shimmer(isDark),
+                      }}
+                    />
+                    <div style={{ display: "flex", gap: 22 }}>
+                      <div
+                        style={{
+                          height: 22,
+                          width: 60,
+                          borderRadius: 6,
+                          ...shimmer(isDark),
+                        }}
+                      />
+                      <div
+                        style={{
+                          height: 22,
+                          width: 50,
+                          borderRadius: 6,
+                          ...shimmer(isDark),
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

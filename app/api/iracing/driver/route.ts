@@ -62,7 +62,52 @@ export async function GET(request: NextRequest) {
         ? memberData.members[0]
         : (memberData?.member ?? memberData);
 
-      const licenses = member?.licenses ?? {};
+      // iRacing category_id mapping
+      const CATEGORY_BY_ID: Record<number, string> = {
+        1: "oval",
+        2: "sports_car",
+        3: "dirt_oval",
+        4: "dirt_road",
+        5: "sports_car",
+        6: "formula_car",
+      };
+      // For member/get the category field itself contains the key name
+      const VALID_CATS = new Set([
+        "oval",
+        "sports_car",
+        "formula_car",
+        "dirt_oval",
+        "dirt_road",
+        "road",
+      ]);
+
+      const rawLicenses = member?.licenses ?? {};
+      const licenses: Record<string, any> = {};
+
+      if (Array.isArray(rawLicenses)) {
+        for (const l of rawLicenses) {
+          const key = VALID_CATS.has(l.category)
+            ? l.category
+            : (CATEGORY_BY_ID[l.category_id] ?? String(l.category_id));
+          licenses[key] = l;
+        }
+      } else {
+        for (const [key, lic] of Object.entries(rawLicenses)) {
+          const l = lic as any;
+          // If key is numeric, use category_id from the license object
+          const catKey = VALID_CATS.has(key)
+            ? key
+            : VALID_CATS.has(l?.category)
+              ? l.category
+              : (CATEGORY_BY_ID[l?.category_id] ??
+                CATEGORY_BY_ID[Number(key)] ??
+                key);
+          licenses[catKey] = l;
+        }
+      }
+
+      // Helmet — iRacing stores helmet config, we build an SVG color preview
+      const helmet = member?.helmet ?? null;
       const summary = summaryData?.stats ?? summaryData ?? null;
 
       return NextResponse.json({
@@ -70,6 +115,7 @@ export async function GET(request: NextRequest) {
         display_name: member?.display_name,
         club_name: member?.club_name ?? member?.flair_name ?? "",
         member_since: member?.member_since,
+        helmet,
         licenses,
         summary: summary
           ? {

@@ -1,6 +1,4 @@
 "use client";
-// /app/components/DriverProfile.tsx
-
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import {
@@ -100,6 +98,7 @@ export default function DriverProfile({ open, onClose }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   const searchTimeout = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -108,15 +107,24 @@ export default function DriverProfile({ open, onClose }: Props) {
   const [tab, setTab] = useState<"stats" | "races">("stats");
 
   const T = {
-    bg: isDark ? "#060C18" : "#F8FAFC",
+    bg: isDark ? "#060C18" : "#F1F5F9",
     card: isDark ? "#0A1221" : "#FFFFFF",
     border: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
-    input: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
-    text: isDark ? "#E2E8F0" : "#1E293B",
+    input: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+    text: isDark ? "#F1F5F9" : "#0F172A",
     muted: isDark ? "#64748B" : "#94A3B8",
+    faint: isDark ? "#334155" : "#CBD5E1",
     row: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
-    hover: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
+    hover: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)",
   };
+
+  const shimmer = (dark: boolean): CSSProperties => ({
+    background: dark
+      ? "linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%)"
+      : "linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 75%)",
+    backgroundSize: "600px 100%",
+    animation: "shimmer 1.4s infinite linear",
+  });
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 100);
@@ -167,10 +175,6 @@ export default function DriverProfile({ open, onClose }: Props) {
         }),
       ]);
       const [pData, rData] = await Promise.all([pRes.json(), rRes.json()]);
-      console.log(
-        "[DriverProfile] profile:",
-        JSON.stringify(pData).slice(0, 500),
-      );
       if (pData?.cust_id) {
         setProfile(pData);
         setRaces(rData.races ?? []);
@@ -183,14 +187,6 @@ export default function DriverProfile({ open, onClose }: Props) {
   }
 
   if (!open) return null;
-
-  const shimmer = (dark: boolean): CSSProperties => ({
-    background: dark
-      ? "linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%)"
-      : "linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 75%)",
-    backgroundSize: "600px 100%",
-    animation: "shimmer 1.4s infinite linear",
-  });
 
   // ── FULLSCREEN PROFILE ────────────────────────────────────────
   if (profile || loading) {
@@ -207,7 +203,7 @@ export default function DriverProfile({ open, onClose }: Props) {
 
     const HelmetBadge = ({
       helmet,
-      size = 112,
+      size = 140,
       fallbackColor = "#3B9EFF",
       fallbackLabel = "?",
     }: {
@@ -215,17 +211,17 @@ export default function DriverProfile({ open, onClose }: Props) {
       size?: number;
       fallbackColor?: string;
       fallbackLabel?: string;
-    }) => {
+    }): JSX.Element => {
       if (!helmet)
         return (
           <div
             style={{
               width: size,
               height: size,
-              borderRadius: 22,
-              background: `linear-gradient(145deg, ${fallbackColor}20, transparent)`,
-              border: `3px solid ${fallbackColor}35`,
-              boxShadow: `0 0 45px ${fallbackColor}50, inset 0 4px 15px rgba(255,255,255,0.2)`,
+              borderRadius: 28,
+              background: `radial-gradient(circle at 35% 35%, ${fallbackColor}30, transparent 70%)`,
+              border: `3px solid ${fallbackColor}30`,
+              boxShadow: `0 0 60px ${fallbackColor}40, 0 20px 40px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.15)`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -238,93 +234,114 @@ export default function DriverProfile({ open, onClose }: Props) {
                 fontWeight: 900,
                 fontSize: size * 0.42,
                 color: fallbackColor,
-                textShadow: `0 0 25px ${fallbackColor}90`,
+                textShadow: `0 0 40px ${fallbackColor}`,
               }}
             >
               {fallbackLabel}
             </span>
           </div>
         );
-      const c1 = `#${helmet.color1 ?? "3B9EFF"}`;
-      const c2 = `#${helmet.color2 ?? "A855F7"}`;
-      const c3 = `#${helmet.color3 ?? "22C55E"}`;
+      const c1 = `#${helmet.color1 ?? "1E3A5F"}`;
+      const c2 = `#${helmet.color2 ?? "3B9EFF"}`;
+      const c3 = `#${helmet.color3 ?? "F97316"}`;
       return (
         <div
           style={{
             width: size,
             height: size,
-            borderRadius: 22,
+            borderRadius: 28,
             overflow: "hidden",
             flexShrink: 0,
-            boxShadow:
-              "0 25px 50px rgba(0,0,0,0.45), inset 0 6px 20px rgba(255,255,255,0.18)",
-            border: "3px solid rgba(255,255,255,0.18)",
             position: "relative",
+            boxShadow: `0 0 50px ${c1}60, 0 25px 60px rgba(0,0,0,0.6), inset 0 3px 0 rgba(255,255,255,0.2)`,
+            border: "3px solid rgba(255,255,255,0.15)",
           }}
         >
           <svg
-            viewBox="0 0 108 108"
+            viewBox="0 0 140 140"
             width={size}
             height={size}
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
-              <clipPath id="helmet-clip">
-                <path d="M54 10 C32 10 15 26 15 48 C15 72 32 92 54 96 C76 92 93 72 93 48 C93 26 76 10 54 10Z" />
+              <clipPath id="hclip">
+                <path d="M70 8 C42 8 20 28 18 54 C16 82 30 112 50 124 C57 128 63 130 70 130 C77 130 83 128 90 124 C110 112 124 82 122 54 C120 28 98 8 70 8Z" />
               </clipPath>
-              <linearGradient
-                id="visorGrad"
-                x1="30%"
-                y1="40%"
-                x2="70%"
-                y2="70%"
-              >
-                <stop offset="0%" stopColor="rgba(0,0,0,0.65)" />
-                <stop offset="100%" stopColor="rgba(100,190,255,0.28)" />
+              <radialGradient id="hshine" cx="38%" cy="28%" r="55%">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.35)" />
+                <stop offset="60%" stopColor="rgba(255,255,255,0)" />
+              </radialGradient>
+              <radialGradient id="hvisor" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="rgba(80,180,255,0.25)" />
+                <stop offset="100%" stopColor="rgba(0,10,30,0.80)" />
+              </radialGradient>
+              <linearGradient id="hstripe" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={c2} stopOpacity="1" />
+                <stop offset="100%" stopColor={c2} stopOpacity="0.7" />
               </linearGradient>
             </defs>
-            <rect
-              width="108"
-              height="108"
-              fill={c1}
-              clipPath="url(#helmet-clip)"
-            />
+            {/* Base */}
+            <rect width="140" height="140" fill={c1} clipPath="url(#hclip)" />
+            {/* Mid stripe */}
             <rect
               x="0"
-              y="40"
-              width="108"
-              height="20"
-              fill={c2}
-              clipPath="url(#helmet-clip)"
+              y="52"
+              width="140"
+              height="22"
+              fill="url(#hstripe)"
+              clipPath="url(#hclip)"
             />
+            {/* Bottom stripe */}
             <rect
               x="0"
-              y="60"
-              width="108"
+              y="74"
+              width="140"
               height="14"
               fill={c3}
-              clipPath="url(#helmet-clip)"
+              clipPath="url(#hclip)"
             />
+            {/* Visor */}
             <ellipse
-              cx="54"
-              cy="56"
-              rx="34"
-              ry="16"
-              fill="url(#visorGrad)"
-              clipPath="url(#helmet-clip)"
+              cx="70"
+              cy="72"
+              rx="42"
+              ry="19"
+              fill="url(#hvisor)"
+              clipPath="url(#hclip)"
             />
+            {/* Visor edge highlight */}
+            <ellipse
+              cx="70"
+              cy="63"
+              rx="40"
+              ry="6"
+              fill="rgba(120,200,255,0.18)"
+              clipPath="url(#hclip)"
+            />
+            {/* Top shine */}
+            <ellipse
+              cx="56"
+              cy="34"
+              rx="28"
+              ry="18"
+              fill="url(#hshine)"
+              clipPath="url(#hclip)"
+            />
+            {/* Thin highlight line */}
             <path
-              d="M35 30 Q54 22 73 33"
+              d="M38 28 Q70 18 102 29"
               fill="none"
-              stroke="rgba(255,255,255,0.45)"
-              strokeWidth="7"
+              stroke="rgba(255,255,255,0.55)"
+              strokeWidth="5"
               strokeLinecap="round"
+              clipPath="url(#hclip)"
             />
+            {/* Outline */}
             <path
-              d="M54 10 C32 10 15 26 15 48 C15 72 32 92 54 96 C76 92 93 72 93 48 C93 26 76 10 54 10Z"
+              d="M70 8 C42 8 20 28 18 54 C16 82 30 112 50 124 C57 128 63 130 70 130 C77 130 83 128 90 124 C110 112 124 82 122 54 C120 28 98 8 70 8Z"
               fill="none"
-              stroke="rgba(255,255,255,0.3)"
-              strokeWidth="4"
+              stroke="rgba(255,255,255,0.22)"
+              strokeWidth="3"
             />
           </svg>
         </div>
@@ -343,15 +360,23 @@ export default function DriverProfile({ open, onClose }: Props) {
           overflowY: "auto",
         }}
       >
+        <style>{`
+          @keyframes shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
+          @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        `}</style>
+
         {/* Top bar */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 12,
-            padding: "16px 28px",
+            gap: 14,
+            padding: "16px 32px",
             borderBottom: `1px solid ${T.border}`,
-            background: T.card,
+            background: isDark
+              ? "rgba(6,12,24,0.95)"
+              : "rgba(248,250,252,0.95)",
+            backdropFilter: "blur(20px)",
             flexShrink: 0,
             position: "sticky",
             top: 0,
@@ -368,26 +393,32 @@ export default function DriverProfile({ open, onClose }: Props) {
               alignItems: "center",
               gap: 8,
               background: "none",
-              border: "none",
+              border: `1px solid transparent`,
               cursor: "pointer",
               color: T.muted,
               fontFamily: "Syne, sans-serif",
               fontWeight: 600,
               fontSize: 14,
-              padding: "8px 12px",
-              borderRadius: 10,
+              padding: "8px 14px",
+              borderRadius: 12,
               transition: "all 0.2s",
             }}
-            onMouseEnter={(e) =>
-              ((e.currentTarget as HTMLElement).style.background = T.hover)
-            }
-            onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLElement).style.background = "none")
-            }
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = T.hover;
+              el.style.borderColor = T.border;
+              el.style.color = T.text;
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "none";
+              el.style.borderColor = "transparent";
+              el.style.color = T.muted;
+            }}
           >
-            <ChevronLeft size={18} /> {t.driverSearch}
+            <ChevronLeft size={17} /> {t.driverSearch}
           </button>
-          <span style={{ color: T.border }}>|</span>
+          <span style={{ color: T.faint }}>|</span>
           <span
             style={{
               fontFamily: "Syne, sans-serif",
@@ -396,61 +427,67 @@ export default function DriverProfile({ open, onClose }: Props) {
               color: T.text,
             }}
           >
-            {loading ? "..." : profile?.display_name}
+            {loading ? "···" : profile?.display_name}
           </span>
           <button
             onClick={onClose}
             style={{
               marginLeft: "auto",
               background: "none",
-              border: "none",
+              border: `1px solid transparent`,
               cursor: "pointer",
               color: T.muted,
               padding: 8,
-              borderRadius: 8,
+              borderRadius: 10,
+              display: "flex",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = T.hover;
+              el.style.borderColor = T.border;
+              el.style.color = T.text;
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "none";
+              el.style.borderColor = "transparent";
+              el.style.color = T.muted;
             }}
           >
-            <X size={22} />
+            <X size={20} />
           </button>
         </div>
 
+        {/* Skeleton */}
         {loading && (
           <div
             style={{
-              maxWidth: 920,
+              maxWidth: 960,
               width: "100%",
               margin: "0 auto",
-              padding: "36px 28px",
+              padding: "40px 32px",
               display: "flex",
               flexDirection: "column",
               gap: 32,
             }}
           >
-            <style>{`
-              @keyframes shimmer {
-                0% { background-position: -600px 0; }
-                100% { background-position: 600px 0; }
-              }
-            `}</style>
-
-            {/* Hero skeleton */}
             <div
               style={{
-                padding: "40px",
-                borderRadius: 28,
+                padding: "48px",
+                borderRadius: 32,
                 border: `1px solid ${T.border}`,
                 background: T.card,
                 display: "flex",
                 alignItems: "flex-start",
-                gap: 32,
+                gap: 36,
               }}
             >
-              {/* Helmet */}
               <div
                 style={{
-                  width: 112,
-                  height: 112,
-                  borderRadius: 22,
+                  width: 140,
+                  height: 140,
+                  borderRadius: 28,
                   flexShrink: 0,
                   ...shimmer(isDark),
                 }}
@@ -460,22 +497,22 @@ export default function DriverProfile({ open, onClose }: Props) {
                   flex: 1,
                   display: "flex",
                   flexDirection: "column",
-                  gap: 12,
-                  paddingTop: 8,
+                  gap: 14,
+                  paddingTop: 10,
                 }}
               >
                 <div
                   style={{
-                    height: 36,
-                    width: "55%",
-                    borderRadius: 10,
+                    height: 40,
+                    width: "50%",
+                    borderRadius: 12,
                     ...shimmer(isDark),
                   }}
                 />
                 <div
                   style={{
                     height: 16,
-                    width: "35%",
+                    width: "32%",
                     borderRadius: 8,
                     ...shimmer(isDark),
                   }}
@@ -483,19 +520,18 @@ export default function DriverProfile({ open, onClose }: Props) {
               </div>
               <div
                 style={{
-                  textAlign: "right",
                   display: "flex",
                   flexDirection: "column",
                   gap: 10,
                   alignItems: "flex-end",
-                  paddingTop: 4,
+                  paddingTop: 6,
                 }}
               >
                 <div
                   style={{
-                    height: 46,
-                    width: 120,
-                    borderRadius: 10,
+                    height: 52,
+                    width: 130,
+                    borderRadius: 12,
                     ...shimmer(isDark),
                   }}
                 />
@@ -507,22 +543,12 @@ export default function DriverProfile({ open, onClose }: Props) {
                     ...shimmer(isDark),
                   }}
                 />
-                <div
-                  style={{
-                    height: 14,
-                    width: 60,
-                    borderRadius: 8,
-                    ...shimmer(isDark),
-                  }}
-                />
               </div>
             </div>
-
-            {/* License cards skeleton */}
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))",
                 gap: 14,
               }}
             >
@@ -530,9 +556,9 @@ export default function DriverProfile({ open, onClose }: Props) {
                 <div
                   key={i}
                   style={{
-                    padding: "22px",
+                    padding: "24px",
                     background: T.card,
-                    borderRadius: 18,
+                    borderRadius: 20,
                     border: `1px solid ${T.border}`,
                     display: "flex",
                     gap: 18,
@@ -541,9 +567,9 @@ export default function DriverProfile({ open, onClose }: Props) {
                 >
                   <div
                     style={{
-                      width: 52,
-                      height: 52,
-                      borderRadius: 14,
+                      width: 56,
+                      height: 56,
+                      borderRadius: 16,
                       flexShrink: 0,
                       ...shimmer(isDark),
                     }}
@@ -559,24 +585,24 @@ export default function DriverProfile({ open, onClose }: Props) {
                     <div
                       style={{
                         height: 14,
-                        width: "50%",
+                        width: "45%",
                         borderRadius: 6,
                         ...shimmer(isDark),
                       }}
                     />
-                    <div style={{ display: "flex", gap: 22 }}>
+                    <div style={{ display: "flex", gap: 20 }}>
                       <div
                         style={{
-                          height: 22,
-                          width: 60,
+                          height: 24,
+                          width: 64,
                           borderRadius: 6,
                           ...shimmer(isDark),
                         }}
                       />
                       <div
                         style={{
-                          height: 22,
-                          width: 50,
+                          height: 24,
+                          width: 52,
                           borderRadius: 6,
                           ...shimmer(isDark),
                         }}
@@ -589,66 +615,100 @@ export default function DriverProfile({ open, onClose }: Props) {
           </div>
         )}
 
+        {/* Profile content */}
         {!loading && profile && (
           <div
             style={{
-              maxWidth: 920,
+              maxWidth: 960,
               width: "100%",
               margin: "0 auto",
-              padding: "36px 28px",
+              padding: "40px 32px",
               display: "flex",
               flexDirection: "column",
               gap: 32,
+              animation: "fadeUp 0.35s ease",
             }}
           >
             {/* Hero */}
             <div
               style={{
-                padding: "40px",
-                borderRadius: 28,
-                border: `1px solid ${T.border}`,
+                padding: "48px",
+                borderRadius: 32,
+                border: `1px solid ${isDark ? `${primaryColor}30` : `${primaryColor}20`}`,
                 background: isDark
-                  ? `linear-gradient(135deg, ${primaryColor}22 0%, ${T.card} 65%)`
-                  : `linear-gradient(135deg, ${primaryColor}12 0%, #FFFFFF 65%)`,
-                boxShadow:
-                  "0 20px 50px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.1)",
+                  ? `linear-gradient(145deg, ${primaryColor}18 0%, #0A1221 55%, #060C18 100%)`
+                  : `linear-gradient(145deg, ${primaryColor}10 0%, #FFFFFF 60%)`,
+                boxShadow: isDark
+                  ? `0 0 80px ${primaryColor}15, 0 32px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)`
+                  : `0 20px 48px rgba(0,0,0,0.1)`,
                 overflow: "hidden",
+                position: "relative",
               }}
             >
+              {/* Background glow orb */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: -60,
+                  right: -60,
+                  width: 280,
+                  height: 280,
+                  borderRadius: "50%",
+                  background: `radial-gradient(circle, ${primaryColor}18 0%, transparent 70%)`,
+                  pointerEvents: "none",
+                }}
+              />
+
               <div
                 style={{
                   display: "flex",
-                  alignItems: "flex-start",
-                  gap: 32,
+                  alignItems: "center",
+                  gap: 40,
                   flexWrap: "wrap",
+                  position: "relative",
                 }}
               >
                 <HelmetBadge
                   helmet={(profile as any).helmet}
-                  size={112}
+                  size={140}
                   fallbackColor={primaryColor}
                   fallbackLabel={shortLicense(primary?.group_name ?? "R")}
                 />
+
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <h1
                     style={{
                       fontFamily: "Syne, sans-serif",
                       fontWeight: 900,
-                      fontSize: 36,
+                      fontSize: 40,
                       color: T.text,
-                      margin: "0 0 10px",
-                      letterSpacing: "-0.025em",
+                      margin: "0 0 12px",
+                      letterSpacing: "-0.03em",
+                      lineHeight: 1,
                     }}
                   >
                     {profile.display_name}
                   </h1>
-                  <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 16,
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                    }}
+                  >
                     {profile.club_name && (
                       <span
                         style={{
                           fontFamily: "DM Mono, monospace",
                           fontSize: 13,
                           color: T.muted,
+                          background: isDark
+                            ? "rgba(255,255,255,0.06)"
+                            : "rgba(0,0,0,0.05)",
+                          padding: "4px 10px",
+                          borderRadius: 8,
+                          border: `1px solid ${T.border}`,
                         }}
                       >
                         {profile.club_name}
@@ -662,45 +722,58 @@ export default function DriverProfile({ open, onClose }: Props) {
                           color: T.muted,
                         }}
                       >
-                        · Since {new Date(profile.member_since).getFullYear()}
+                        Since {new Date(profile.member_since).getFullYear()}
                       </span>
                     )}
                     <span
                       style={{
                         fontFamily: "DM Mono, monospace",
                         fontSize: 13,
-                        color: T.muted,
+                        color: T.faint,
                       }}
                     >
-                      · #{profile.cust_id}
+                      #{profile.cust_id}
                     </span>
                   </div>
                 </div>
+
                 {primary && (
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
                     <div
                       style={{
                         fontFamily: "DM Mono, monospace",
                         fontWeight: 900,
-                        fontSize: 46,
+                        fontSize: 52,
                         lineHeight: 1,
                         color: "#60A5FA",
-                        textShadow: `0 0 30px ${primaryColor}60`,
+                        textShadow: `0 0 40px ${primaryColor}80, 0 0 80px ${primaryColor}40`,
+                        letterSpacing: "-0.02em",
                       }}
                     >
                       {(primary.irating ?? 0).toLocaleString()}
                     </div>
                     <div
                       style={{
-                        fontSize: 14,
+                        fontFamily: "DM Mono, monospace",
+                        fontSize: 16,
                         color: primaryColor,
                         fontWeight: 700,
-                        marginTop: 6,
+                        marginTop: 8,
+                        textShadow: `0 0 20px ${primaryColor}60`,
                       }}
                     >
                       SR {(primary.safety_rating ?? 0).toFixed(2)}
                     </div>
-                    <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>
+                    <div
+                      style={{
+                        fontFamily: "DM Mono, monospace",
+                        fontSize: 12,
+                        color: T.muted,
+                        marginTop: 6,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.1em",
+                      }}
+                    >
                       {CATEGORY_LABELS[primaryCatKey] ?? "Sports Car"}
                     </div>
                   </div>
@@ -713,7 +786,7 @@ export default function DriverProfile({ open, onClose }: Props) {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))",
                   gap: 16,
                 }}
               >
@@ -721,53 +794,61 @@ export default function DriverProfile({ open, onClose }: Props) {
                   {
                     label: "Total Starts",
                     value: profile.summary.total_starts.toLocaleString(),
-                    icon: <Flag size={20} color="#3B9EFF" />,
+                    icon: <Flag size={22} color="#3B9EFF" />,
+                    glow: "#3B9EFF",
                   },
                   {
                     label: "Wins",
                     value: profile.summary.total_wins.toLocaleString(),
-                    icon: <Trophy size={20} color="#EAB308" />,
+                    icon: <Trophy size={22} color="#EAB308" />,
+                    glow: "#EAB308",
                   },
                   {
                     label: "Top 5",
                     value: profile.summary.total_top5.toLocaleString(),
-                    icon: <Shield size={20} color="#22C55E" />,
+                    icon: <Shield size={22} color="#22C55E" />,
+                    glow: "#22C55E",
                   },
                   {
                     label: "Win %",
                     value: `${profile.summary.win_pct}%`,
-                    icon: <TrendingUp size={20} color="#A855F7" />,
+                    icon: <TrendingUp size={22} color="#A855F7" />,
+                    glow: "#A855F7",
                   },
                 ].map((s) => (
                   <div
                     key={s.label}
                     style={{
-                      padding: "20px 24px",
+                      padding: "22px 24px",
                       background: T.card,
-                      borderRadius: 18,
+                      borderRadius: 20,
                       border: `1px solid ${T.border}`,
-                      transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
+                      transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
                       cursor: "default",
                     }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.transform =
-                        "translateY(-4px)";
-                      (e.currentTarget as HTMLElement).style.boxShadow =
-                        "0 15px 30px rgba(0,0,0,0.2)";
+                      const el = e.currentTarget as HTMLElement;
+                      el.style.transform = "translateY(-6px)";
+                      el.style.boxShadow = `0 20px 40px rgba(0,0,0,0.25), 0 0 30px ${s.glow}18`;
+                      el.style.borderColor = `${s.glow}35`;
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.transform =
-                        "translateY(0)";
-                      (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                      const el = e.currentTarget as HTMLElement;
+                      el.style.transform = "translateY(0)";
+                      el.style.boxShadow = "none";
+                      el.style.borderColor = T.border;
                     }}
                   >
-                    <div style={{ marginBottom: 12 }}>{s.icon}</div>
+                    <div style={{ marginBottom: 14, opacity: 0.9 }}>
+                      {s.icon}
+                    </div>
                     <div
                       style={{
                         fontFamily: "DM Mono, monospace",
-                        fontWeight: 800,
-                        fontSize: 24,
+                        fontWeight: 900,
+                        fontSize: 26,
                         color: T.text,
+                        letterSpacing: "-0.02em",
                       }}
                     >
                       {s.value}
@@ -775,11 +856,11 @@ export default function DriverProfile({ open, onClose }: Props) {
                     <div
                       style={{
                         fontFamily: "DM Mono, monospace",
-                        fontSize: 11,
+                        fontSize: 10.5,
                         color: T.muted,
                         textTransform: "uppercase",
-                        letterSpacing: "0.08em",
-                        marginTop: 6,
+                        letterSpacing: "0.1em",
+                        marginTop: 8,
                       }}
                     >
                       {s.label}
@@ -791,7 +872,11 @@ export default function DriverProfile({ open, onClose }: Props) {
 
             {/* Tabs */}
             <div
-              style={{ display: "flex", borderBottom: `1px solid ${T.border}` }}
+              style={{
+                display: "flex",
+                borderBottom: `1px solid ${T.border}`,
+                gap: 4,
+              }}
             >
               {(["stats", "races"] as const).map((tabId) => (
                 <button
@@ -808,7 +893,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     color: tab === tabId ? "#3B9EFF" : T.muted,
                     borderBottom: `2px solid ${tab === tabId ? "#3B9EFF" : "transparent"}`,
                     marginBottom: -1,
-                    transition: "all 0.15s",
+                    transition: "all 0.2s",
                   }}
                 >
                   {tabId === "stats" ? t.licenseStats : t.recentRaces}
@@ -821,7 +906,7 @@ export default function DriverProfile({ open, onClose }: Props) {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))",
                   gap: 14,
                 }}
               >
@@ -845,37 +930,37 @@ export default function DriverProfile({ open, onClose }: Props) {
                     <div
                       key={key}
                       style={{
-                        padding: "22px",
+                        padding: "24px",
                         background: T.card,
-                        borderRadius: 18,
+                        borderRadius: 20,
                         border: `1px solid ${T.border}`,
                         display: "flex",
-                        gap: 18,
+                        gap: 20,
                         alignItems: "center",
-                        transition: "all 0.2s",
+                        transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
                         cursor: "default",
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.transform =
-                          "translateY(-3px)";
-                        (e.currentTarget as HTMLElement).style.boxShadow =
-                          "0 12px 28px rgba(0,0,0,0.15)";
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.transform = "translateY(-5px)";
+                        el.style.boxShadow = `0 16px 40px rgba(0,0,0,0.2), 0 0 24px ${color}20`;
+                        el.style.borderColor = `${color}35`;
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.transform =
-                          "translateY(0)";
-                        (e.currentTarget as HTMLElement).style.boxShadow =
-                          "none";
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.transform = "translateY(0)";
+                        el.style.boxShadow = "none";
+                        el.style.borderColor = T.border;
                       }}
                     >
                       <div
                         style={{
-                          width: 52,
-                          height: 52,
-                          borderRadius: 14,
-                          background: `linear-gradient(145deg, ${color}25, ${color}10)`,
-                          border: `2px solid ${color}50`,
-                          boxShadow: `0 0 20px ${color}30`,
+                          width: 56,
+                          height: 56,
+                          borderRadius: 16,
+                          background: `radial-gradient(circle at 35% 35%, ${color}30, ${color}12)`,
+                          border: `2px solid ${color}45`,
+                          boxShadow: `0 0 24px ${color}35, inset 0 1px 0 rgba(255,255,255,0.15)`,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -885,10 +970,10 @@ export default function DriverProfile({ open, onClose }: Props) {
                         <span
                           style={{
                             fontFamily: "DM Mono, monospace",
-                            fontSize: 18,
+                            fontSize: 19,
                             fontWeight: 900,
                             color,
-                            textShadow: `0 0 12px ${color}80`,
+                            textShadow: `0 0 16px ${color}`,
                           }}
                         >
                           {shortLicense(lic.group_name ?? "?")}
@@ -901,19 +986,22 @@ export default function DriverProfile({ open, onClose }: Props) {
                             fontWeight: 700,
                             fontSize: 14,
                             color: catColor,
-                            marginBottom: 10,
+                            marginBottom: 12,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
                           }}
                         >
                           {CATEGORY_LABELS[key] ?? key}
                         </div>
-                        <div style={{ display: "flex", gap: 22 }}>
+                        <div style={{ display: "flex", gap: 24 }}>
                           <div>
                             <div
                               style={{
                                 fontFamily: "DM Mono, monospace",
-                                fontWeight: 800,
-                                fontSize: 22,
+                                fontWeight: 900,
+                                fontSize: 24,
                                 color: "#60A5FA",
+                                letterSpacing: "-0.02em",
                               }}
                             >
                               {(lic.irating ?? 0).toLocaleString()}
@@ -921,10 +1009,11 @@ export default function DriverProfile({ open, onClose }: Props) {
                             <div
                               style={{
                                 fontFamily: "DM Mono, monospace",
-                                fontSize: 10,
+                                fontSize: 9.5,
                                 color: T.muted,
                                 textTransform: "uppercase",
-                                letterSpacing: "0.08em",
+                                letterSpacing: "0.1em",
+                                marginTop: 3,
                               }}
                             >
                               iRating
@@ -934,9 +1023,10 @@ export default function DriverProfile({ open, onClose }: Props) {
                             <div
                               style={{
                                 fontFamily: "DM Mono, monospace",
-                                fontWeight: 800,
-                                fontSize: 22,
+                                fontWeight: 900,
+                                fontSize: 24,
                                 color,
+                                letterSpacing: "-0.02em",
                               }}
                             >
                               {(lic.safety_rating ?? 0).toFixed(2)}
@@ -944,10 +1034,11 @@ export default function DriverProfile({ open, onClose }: Props) {
                             <div
                               style={{
                                 fontFamily: "DM Mono, monospace",
-                                fontSize: 10,
+                                fontSize: 9.5,
                                 color: T.muted,
                                 textTransform: "uppercase",
-                                letterSpacing: "0.08em",
+                                letterSpacing: "0.1em",
+                                marginTop: 3,
                               }}
                             >
                               Safety
@@ -987,37 +1078,49 @@ export default function DriverProfile({ open, onClose }: Props) {
                         ? "#EF4444"
                         : T.muted;
                   const isPodium = race.finish_position <= 3;
+                  const isWin = race.finish_position === 1;
                   return (
                     <div
                       key={race.subsession_id}
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: 18,
-                        padding: "18px 22px",
+                        gap: 20,
+                        padding: "18px 24px",
                         background: T.card,
-                        borderRadius: 16,
-                        border: `1px solid ${race.finish_position === 1 ? "rgba(234,179,8,0.35)" : T.border}`,
-                        transition: "all 0.2s",
+                        borderRadius: 18,
+                        border: `1px solid ${isWin ? "rgba(234,179,8,0.35)" : T.border}`,
+                        transition: "all 0.25s ease",
                         cursor: "default",
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.transform =
-                          "translateX(4px)";
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.transform = "translateX(6px)";
+                        el.style.borderColor = isWin
+                          ? "rgba(234,179,8,0.5)"
+                          : "rgba(59,158,255,0.3)";
+                        el.style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)";
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.transform =
-                          "translateX(0)";
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.transform = "translateX(0)";
+                        el.style.borderColor = isWin
+                          ? "rgba(234,179,8,0.35)"
+                          : T.border;
+                        el.style.boxShadow = "none";
                       }}
                     >
                       <div
                         style={{
-                          width: 46,
-                          height: 46,
-                          borderRadius: 12,
+                          width: 48,
+                          height: 48,
+                          borderRadius: 14,
                           flexShrink: 0,
                           background: isPodium ? "rgba(234,179,8,0.12)" : T.row,
-                          border: `1px solid ${isPodium ? "rgba(234,179,8,0.35)" : T.border}`,
+                          border: `2px solid ${isPodium ? "rgba(234,179,8,0.4)" : T.border}`,
+                          boxShadow: isPodium
+                            ? "0 0 20px rgba(234,179,8,0.2)"
+                            : "none",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -1027,13 +1130,11 @@ export default function DriverProfile({ open, onClose }: Props) {
                           style={{
                             fontFamily: "DM Mono, monospace",
                             fontWeight: 900,
-                            fontSize: 15,
+                            fontSize: 14,
                             color: isPodium ? "#EAB308" : T.muted,
                           }}
                         >
-                          {race.finish_position === 1
-                            ? "🏆"
-                            : `P${race.finish_position}`}
+                          {isWin ? "🏆" : `P${race.finish_position}`}
                         </span>
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -1054,7 +1155,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                           style={{
                             display: "flex",
                             gap: 10,
-                            marginTop: 4,
+                            marginTop: 5,
                             flexWrap: "wrap",
                           }}
                         >
@@ -1087,7 +1188,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                       <div
                         style={{
                           display: "flex",
-                          gap: 22,
+                          gap: 24,
                           flexShrink: 0,
                           alignItems: "center",
                         }}
@@ -1112,8 +1213,12 @@ export default function DriverProfile({ open, onClose }: Props) {
                               style={{
                                 fontFamily: "DM Mono, monospace",
                                 fontWeight: 800,
-                                fontSize: 15,
+                                fontSize: 16,
                                 color: iRatingColor,
+                                textShadow:
+                                  race.irating_change !== 0
+                                    ? `0 0 12px ${iRatingColor}60`
+                                    : "none",
                               }}
                             >
                               {race.irating_change > 0 ? "+" : ""}
@@ -1123,9 +1228,10 @@ export default function DriverProfile({ open, onClose }: Props) {
                           <div
                             style={{
                               fontFamily: "DM Mono, monospace",
-                              fontSize: 10,
+                              fontSize: 9.5,
                               color: T.muted,
                               textTransform: "uppercase",
+                              letterSpacing: "0.08em",
                             }}
                           >
                             iRating
@@ -1136,18 +1242,19 @@ export default function DriverProfile({ open, onClose }: Props) {
                             style={{
                               fontFamily: "DM Mono, monospace",
                               fontWeight: 700,
-                              fontSize: 15,
+                              fontSize: 16,
                               color: T.text,
                             }}
                           >
-                            {race.sof.toLocaleString()}
+                            {(race.sof ?? 0).toLocaleString()}
                           </div>
                           <div
                             style={{
                               fontFamily: "DM Mono, monospace",
-                              fontSize: 10,
+                              fontSize: 9.5,
                               color: T.muted,
                               textTransform: "uppercase",
+                              letterSpacing: "0.08em",
                             }}
                           >
                             SOF
@@ -1159,7 +1266,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                               style={{
                                 fontFamily: "DM Mono, monospace",
                                 fontWeight: 700,
-                                fontSize: 15,
+                                fontSize: 16,
                                 color: "#F97316",
                               }}
                             >
@@ -1168,9 +1275,10 @@ export default function DriverProfile({ open, onClose }: Props) {
                             <div
                               style={{
                                 fontFamily: "DM Mono, monospace",
-                                fontSize: 10,
+                                fontSize: 9.5,
                                 color: T.muted,
                                 textTransform: "uppercase",
+                                letterSpacing: "0.08em",
                               }}
                             >
                               Inc
@@ -1199,47 +1307,67 @@ export default function DriverProfile({ open, onClose }: Props) {
         position: "fixed",
         inset: 0,
         zIndex: 2000,
-        background: "rgba(0,0,0,0.75)",
-        backdropFilter: "blur(16px)",
+        background: "rgba(0,0,0,0.8)",
+        backdropFilter: "blur(24px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
       }}
     >
+      <style>{`
+        @keyframes modalIn { from{opacity:0;transform:scale(0.96) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .driver-input:focus { border-color: rgba(59,158,255,0.6) !important; box-shadow: 0 0 0 3px rgba(59,158,255,0.15), 0 0 20px rgba(59,158,255,0.1) !important; }
+      `}</style>
       <div
         style={{
           width: "100%",
-          maxWidth: 520,
-          background: isDark ? "#0A1221" : "#FFFFFF",
-          borderRadius: 24,
-          border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
-          boxShadow: "0 32px 80px rgba(0,0,0,0.6)",
+          maxWidth: 540,
+          background: isDark ? "rgba(10,18,33,0.98)" : "#FFFFFF",
+          borderRadius: 28,
+          border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
+          boxShadow: isDark
+            ? "0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)"
+            : "0 32px 80px rgba(0,0,0,0.2)",
           overflow: "hidden",
+          animation: "modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1)",
         }}
       >
         {/* Header */}
         <div
           style={{
-            padding: "24px 24px 18px",
-            borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+            padding: "26px 26px 20px",
+            borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"}`,
           }}
         >
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
-              marginBottom: 18,
+              gap: 12,
+              marginBottom: 20,
             }}
           >
-            <User size={20} color="#3B9EFF" />
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                background: "rgba(59,158,255,0.12)",
+                border: "1px solid rgba(59,158,255,0.25)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <User size={18} color="#3B9EFF" />
+            </div>
             <span
               style={{
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 800,
-                fontSize: 18,
-                color: isDark ? "#E2E8F0" : "#1E293B",
+                fontSize: 19,
+                color: isDark ? "#F1F5F9" : "#0F172A",
               }}
             >
               {t.driverSearch}
@@ -1249,12 +1377,29 @@ export default function DriverProfile({ open, onClose }: Props) {
               style={{
                 marginLeft: "auto",
                 background: "none",
-                border: "none",
+                border: `1px solid transparent`,
                 cursor: "pointer",
                 color: isDark ? "#64748B" : "#94A3B8",
                 display: "flex",
-                padding: 6,
-                borderRadius: 8,
+                padding: 8,
+                borderRadius: 10,
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = isDark
+                  ? "rgba(255,255,255,0.08)"
+                  : "rgba(0,0,0,0.06)";
+                el.style.borderColor = isDark
+                  ? "rgba(255,255,255,0.12)"
+                  : "rgba(0,0,0,0.1)";
+                el.style.color = isDark ? "#E2E8F0" : "#1E293B";
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = "none";
+                el.style.borderColor = "transparent";
+                el.style.color = isDark ? "#64748B" : "#94A3B8";
               }}
             >
               <X size={20} />
@@ -1263,44 +1408,49 @@ export default function DriverProfile({ open, onClose }: Props) {
           <div style={{ position: "relative" }}>
             <Search
               size={16}
-              color={isDark ? "#64748B" : "#94A3B8"}
+              color={isDark ? "#475569" : "#94A3B8"}
               style={{
                 position: "absolute",
-                left: 14,
+                left: 16,
                 top: "50%",
                 transform: "translateY(-50%)",
+                pointerEvents: "none",
               }}
             />
             <input
               ref={inputRef}
               value={query}
               onChange={(e) => handleSearch(e.target.value)}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
               placeholder={t.searchDriverPlaceholder}
+              className="driver-input"
               style={{
                 width: "100%",
-                padding: "14px 14px 14px 42px",
-                borderRadius: 14,
+                padding: "14px 16px 14px 46px",
+                borderRadius: 16,
                 background: isDark
-                  ? "rgba(255,255,255,0.06)"
+                  ? "rgba(255,255,255,0.05)"
                   : "rgba(0,0,0,0.04)",
-                border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
-                color: isDark ? "#E2E8F0" : "#1E293B",
+                border: `1.5px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
+                color: isDark ? "#F1F5F9" : "#0F172A",
                 fontFamily: "DM Sans, sans-serif",
                 fontSize: 15,
                 outline: "none",
                 boxSizing: "border-box",
-                transition: "border-color 0.2s",
+                transition: "border-color 0.2s, box-shadow 0.2s",
               }}
             />
             {searching && (
               <span
                 style={{
                   position: "absolute",
-                  right: 16,
+                  right: 18,
                   top: "50%",
                   transform: "translateY(-50%)",
-                  fontSize: 13,
+                  fontSize: 18,
                   color: isDark ? "#64748B" : "#94A3B8",
+                  letterSpacing: 2,
                 }}
               >
                 ···
@@ -1318,7 +1468,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                 onClick={() => loadProfile(r.cust_id)}
                 style={{
                   width: "100%",
-                  padding: "14px 24px",
+                  padding: "14px 26px",
                   display: "flex",
                   alignItems: "center",
                   gap: 14,
@@ -1334,8 +1484,8 @@ export default function DriverProfile({ open, onClose }: Props) {
                 }}
                 onMouseEnter={(e) =>
                   ((e.currentTarget as HTMLElement).style.background = isDark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.03)")
+                    ? "rgba(59,158,255,0.07)"
+                    : "rgba(59,158,255,0.05)")
                 }
                 onMouseLeave={(e) =>
                   ((e.currentTarget as HTMLElement).style.background = "none")
@@ -1354,7 +1504,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     flexShrink: 0,
                   }}
                 >
-                  <User size={17} color="#3B9EFF" />
+                  <User size={16} color="#3B9EFF" />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
@@ -1362,7 +1512,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                       fontFamily: "Syne, sans-serif",
                       fontWeight: 700,
                       fontSize: 14,
-                      color: isDark ? "#E2E8F0" : "#1E293B",
+                      color: isDark ? "#F1F5F9" : "#0F172A",
                     }}
                   >
                     {r.display_name}
@@ -1382,7 +1532,12 @@ export default function DriverProfile({ open, onClose }: Props) {
                   style={{
                     fontFamily: "DM Mono, monospace",
                     fontSize: 11,
-                    color: isDark ? "#475569" : "#CBD5E1",
+                    color: isDark ? "#334155" : "#CBD5E1",
+                    padding: "3px 8px",
+                    background: isDark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.04)",
+                    borderRadius: 6,
                   }}
                 >
                   #{r.cust_id}
@@ -1392,20 +1547,35 @@ export default function DriverProfile({ open, onClose }: Props) {
           </div>
         )}
 
-        {/* Empty hint */}
+        {/* Empty state */}
         {results.length === 0 && query.length < 2 && (
           <div style={{ padding: "52px 28px", textAlign: "center" }}>
-            <User
-              size={44}
-              strokeWidth={1}
-              color={isDark ? "#334155" : "#CBD5E1"}
-              style={{ marginBottom: 18 }}
-            />
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 20,
+                background: isDark
+                  ? "rgba(255,255,255,0.04)"
+                  : "rgba(0,0,0,0.04)",
+                border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 20px",
+              }}
+            >
+              <User
+                size={28}
+                strokeWidth={1.5}
+                color={isDark ? "#334155" : "#CBD5E1"}
+              />
+            </div>
             <p
               style={{
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 700,
-                fontSize: 16,
+                fontSize: 17,
                 color: isDark ? "#E2E8F0" : "#1E293B",
                 margin: "0 0 10px",
               }}
@@ -1418,7 +1588,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                 fontSize: 14,
                 color: isDark ? "#64748B" : "#94A3B8",
                 margin: 0,
-                lineHeight: 1.6,
+                lineHeight: 1.7,
               }}
             >
               {t.searchDriverDesc}

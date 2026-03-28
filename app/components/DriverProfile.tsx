@@ -331,13 +331,33 @@ export default function DriverProfile({ open, onClose }: Props) {
               display: "block",
             }}
           />
-          {/* Glossy overlay */}
+          {/* Top shine — simula curvatura 3D */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 40%, rgba(255,255,255,0.08) 100%)",
+                "radial-gradient(ellipse at 38% 28%, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.08) 35%, transparent 65%)",
+              pointerEvents: "none",
+            }}
+          />
+          {/* Bottom shadow — profundidad */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.35) 100%)",
+              pointerEvents: "none",
+            }}
+          />
+          {/* Edge vignette — bordes redondeados más naturales */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              boxShadow: "inset 0 0 30px rgba(0,0,0,0.5)",
+              borderRadius: 28,
               pointerEvents: "none",
             }}
           />

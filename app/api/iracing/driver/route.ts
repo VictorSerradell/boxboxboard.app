@@ -48,7 +48,11 @@ export async function GET(request: NextRequest) {
 
     // ── Full profile ─────────────────────────────────────────
     if (action === "profile" && custId) {
-      const [memberData, summaryData] = await Promise.all([
+      const [memberData, memberInfo, summaryData] = await Promise.all([
+        iracingFetch(
+          `member/get?cust_ids=${custId}&include_licenses=false`,
+          token,
+        ),
         iracingFetch(
           `member/get?cust_ids=${custId}&include_licenses=true`,
           token,
@@ -62,18 +66,11 @@ export async function GET(request: NextRequest) {
         ? memberData.members[0]
         : (memberData?.member ?? memberData);
 
-      console.log("[driver/profile] member keys:", Object.keys(member ?? {}));
-      console.log(
-        "[driver/profile] raw licenses:",
-        JSON.stringify(member?.licenses).slice(0, 500),
-      );
-      console.log(
-        "[driver/profile] summaryData:",
-        JSON.stringify(summaryData).slice(0, 200),
-      );
+      // member/get with include_licenses=true returns licenses as array with real iRatings
+      const memberWithLic = Array.isArray(memberInfo?.members)
+        ? memberInfo.members[0]
+        : (memberInfo?.member ?? memberInfo);
 
-      // iRacing category_id → key mapping (from member/info response we know the real IDs)
-      // oval=1, sports_car=5, formula_car=6, dirt_oval=3, dirt_road=4
       const CATEGORY_BY_ID: Record<number, string> = {
         1: "oval",
         2: "road",
@@ -90,7 +87,7 @@ export async function GET(request: NextRequest) {
         "dirt_road",
       ]);
 
-      const rawLicenses = member?.licenses ?? {};
+      const rawLicenses = memberWithLic?.licenses ?? member?.licenses ?? {};
       const licenses: Record<string, any> = {};
 
       if (Array.isArray(rawLicenses)) {
@@ -101,33 +98,25 @@ export async function GET(request: NextRequest) {
           licenses[key] = l;
         }
       } else {
-        // Object format — keys may be category names or numeric strings
         for (const [key, lic] of Object.entries(rawLicenses)) {
           const l = lic as any;
           const numKey = Number(key);
           let catKey: string;
-          if (VALID_CATS.has(key)) {
-            catKey = key;
-          } else if (VALID_CATS.has(l?.category)) {
-            catKey = l.category;
-          } else if (!isNaN(numKey)) {
+          if (VALID_CATS.has(key)) catKey = key;
+          else if (VALID_CATS.has(l?.category)) catKey = l.category;
+          else if (!isNaN(numKey))
             catKey =
               CATEGORY_BY_ID[numKey] ?? CATEGORY_BY_ID[l?.category_id] ?? key;
-          } else {
-            catKey = CATEGORY_BY_ID[l?.category_id] ?? key;
-          }
+          else catKey = CATEGORY_BY_ID[l?.category_id] ?? key;
           licenses[catKey] = l;
         }
       }
 
       console.log("[driver/profile] mapped licenses:", Object.keys(licenses));
+      console.log("[driver/profile] oval irating:", licenses.oval?.irating);
 
       const helmet = member?.helmet ?? null;
-
-      // summaryData = { this_year: { num_official_sessions, num_official_wins, ... }, cust_id }
       const yr = summaryData?.this_year ?? {};
-
-      console.log("[driver/profile] this_year keys:", Object.keys(yr));
 
       const summary =
         yr.num_official_sessions > 0
@@ -135,13 +124,10 @@ export async function GET(request: NextRequest) {
               total_starts: yr.num_official_sessions ?? 0,
               total_wins: yr.num_official_wins ?? 0,
               total_top5: yr.num_official_top5 ?? 0,
-              win_pct:
-                yr.num_official_sessions > 0
-                  ? (
-                      (yr.num_official_wins / yr.num_official_sessions) *
-                      100
-                    ).toFixed(1)
-                  : "0.0",
+              win_pct: (
+                (yr.num_official_wins / yr.num_official_sessions) *
+                100
+              ).toFixed(1),
             }
           : null;
 

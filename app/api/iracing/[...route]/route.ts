@@ -1,159 +1,184 @@
-// /app/api/iracing/[...route]/route.ts
-// Proxy for all iRacing /data/* endpoints
-// Uses Bearer token from httpOnly cookie, with auto-refresh
+// /app/api/auth/callback/iracing/route.ts
+// ─────────────────────────────────────────────────────────────────
+// PASO 2 del flujo Authorization Code:
+// iRacing redirige aquí con ?code=XXX&state=YYY
+// Esta ruta canjea el code por access_token + refresh_token,
+// obtiene info del miembro y guarda todo en cookies httpOnly.
+// ─────────────────────────────────────────────────────────────────
 
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
 
-const IRACING_BASE = "https://members-ng.iracing.com";
 const OAUTH_TOKEN_URL = "https://oauth.iracing.com/oauth2/token";
+const DATA_BASE = "https://members-ng.iracing.com";
+const APP_BASE = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
 
+// Mismo masking que iRacing requiere para client_secret
 function mask(secret: string, id: string): string {
   return createHash("sha256")
     .update(`${secret}${id.trim().toLowerCase()}`)
     .digest("base64");
 }
 
-async function refreshAccessToken(
-  refreshToken: string,
-): Promise<string | null> {
-  const clientId = process.env.IRACING_CLIENT_ID;
-  const clientSecret = process.env.IRACING_CLIENT_SECRET;
-  if (!clientId || !clientSecret) return null;
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl;
+  const code = searchParams.get("code");
+  const returnedState = searchParams.get("state");
+  const error = searchParams.get("error");
 
+  // ── Error devuelto por iRacing ──────────────────────────────
+  if (error) {
+    const desc = searchParams.get("error_description") ?? error;
+    return NextResponse.redirect(
+      `${APP_BASE}/app?auth_error=${encodeURIComponent(desc)}`,
+    );
+  }
+
+  if (!code) {
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=no_code`);
+  }
+
+  // ── Validar state (CSRF) ────────────────────────────────────
+  const savedState = request.cookies.get("oauth_state")?.value;
+
+  if (!savedState || savedState !== returnedState) {
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=invalid_state`);
+  }
+
+  // ── Recuperar code_verifier ─────────────────────────────────
+  const codeVerifier = request.cookies.get("pkce_verifier")?.value;
+  if (!codeVerifier) {
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=missing_verifier`);
+  }
+
+  const clientId = process.env.IRACING_CLIENT_ID!;
+  const clientSecret = process.env.IRACING_CLIENT_SECRET!;
+  const redirectUri =
+    process.env.IRACING_REDIRECT_URI ??
+    "http://localhost:3000/api/auth/callback/iracing";
+
+  if (!clientId || !clientSecret) {
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=not_configured`);
+  }
+
+  // ── Canjear code por tokens ─────────────────────────────────
   const params = new URLSearchParams({
-    grant_type: "refresh_token",
+    grant_type: "authorization_code",
     client_id: clientId,
     client_secret: mask(clientSecret, clientId),
-    refresh_token: refreshToken,
+    code,
+    redirect_uri: redirectUri,
+    code_verifier: codeVerifier,
   });
 
-  const res = await fetch(OAUTH_TOKEN_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: params.toString(),
-  });
+  let tokenData: {
+    access_token?: string;
+    refresh_token?: string;
+    expires_in?: number;
+    refresh_token_expires_in?: number;
+  };
 
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.access_token ?? null;
-}
+  try {
+    const tokenRes = await fetch(OAUTH_TOKEN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+    });
 
-async function iracingFetch(
-  path: string,
-  searchParams: URLSearchParams,
-  accessToken: string,
-) {
-  const url = new URL(`${IRACING_BASE}/data/${path}`);
-  searchParams.forEach((v, k) => url.searchParams.set(k, v));
-
-  const res = await fetch(url.toString(), {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "User-Agent": "boxboxboard /1.0",
-      Accept: "application/json",
-    },
-  });
-
-  return res;
-}
-
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { route: string[] } },
-) {
-  const path = params.route.join("/");
-  const searchParams = request.nextUrl.searchParams;
-
-  // Get access token from cookie
-  let accessToken = request.cookies.get("iracing_access_token")?.value;
-  const refreshToken = request.cookies.get("iracing_refresh_token")?.value;
-
-  if (!accessToken && !refreshToken) {
-    return NextResponse.json(
-      { error: "Not authenticated. Please log in to your iRacing account." },
-      { status: 401 },
-    );
-  }
-
-  // Try request, refresh token if 401
-  let iracingRes = accessToken
-    ? await iracingFetch(path, searchParams, accessToken)
-    : null;
-
-  if ((!iracingRes || iracingRes.status === 401) && refreshToken) {
-    const newToken = await refreshAccessToken(refreshToken);
-    if (newToken) {
-      accessToken = newToken;
-      iracingRes = await iracingFetch(path, searchParams, newToken);
+    if (!tokenRes.ok) {
+      const errText = await tokenRes.text();
+      console.error("Token exchange error:", tokenRes.status, errText);
+      return NextResponse.redirect(
+        `${APP_BASE}/app?auth_error=token_exchange_failed`,
+      );
     }
+
+    tokenData = await tokenRes.json();
+  } catch (e) {
+    console.error("Token fetch error:", e);
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=network_error`);
   }
 
-  if (!iracingRes) {
-    return NextResponse.json(
-      { error: "Authentication failed" },
-      { status: 401 },
-    );
+  const { access_token, refresh_token, expires_in, refresh_token_expires_in } =
+    tokenData;
+
+  if (!access_token) {
+    return NextResponse.redirect(`${APP_BASE}/app?auth_error=no_token`);
   }
 
-  if (iracingRes.status === 401) {
-    return NextResponse.json(
-      { error: "Session expired. Please log in again." },
-      { status: 401 },
-    );
+  // ── Obtener info del miembro ────────────────────────────────
+  let custId: number | null = null;
+  let displayName = "Driver";
+
+  try {
+    const memberRes = await fetch(`${DATA_BASE}/data/member/info`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "User-Agent": "BoxBoxBoard/1.0",
+      },
+    });
+
+    if (memberRes.ok) {
+      const raw = await memberRes.json();
+      // Resolver S3 redirect si lo hay
+      const data = raw?.link
+        ? await fetch(raw.link).then((r) => r.json())
+        : raw;
+
+      custId = data?.cust_id ?? null;
+      displayName = data?.display_name ?? "Driver";
+    }
+  } catch (e) {
+    console.warn("Could not fetch member info:", e);
   }
 
-  if (iracingRes.status === 429) {
-    return NextResponse.json(
-      { error: "iRacing API rate limit exceeded. Please wait." },
-      { status: 429 },
-    );
-  }
+  // ── Guardar tokens en cookies httpOnly y redirigir al inicio ─
+  const response = NextResponse.redirect(`${APP_BASE}/app?auth=success`);
 
-  if (!iracingRes.ok) {
-    return NextResponse.json(
-      { error: `iRacing API error: ${iracingRes.status}` },
-      { status: iracingRes.status },
-    );
-  }
+  const secureCookie = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+  };
 
-  const data = await iracingRes.json();
+  response.cookies.set("iracing_access_token", access_token, {
+    ...secureCookie,
+    maxAge: expires_in ?? 600,
+  });
 
-  // Handle S3 redirect pattern
-  let finalData = data;
-  if (
-    data &&
-    typeof data === "object" &&
-    "link" in data &&
-    typeof data.link === "string"
-  ) {
-    const s3Res = await fetch(data.link);
-    if (s3Res.ok) finalData = await s3Res.json();
-  }
-
-  const response = NextResponse.json(finalData);
-
-  // Update access token cookie if refreshed
-  if (accessToken !== request.cookies.get("iracing_access_token")?.value) {
-    response.cookies.set("iracing_access_token", accessToken!, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 600,
-      path: "/",
+  if (refresh_token) {
+    response.cookies.set("iracing_refresh_token", refresh_token, {
+      ...secureCookie,
+      maxAge: refresh_token_expires_in ?? 3600,
     });
   }
 
-  // Cache public data 1 hour
-  const isPublic = ["season", "series", "carclass", "track", "cars"].some((p) =>
-    path.startsWith(p),
-  );
-  if (isPublic) {
-    response.headers.set(
-      "Cache-Control",
-      "public, s-maxage=3600, stale-while-revalidate=7200",
-    );
+  if (custId) {
+    response.cookies.set("iracing_cust_id", String(custId), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: refresh_token_expires_in ?? 3600,
+      path: "/",
+      ...(process.env.NODE_ENV === "production" && {
+        domain: ".boxboxboard.app",
+      }),
+    });
   }
+
+  // Guardar display_name para el frontend (no sensible)
+  response.cookies.set("iracing_display_name", displayName, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: refresh_token_expires_in ?? 3600,
+    path: "/",
+  });
+
+  // Limpiar cookies temporales del flujo
+  response.cookies.delete("pkce_verifier");
+  response.cookies.delete("oauth_state");
 
   return response;
 }

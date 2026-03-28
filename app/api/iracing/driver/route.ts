@@ -124,31 +124,39 @@ export async function GET(request: NextRequest) {
 
       const helmet = member?.helmet ?? null;
 
-      // member_summary can be nested differently
+      // member_summary nests stats inside 'this_year'
       const rawSummary =
-        summaryData?.stats ?? summaryData?.member_summary ?? summaryData;
+        summaryData?.this_year ??
+        summaryData?.stats ??
+        summaryData?.member_summary ??
+        summaryData;
 
       console.log(
         "[driver/profile] rawSummary keys:",
         Object.keys(rawSummary ?? {}),
       );
+      console.log(
+        "[driver/profile] rawSummary sample:",
+        JSON.stringify(rawSummary).slice(0, 300),
+      );
 
-      const summary = rawSummary
-        ? {
-            total_starts:
-              rawSummary.num_official_sessions ?? rawSummary.starts ?? 0,
-            total_wins: rawSummary.num_official_wins ?? rawSummary.wins ?? 0,
-            total_top5: rawSummary.num_official_top5 ?? rawSummary.top5 ?? 0,
-            win_pct:
-              rawSummary.num_official_sessions > 0
-                ? (
-                    (rawSummary.num_official_wins /
-                      rawSummary.num_official_sessions) *
-                    100
-                  ).toFixed(1)
-                : (rawSummary.win_percentage?.toFixed(1) ?? "0.0"),
-          }
-        : null;
+      const summary =
+        rawSummary && Object.keys(rawSummary).length > 2
+          ? {
+              total_starts:
+                rawSummary.num_official_sessions ?? rawSummary.starts ?? 0,
+              total_wins: rawSummary.num_official_wins ?? rawSummary.wins ?? 0,
+              total_top5: rawSummary.num_official_top5 ?? rawSummary.top5 ?? 0,
+              win_pct:
+                rawSummary.num_official_sessions > 0
+                  ? (
+                      (rawSummary.num_official_wins /
+                        rawSummary.num_official_sessions) *
+                      100
+                    ).toFixed(1)
+                  : "0.0",
+            }
+          : null;
 
       return NextResponse.json({
         cust_id: member?.cust_id,

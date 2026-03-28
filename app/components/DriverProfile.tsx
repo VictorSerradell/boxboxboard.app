@@ -215,9 +215,7 @@ export default function DriverProfile({ open, onClose }: Props) {
       fallbackLabel?: string;
     }): JSX.Element => {
       const [imgError, setImgError] = useState(false);
-      const helmetUrl = custId
-        ? `https://images-static.iracing.com/img/helmets/${custId}.png`
-        : null;
+      const helmetUrl = custId ? `/api/iracing/helmet?cust_id=${custId}` : null;
 
       if (!helmetUrl || imgError) {
         // Fallback SVG with helmet colors from API

@@ -62,23 +62,32 @@ export async function GET(request: NextRequest) {
         ? memberData.members[0]
         : (memberData?.member ?? memberData);
 
-      // iRacing category_id mapping
+      console.log("[driver/profile] member keys:", Object.keys(member ?? {}));
+      console.log(
+        "[driver/profile] raw licenses:",
+        JSON.stringify(member?.licenses).slice(0, 300),
+      );
+      console.log(
+        "[driver/profile] summaryData:",
+        JSON.stringify(summaryData).slice(0, 300),
+      );
+
+      // iRacing category_id → key mapping (from member/info response we know the real IDs)
+      // oval=1, sports_car=5, formula_car=6, dirt_oval=3, dirt_road=4
       const CATEGORY_BY_ID: Record<number, string> = {
         1: "oval",
-        2: "sports_car",
+        2: "road",
         3: "dirt_oval",
         4: "dirt_road",
         5: "sports_car",
         6: "formula_car",
       };
-      // For member/get the category field itself contains the key name
       const VALID_CATS = new Set([
         "oval",
         "sports_car",
         "formula_car",
         "dirt_oval",
         "dirt_road",
-        "road",
       ]);
 
       const rawLicenses = member?.licenses ?? {};
@@ -92,23 +101,54 @@ export async function GET(request: NextRequest) {
           licenses[key] = l;
         }
       } else {
+        // Object format — keys may be category names or numeric strings
         for (const [key, lic] of Object.entries(rawLicenses)) {
           const l = lic as any;
-          // If key is numeric, use category_id from the license object
-          const catKey = VALID_CATS.has(key)
-            ? key
-            : VALID_CATS.has(l?.category)
-              ? l.category
-              : (CATEGORY_BY_ID[l?.category_id] ??
-                CATEGORY_BY_ID[Number(key)] ??
-                key);
+          const numKey = Number(key);
+          let catKey: string;
+          if (VALID_CATS.has(key)) {
+            catKey = key;
+          } else if (VALID_CATS.has(l?.category)) {
+            catKey = l.category;
+          } else if (!isNaN(numKey)) {
+            catKey =
+              CATEGORY_BY_ID[numKey] ?? CATEGORY_BY_ID[l?.category_id] ?? key;
+          } else {
+            catKey = CATEGORY_BY_ID[l?.category_id] ?? key;
+          }
           licenses[catKey] = l;
         }
       }
 
-      // Helmet — iRacing stores helmet config, we build an SVG color preview
+      console.log("[driver/profile] mapped licenses:", Object.keys(licenses));
+
       const helmet = member?.helmet ?? null;
-      const summary = summaryData?.stats ?? summaryData ?? null;
+
+      // member_summary can be nested differently
+      const rawSummary =
+        summaryData?.stats ?? summaryData?.member_summary ?? summaryData;
+
+      console.log(
+        "[driver/profile] rawSummary keys:",
+        Object.keys(rawSummary ?? {}),
+      );
+
+      const summary = rawSummary
+        ? {
+            total_starts:
+              rawSummary.num_official_sessions ?? rawSummary.starts ?? 0,
+            total_wins: rawSummary.num_official_wins ?? rawSummary.wins ?? 0,
+            total_top5: rawSummary.num_official_top5 ?? rawSummary.top5 ?? 0,
+            win_pct:
+              rawSummary.num_official_sessions > 0
+                ? (
+                    (rawSummary.num_official_wins /
+                      rawSummary.num_official_sessions) *
+                    100
+                  ).toFixed(1)
+                : (rawSummary.win_percentage?.toFixed(1) ?? "0.0"),
+          }
+        : null;
 
       return NextResponse.json({
         cust_id: member?.cust_id,
@@ -117,22 +157,7 @@ export async function GET(request: NextRequest) {
         member_since: member?.member_since,
         helmet,
         licenses,
-        summary: summary
-          ? {
-              total_starts: summary.num_official_sessions ?? 0,
-              total_wins: summary.num_official_wins ?? 0,
-              total_top5: summary.num_official_top5 ?? 0,
-              total_poles: summary.num_official_poles ?? 0,
-              win_pct:
-                summary.num_official_sessions > 0
-                  ? (
-                      (summary.num_official_wins /
-                        summary.num_official_sessions) *
-                      100
-                    ).toFixed(1)
-                  : "0.0",
-            }
-          : null,
+        summary,
       });
     }
 

@@ -65,11 +65,11 @@ export async function GET(request: NextRequest) {
       console.log("[driver/profile] member keys:", Object.keys(member ?? {}));
       console.log(
         "[driver/profile] raw licenses:",
-        JSON.stringify(member?.licenses).slice(0, 300),
+        JSON.stringify(member?.licenses).slice(0, 500),
       );
       console.log(
         "[driver/profile] summaryData:",
-        JSON.stringify(summaryData).slice(0, 300),
+        JSON.stringify(summaryData).slice(0, 200),
       );
 
       // iRacing category_id → key mapping (from member/info response we know the real IDs)
@@ -124,34 +124,21 @@ export async function GET(request: NextRequest) {
 
       const helmet = member?.helmet ?? null;
 
-      // member_summary nests stats inside 'this_year'
-      const rawSummary =
-        summaryData?.this_year ??
-        summaryData?.stats ??
-        summaryData?.member_summary ??
-        summaryData;
+      // summaryData = { this_year: { num_official_sessions, num_official_wins, ... }, cust_id }
+      const yr = summaryData?.this_year ?? {};
 
-      console.log(
-        "[driver/profile] rawSummary keys:",
-        Object.keys(rawSummary ?? {}),
-      );
-      console.log(
-        "[driver/profile] rawSummary sample:",
-        JSON.stringify(rawSummary).slice(0, 300),
-      );
+      console.log("[driver/profile] this_year keys:", Object.keys(yr));
 
       const summary =
-        rawSummary && Object.keys(rawSummary).length > 2
+        yr.num_official_sessions > 0
           ? {
-              total_starts:
-                rawSummary.num_official_sessions ?? rawSummary.starts ?? 0,
-              total_wins: rawSummary.num_official_wins ?? rawSummary.wins ?? 0,
-              total_top5: rawSummary.num_official_top5 ?? rawSummary.top5 ?? 0,
+              total_starts: yr.num_official_sessions ?? 0,
+              total_wins: yr.num_official_wins ?? 0,
+              total_top5: yr.num_official_top5 ?? 0,
               win_pct:
-                rawSummary.num_official_sessions > 0
+                yr.num_official_sessions > 0
                   ? (
-                      (rawSummary.num_official_wins /
-                        rawSummary.num_official_sessions) *
+                      (yr.num_official_wins / yr.num_official_sessions) *
                       100
                     ).toFixed(1)
                   : "0.0",

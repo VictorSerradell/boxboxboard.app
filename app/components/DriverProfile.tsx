@@ -95,7 +95,7 @@ interface Props {
   onClose: () => void;
 }
 
-// ── ERROR BOUNDARY + SUSPENSE (evita que el 3D rompa toda la página) ──
+// ── ERROR BOUNDARY + SUSPENSE ──
 class HelmetErrorBoundary extends React.Component<
   { children: React.ReactNode; fallback: React.ReactNode },
   { hasError: boolean }
@@ -113,7 +113,7 @@ class HelmetErrorBoundary extends React.Component<
   }
 }
 
-// ── CASCO 2D SVG (fallback cuando el PNG 404 o falla) ──
+// ── CASCO 2D SVG MEJORADO (fallback) ──
 const HelmetBadge = ({
   helmet,
   size = 170,
@@ -148,49 +148,111 @@ const HelmetBadge = ({
       >
         <defs>
           <radialGradient id={`sg-${id}`} cx="38%" cy="28%" r="52%">
-            <stop offset="0%" stopColor="white" stopOpacity="0.45" />
+            <stop offset="0%" stopColor="white" stopOpacity="0.55" />
             <stop offset="100%" stopColor="white" stopOpacity="0" />
           </radialGradient>
           <radialGradient id={`vg-${id}`} cx="38%" cy="38%" r="58%">
-            <stop offset="0%" stopColor="#88CCFF" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#000810" stopOpacity="0.97" />
+            <stop offset="0%" stopColor={c1} stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#000810" stopOpacity="0.98" />
           </radialGradient>
           <clipPath id={`hclip-${id}`}>
             <path d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z" />
           </clipPath>
         </defs>
+
         <g clipPath={`url(#hclip-${id})`}>
+          {/* Cuerpo principal del casco (relleno base) */}
           <path
             d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z"
             fill={c1}
           />
-          <rect x="0" y="138" width="240" height="22" fill={c2} />
-          <rect x="0" y="160" width="240" height="14" fill={c3} />
+
+          {/* Bandas horizontales con borde para profundidad */}
+          <rect
+            x="0"
+            y="138"
+            width="240"
+            height="22"
+            fill={c2}
+            stroke="#113344"
+            strokeWidth="3"
+          />
+          <rect
+            x="0"
+            y="160"
+            width="240"
+            height="14"
+            fill={c3}
+            stroke="#113344"
+            strokeWidth="2"
+          />
+
+          {/* Parte inferior oscura */}
           <rect x="0" y="174" width="240" height="100" fill={c1d} />
+
+          {/* Parte superior del casco (superposición suave) */}
           <path
             d="M120 10 C68 10 26 44 14 90 C8 112 8 134 14 140 L226 140 C232 134 232 112 226 90 C214 44 172 10 120 10 Z"
             fill={c1}
+            opacity="0.45"
           />
+
+          {/* Brillo superior mejorado */}
           <path
             d="M120 10 C68 10 26 44 14 90 C8 112 8 134 14 140 L226 140 C232 134 232 112 226 90 C214 44 172 10 120 10 Z"
             fill={`url(#sg-${id})`}
           />
+
+          {/* Paneles laterales (nuevo detalle técnico 3D) */}
+          <path
+            d="M68 45 C63 68 52 88 54 127"
+            fill="none"
+            stroke={c2}
+            strokeWidth="3.5"
+            opacity="0.75"
+          />
+          <path
+            d="M172 45 C177 68 188 88 186 127"
+            fill="none"
+            stroke={c2}
+            strokeWidth="3.5"
+            opacity="0.75"
+          />
+
+          {/* Visor oscuro base */}
           <path
             d="M18 134 C18 130 22 126 28 124 L212 124 C218 126 222 130 222 134 L222 195 C222 205 214 212 204 213 L36 213 C26 212 18 205 18 195 Z"
             fill="#000810"
           />
+
+          {/* Gradiente del visor (más reflectante) */}
           <path
             d="M18 134 C18 130 22 126 28 124 L212 124 C218 126 222 130 222 134 L222 195 C222 205 214 212 204 213 L36 213 C26 212 18 205 18 195 Z"
             fill={`url(#vg-${id})`}
           />
+
+          {/* Marco interior del visor (nuevo efecto cristal) */}
+          <path
+            d="M27 137 C27 133 30 129 36 127 L204 127 C210 129 213 133 213 137 L213 192 C213 199 206 204 196 205 L44 205 C34 204 28 199 28 192 Z"
+            fill="none"
+            stroke={c1}
+            strokeWidth="2.5"
+            opacity="0.65"
+          />
+
+          {/* Parte inferior del casco */}
           <rect x="0" y="213" width="240" height="50" fill={c1d} />
+
+          {/* Ventilas superiores mejoradas */}
           <rect
             x="96"
             y="13"
             width="7"
             height="18"
             rx="3.5"
-            fill="rgba(0,0,0,0.5)"
+            fill="#113344"
+            stroke={c1}
+            strokeWidth="1.5"
           />
           <rect
             x="108"
@@ -198,7 +260,9 @@ const HelmetBadge = ({
             width="7"
             height="22"
             rx="3.5"
-            fill="rgba(0,0,0,0.5)"
+            fill="#113344"
+            stroke={c1}
+            strokeWidth="1.5"
           />
           <rect
             x="120"
@@ -206,7 +270,9 @@ const HelmetBadge = ({
             width="7"
             height="24"
             rx="3.5"
-            fill="rgba(0,0,0,0.5)"
+            fill="#113344"
+            stroke={c1}
+            strokeWidth="1.5"
           />
           <rect
             x="132"
@@ -214,7 +280,9 @@ const HelmetBadge = ({
             width="7"
             height="22"
             rx="3.5"
-            fill="rgba(0,0,0,0.5)"
+            fill="#113344"
+            stroke={c1}
+            strokeWidth="1.5"
           />
           <rect
             x="144"
@@ -222,23 +290,31 @@ const HelmetBadge = ({
             width="7"
             height="18"
             rx="3.5"
-            fill="rgba(0,0,0,0.5)"
+            fill="#113344"
+            stroke={c1}
+            strokeWidth="1.5"
           />
+
+          {/* Rejilla inferior mejorada */}
           <rect
-            x="90"
+            x="88"
             y="220"
             width="9"
             height="13"
             rx="4"
-            fill="rgba(0,0,0,0.45)"
+            fill="#0F2A3D"
+            stroke={c2}
+            strokeWidth="1.5"
           />
           <rect
-            x="104"
+            x="103"
             y="220"
             width="9"
             height="13"
             rx="4"
-            fill="rgba(0,0,0,0.45)"
+            fill="#0F2A3D"
+            stroke={c2}
+            strokeWidth="1.5"
           />
           <rect
             x="118"
@@ -246,48 +322,73 @@ const HelmetBadge = ({
             width="9"
             height="13"
             rx="4"
-            fill="rgba(0,0,0,0.45)"
+            fill="#0F2A3D"
+            stroke={c2}
+            strokeWidth="1.5"
           />
           <rect
-            x="132"
+            x="133"
             y="220"
             width="9"
             height="13"
             rx="4"
-            fill="rgba(0,0,0,0.45)"
+            fill="#0F2A3D"
+            stroke={c2}
+            strokeWidth="1.5"
           />
           <rect
-            x="146"
+            x="148"
             y="220"
             width="9"
             height="13"
             rx="4"
-            fill="rgba(0,0,0,0.45)"
+            fill="#0F2A3D"
+            stroke={c2}
+            strokeWidth="1.5"
           />
         </g>
+
+        {/* Línea superior del visor (más gruesa) */}
         <path
           d="M28 124 L212 124"
-          stroke="#66BBEE"
-          strokeWidth="3"
+          stroke={c2}
+          strokeWidth="4"
           strokeLinecap="round"
           fill="none"
           clipPath={`url(#hclip-${id})`}
         />
+
+        {/* Línea curva del visor (reflejo suave) */}
         <path
           d="M34 140 C62 133 90 130 120 130 C150 130 178 133 206 140"
-          stroke="rgba(160,220,255,0.55)"
-          strokeWidth="5"
+          stroke={c1}
+          strokeWidth="4.5"
           strokeLinecap="round"
           fill="none"
           clipPath={`url(#hclip-${id})`}
+          opacity="0.8"
         />
+
+        {/* Borde exterior oscuro (profundidad) */}
         <path
           d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z"
           fill="none"
-          stroke="rgba(255,255,255,0.2)"
+          stroke="#113344"
+          strokeWidth="7"
+          opacity="0.65"
+        />
+
+        {/* Borde exterior claro (brillo) */}
+        <path
+          d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z"
+          fill="none"
+          stroke={c1}
           strokeWidth="2"
+          opacity="0.4"
         />
       </svg>
+
+      {/* Overlay de brillo extra (igual que antes) */}
       <div
         style={{
           position: "absolute",
@@ -310,7 +411,7 @@ const HelmetBadge = ({
   );
 };
 
-// ── 3D HELMET MESH ──
+// ── 3D HELMET MESH (sin cambios) ──
 function HelmetMesh({ custId }: { custId: number }) {
   const meshRef = useRef<THREE.Mesh>(null!);
   const texture = useLoader(
@@ -346,7 +447,7 @@ function HelmetMesh({ custId }: { custId: number }) {
   );
 }
 
-// ── 3D VIEWER CON FALLBACK ──
+// ── 3D VIEWER (sin cambios) ──
 const HelmetViewer = ({ custId, helmet }: { custId: number; helmet: any }) => {
   const fallback = <HelmetBadge helmet={helmet} size={170} />;
 

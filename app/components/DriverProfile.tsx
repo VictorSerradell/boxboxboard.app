@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
+import React from "react";
 import {
   X,
   Search,
@@ -19,6 +20,7 @@ import { useT } from "../lib/i18n";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls, Environment } from "@react-three/drei";
 import * as THREE from "three";
+import { Suspense } from "react";
 
 interface SearchResult {
   cust_id: number;
@@ -93,6 +95,305 @@ interface Props {
   onClose: () => void;
 }
 
+// ── ERROR BOUNDARY + SUSPENSE (evita que el 3D rompa toda la página) ──
+class HelmetErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+// ── CASCO 2D SVG (fallback cuando el PNG 404 o falla) ──
+const HelmetBadge = ({
+  helmet,
+  size = 170,
+}: {
+  helmet: any;
+  size?: number;
+}) => {
+  const c1 = helmet?.color1 ? `#${helmet.color1}` : "#3B9EFF";
+  const c2 = helmet?.color2 ? `#${helmet.color2}` : "#1E3A5F";
+  const c3 = helmet?.color3 ? `#${helmet.color3}` : "#F97316";
+  const c1d = c1;
+  const id = `hc-${Math.random().toString(36).slice(2, 7)}`;
+
+  return (
+    <div
+      style={{
+        width: size,
+        height: size * 1.18,
+        borderRadius: size * 0.2,
+        overflow: "hidden",
+        flexShrink: 0,
+        boxShadow: `0 0 50px ${c1}50, 0 25px 60px rgba(0,0,0,0.6)`,
+        border: "3px solid rgba(255,255,255,0.18)",
+        position: "relative",
+      }}
+    >
+      <svg
+        viewBox="0 0 240 280"
+        width={size}
+        height={size * 1.18}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <radialGradient id={`sg-${id}`} cx="38%" cy="28%" r="52%">
+            <stop offset="0%" stopColor="white" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id={`vg-${id}`} cx="38%" cy="38%" r="58%">
+            <stop offset="0%" stopColor="#88CCFF" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#000810" stopOpacity="0.97" />
+          </radialGradient>
+          <clipPath id={`hclip-${id}`}>
+            <path d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z" />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#hclip-${id})`}>
+          <path
+            d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z"
+            fill={c1}
+          />
+          <rect x="0" y="138" width="240" height="22" fill={c2} />
+          <rect x="0" y="160" width="240" height="14" fill={c3} />
+          <rect x="0" y="174" width="240" height="100" fill={c1d} />
+          <path
+            d="M120 10 C68 10 26 44 14 90 C8 112 8 134 14 140 L226 140 C232 134 232 112 226 90 C214 44 172 10 120 10 Z"
+            fill={c1}
+          />
+          <path
+            d="M120 10 C68 10 26 44 14 90 C8 112 8 134 14 140 L226 140 C232 134 232 112 226 90 C214 44 172 10 120 10 Z"
+            fill={`url(#sg-${id})`}
+          />
+          <path
+            d="M18 134 C18 130 22 126 28 124 L212 124 C218 126 222 130 222 134 L222 195 C222 205 214 212 204 213 L36 213 C26 212 18 205 18 195 Z"
+            fill="#000810"
+          />
+          <path
+            d="M18 134 C18 130 22 126 28 124 L212 124 C218 126 222 130 222 134 L222 195 C222 205 214 212 204 213 L36 213 C26 212 18 205 18 195 Z"
+            fill={`url(#vg-${id})`}
+          />
+          <rect x="0" y="213" width="240" height="50" fill={c1d} />
+          <rect
+            x="96"
+            y="13"
+            width="7"
+            height="18"
+            rx="3.5"
+            fill="rgba(0,0,0,0.5)"
+          />
+          <rect
+            x="108"
+            y="10"
+            width="7"
+            height="22"
+            rx="3.5"
+            fill="rgba(0,0,0,0.5)"
+          />
+          <rect
+            x="120"
+            y="9"
+            width="7"
+            height="24"
+            rx="3.5"
+            fill="rgba(0,0,0,0.5)"
+          />
+          <rect
+            x="132"
+            y="10"
+            width="7"
+            height="22"
+            rx="3.5"
+            fill="rgba(0,0,0,0.5)"
+          />
+          <rect
+            x="144"
+            y="13"
+            width="7"
+            height="18"
+            rx="3.5"
+            fill="rgba(0,0,0,0.5)"
+          />
+          <rect
+            x="90"
+            y="220"
+            width="9"
+            height="13"
+            rx="4"
+            fill="rgba(0,0,0,0.45)"
+          />
+          <rect
+            x="104"
+            y="220"
+            width="9"
+            height="13"
+            rx="4"
+            fill="rgba(0,0,0,0.45)"
+          />
+          <rect
+            x="118"
+            y="220"
+            width="9"
+            height="13"
+            rx="4"
+            fill="rgba(0,0,0,0.45)"
+          />
+          <rect
+            x="132"
+            y="220"
+            width="9"
+            height="13"
+            rx="4"
+            fill="rgba(0,0,0,0.45)"
+          />
+          <rect
+            x="146"
+            y="220"
+            width="9"
+            height="13"
+            rx="4"
+            fill="rgba(0,0,0,0.45)"
+          />
+        </g>
+        <path
+          d="M28 124 L212 124"
+          stroke="#66BBEE"
+          strokeWidth="3"
+          strokeLinecap="round"
+          fill="none"
+          clipPath={`url(#hclip-${id})`}
+        />
+        <path
+          d="M34 140 C62 133 90 130 120 130 C150 130 178 133 206 140"
+          stroke="rgba(160,220,255,0.55)"
+          strokeWidth="5"
+          strokeLinecap="round"
+          fill="none"
+          clipPath={`url(#hclip-${id})`}
+        />
+        <path
+          d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z"
+          fill="none"
+          stroke="rgba(255,255,255,0.2)"
+          strokeWidth="2"
+        />
+      </svg>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at 35% 25%, rgba(255,255,255,0.15) 0%, transparent 55%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          boxShadow: "inset 0 0 30px rgba(0,0,0,0.45)",
+          borderRadius: size * 0.2,
+          pointerEvents: "none",
+        }}
+      />
+    </div>
+  );
+};
+
+// ── 3D HELMET MESH ──
+function HelmetMesh({ custId }: { custId: number }) {
+  const meshRef = useRef<THREE.Mesh>(null!);
+  const texture = useLoader(
+    THREE.TextureLoader,
+    `/api/iracing/helmet?cust_id=${custId}`,
+  );
+
+  useEffect(() => {
+    if (texture) {
+      texture.anisotropy = 16;
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+    }
+  }, [texture]);
+
+  useFrame((state) => {
+    if (meshRef.current)
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.6;
+  });
+
+  return (
+    <mesh ref={meshRef} castShadow receiveShadow>
+      <planeGeometry args={[2.15, 2.55]} />
+      <meshStandardMaterial
+        map={texture}
+        transparent
+        side={THREE.DoubleSide}
+        depthWrite={false}
+        roughness={0.35}
+        metalness={0.15}
+      />
+    </mesh>
+  );
+}
+
+// ── 3D VIEWER CON FALLBACK ──
+const HelmetViewer = ({ custId, helmet }: { custId: number; helmet: any }) => {
+  const fallback = <HelmetBadge helmet={helmet} size={170} />;
+
+  return (
+    <div
+      style={{
+        width: 170,
+        height: 205,
+        flexShrink: 0,
+        borderRadius: 28,
+        overflow: "hidden",
+        boxShadow:
+          "0 0 50px rgba(59,158,255,0.25), 0 25px 60px rgba(0,0,0,0.55)",
+        background: "rgba(0,0,0,0.3)",
+      }}
+    >
+      <HelmetErrorBoundary fallback={fallback}>
+        <Suspense fallback={fallback}>
+          <Canvas
+            camera={{ position: [0, 0.1, 3.7], fov: 46 }}
+            gl={{ antialias: true, alpha: true }}
+            style={{ width: "100%", height: "100%" }}
+          >
+            <ambientLight intensity={0.65} />
+            <directionalLight position={[4, 5, 6]} intensity={1.4} castShadow />
+            <pointLight
+              position={[-4, -4, -5]}
+              intensity={0.7}
+              color="#a0d8ff"
+            />
+            <Environment preset="warehouse" />
+            <HelmetMesh custId={custId} />
+            <OrbitControls
+              enableZoom={true}
+              enablePan={false}
+              minDistance={2.8}
+              maxDistance={5.5}
+              minPolarAngle={Math.PI / 3.5}
+              maxPolarAngle={Math.PI - 0.7}
+            />
+          </Canvas>
+        </Suspense>
+      </HelmetErrorBoundary>
+    </div>
+  );
+};
+
 export default function DriverProfile({ open, onClose }: Props) {
   const { theme } = useTheme();
   const { t } = useT();
@@ -128,80 +429,6 @@ export default function DriverProfile({ open, onClose }: Props) {
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite linear",
   });
-
-  // ── 3D HELMET COMPONENT (real iRacing PNG + Three.js) ─────────────────────
-  const HelmetMesh = ({ custId }: { custId: number }) => {
-    const meshRef = useRef<THREE.Mesh>(null!);
-    const texture = useLoader(
-      THREE.TextureLoader,
-      `/api/iracing/helmet?cust_id=${custId}`,
-    );
-
-    useEffect(() => {
-      if (texture) {
-        texture.anisotropy = 16;
-        texture.minFilter = THREE.LinearFilter;
-        texture.magFilter = THREE.LinearFilter;
-      }
-    }, [texture]);
-
-    useFrame((state) => {
-      if (meshRef.current) {
-        meshRef.current.rotation.y = state.clock.elapsedTime * 0.6;
-      }
-    });
-
-    return (
-      <mesh ref={meshRef} castShadow receiveShadow>
-        <planeGeometry args={[2.15, 2.55]} />
-        <meshStandardMaterial
-          map={texture}
-          transparent
-          side={THREE.DoubleSide}
-          depthWrite={false}
-          roughness={0.35}
-          metalness={0.15}
-        />
-      </mesh>
-    );
-  };
-
-  const HelmetViewer = ({ custId }: { custId: number }) => {
-    return (
-      <div
-        style={{
-          width: 170,
-          height: 205,
-          flexShrink: 0,
-          borderRadius: 28,
-          overflow: "hidden",
-          boxShadow:
-            "0 0 50px rgba(59,158,255,0.25), 0 25px 60px rgba(0,0,0,0.55)",
-          background: "rgba(0,0,0,0.3)",
-        }}
-      >
-        <Canvas
-          camera={{ position: [0, 0.1, 3.7], fov: 46 }}
-          gl={{ antialias: true, alpha: true }}
-          style={{ width: "100%", height: "100%" }}
-        >
-          <ambientLight intensity={0.65} />
-          <directionalLight position={[4, 5, 6]} intensity={1.4} castShadow />
-          <pointLight position={[-4, -4, -5]} intensity={0.7} color="#a0d8ff" />
-          <Environment preset="warehouse" />
-          <HelmetMesh custId={custId} />
-          <OrbitControls
-            enableZoom={true}
-            enablePan={false}
-            minDistance={2.8}
-            maxDistance={5.5}
-            minPolarAngle={Math.PI / 3.5}
-            maxPolarAngle={Math.PI - 0.7}
-          />
-        </Canvas>
-      </div>
-    );
-  };
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 100);
@@ -575,7 +802,6 @@ export default function DriverProfile({ open, onClose }: Props) {
                 position: "relative",
               }}
             >
-              {/* Background glow orb */}
               <div
                 style={{
                   position: "absolute",
@@ -598,7 +824,10 @@ export default function DriverProfile({ open, onClose }: Props) {
                   position: "relative",
                 }}
               >
-                <HelmetViewer custId={profile.cust_id} />
+                <HelmetViewer
+                  custId={profile.cust_id}
+                  helmet={profile.helmet}
+                />
 
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <h1

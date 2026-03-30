@@ -114,60 +114,66 @@ export default function DriverProfile({ open, onClose }: Props) {
     const primaryColor = LICENSE_COLORS[primary?.group_name ?? ''] ?? '#3B9EFF';
     const primaryCatKey = Object.keys(profile?.licenses ?? {}).find(k => profile?.licenses[k] === primary) ?? '';
 
-    const HelmetBadge = ({ custId, helmet, size = 140, fallbackColor = '#3B9EFF', fallbackLabel = '?' }: { custId?: number; helmet: any; size?: number; fallbackColor?: string; fallbackLabel?: string }): JSX.Element => {
-      // iRacing helmet images are not publicly accessible via CDN
-      // We render an SVG using the real colors from the API (color1, color2, color3)
+    const HelmetBadge = ({ helmet, size = 140, fallbackColor = '#3B9EFF', fallbackLabel = '?' }: { helmet: any; size?: number; fallbackColor?: string; fallbackLabel?: string }): JSX.Element => {
       const c1 = helmet?.color1 ? `#${helmet.color1}` : fallbackColor;
       const c2 = helmet?.color2 ? `#${helmet.color2}` : '#1E3A5F';
       const c3 = helmet?.color3 ? `#${helmet.color3}` : '#F97316';
-
+      // Darker variants for chin area
+      const c1d = c1;
+      const id = `hc-${Math.random().toString(36).slice(2,7)}`;
       return (
-        <div style={{ width: size, height: size, borderRadius: 28, overflow: 'hidden', flexShrink: 0, boxShadow: `0 0 50px ${c1}60, 0 25px 60px rgba(0,0,0,0.6)`, border: '3px solid rgba(255,255,255,0.18)', position: 'relative' }}>
-          <svg viewBox="0 0 140 140" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+        <div style={{ width: size, height: size, borderRadius: size * 0.2, overflow: 'hidden', flexShrink: 0, boxShadow: `0 0 40px ${c1}50, 0 20px 50px rgba(0,0,0,0.6)`, border: '3px solid rgba(255,255,255,0.18)', position: 'relative' }}>
+          <svg viewBox="0 0 240 260" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <clipPath id="hclip">
-                <path d="M70 8 C42 8 18 26 16 52 C14 80 28 112 50 126 C57 130 63 132 70 132 C77 132 83 130 90 126 C112 112 126 80 124 52 C122 26 98 8 70 8Z" />
+              <radialGradient id={`sg-${id}`} cx="38%" cy="28%" r="52%">
+                <stop offset="0%" stopColor="white" stopOpacity="0.45"/>
+                <stop offset="100%" stopColor="white" stopOpacity="0"/>
+              </radialGradient>
+              <radialGradient id={`vg-${id}`} cx="38%" cy="38%" r="58%">
+                <stop offset="0%" stopColor="#88CCFF" stopOpacity="0.4"/>
+                <stop offset="100%" stopColor="#000810" stopOpacity="0.97"/>
+              </radialGradient>
+              <clipPath id={`hclip-${id}`}>
+                <path d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z"/>
               </clipPath>
-              <radialGradient id="hshine" cx="36%" cy="26%" r="52%">
-                <stop offset="0%" stopColor="rgba(255,255,255,0.5)" />
-                <stop offset="40%" stopColor="rgba(255,255,255,0.1)" />
-                <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-              </radialGradient>
-              <radialGradient id="hvisor" cx="50%" cy="45%" r="48%">
-                <stop offset="0%" stopColor="rgba(120,200,255,0.3)" />
-                <stop offset="60%" stopColor="rgba(0,10,30,0.75)" />
-                <stop offset="100%" stopColor="rgba(0,5,20,0.9)" />
-              </radialGradient>
-              <linearGradient id="hbase" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={c1} stopOpacity="1" />
-                <stop offset="100%" stopColor={c1} stopOpacity="0.8" />
-              </linearGradient>
             </defs>
-            {/* Base */}
-            <rect width="140" height="140" fill="url(#hbase)" clipPath="url(#hclip)" />
-            {/* Stripe 1 */}
-            <rect x="0" y="50" width="140" height="22" fill={c2} clipPath="url(#hclip)" />
-            {/* Stripe 2 */}
-            <rect x="0" y="72" width="140" height="14" fill={c3} clipPath="url(#hclip)" />
-            {/* Visor */}
-            <ellipse cx="70" cy="74" rx="44" ry="20" fill="url(#hvisor)" clipPath="url(#hclip)" />
-            {/* Visor bottom edge */}
-            <ellipse cx="70" cy="84" rx="38" ry="6" fill="rgba(0,0,0,0.4)" clipPath="url(#hclip)" />
-            {/* Visor top edge highlight */}
-            <ellipse cx="70" cy="62" rx="40" ry="5" fill="rgba(180,230,255,0.2)" clipPath="url(#hclip)" />
-            {/* Top shine */}
-            <ellipse cx="55" cy="36" rx="30" ry="20" fill="url(#hshine)" clipPath="url(#hclip)" />
-            {/* Highlight line */}
-            <path d="M36 26 Q70 16 104 27" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="4" strokeLinecap="round" clipPath="url(#hclip)" />
-            {/* Side shadow */}
-            <path d="M16 52 C16 80 28 112 50 126 L50 8 C30 12 18 30 16 52Z" fill="rgba(0,0,0,0.15)" clipPath="url(#hclip)" />
+            <g clipPath={`url(#hclip-${id})`}>
+              {/* Base */}
+              <path d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z" fill={c1}/>
+              {/* Stripes */}
+              <rect x="0" y="138" width="240" height="22" fill={c2}/>
+              <rect x="0" y="160" width="240" height="14" fill={c3}/>
+              <rect x="0" y="174" width="240" height="100" fill={c1d}/>
+              {/* Dome over stripes */}
+              <path d="M120 10 C68 10 26 44 14 90 C8 112 8 134 14 140 L226 140 C232 134 232 112 226 90 C214 44 172 10 120 10 Z" fill={c1}/>
+              <path d="M120 10 C68 10 26 44 14 90 C8 112 8 134 14 140 L226 140 C232 134 232 112 226 90 C214 44 172 10 120 10 Z" fill={`url(#sg-${id})`}/>
+              {/* Visor */}
+              <path d="M18 134 C18 130 22 126 28 124 L212 124 C218 126 222 130 222 134 L222 195 C222 205 214 212 204 213 L36 213 C26 212 18 205 18 195 Z" fill="#000810"/>
+              <path d="M18 134 C18 130 22 126 28 124 L212 124 C218 126 222 130 222 134 L222 195 C222 205 214 212 204 213 L36 213 C26 212 18 205 18 195 Z" fill={`url(#vg-${id})`}/>
+              {/* Chin below visor */}
+              <rect x="0" y="213" width="240" height="50" fill={c1d}/>
+              {/* Top vents */}
+              <rect x="96" y="13" width="7" height="18" rx="3.5" fill="rgba(0,0,0,0.5)"/>
+              <rect x="108" y="10" width="7" height="22" rx="3.5" fill="rgba(0,0,0,0.5)"/>
+              <rect x="120" y="9" width="7" height="24" rx="3.5" fill="rgba(0,0,0,0.5)"/>
+              <rect x="132" y="10" width="7" height="22" rx="3.5" fill="rgba(0,0,0,0.5)"/>
+              <rect x="144" y="13" width="7" height="18" rx="3.5" fill="rgba(0,0,0,0.5)"/>
+              {/* Chin vents */}
+              <rect x="90" y="220" width="9" height="13" rx="4" fill="rgba(0,0,0,0.45)"/>
+              <rect x="104" y="220" width="9" height="13" rx="4" fill="rgba(0,0,0,0.45)"/>
+              <rect x="118" y="220" width="9" height="13" rx="4" fill="rgba(0,0,0,0.45)"/>
+              <rect x="132" y="220" width="9" height="13" rx="4" fill="rgba(0,0,0,0.45)"/>
+              <rect x="146" y="220" width="9" height="13" rx="4" fill="rgba(0,0,0,0.45)"/>
+            </g>
+            {/* Visor top edge + reflection */}
+            <path d="M28 124 L212 124" stroke="#66BBEE" strokeWidth="3" strokeLinecap="round" fill="none" clipPath={`url(#hclip-${id})`}/>
+            <path d="M34 140 C62 133 90 130 120 130 C150 130 178 133 206 140" stroke="rgba(160,220,255,0.55)" strokeWidth="5" strokeLinecap="round" fill="none" clipPath={`url(#hclip-${id})`}/>
             {/* Outline */}
-            <path d="M70 8 C42 8 18 26 16 52 C14 80 28 112 50 126 C57 130 63 132 70 132 C77 132 83 130 90 126 C112 112 126 80 124 52 C122 26 98 8 70 8Z" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2.5" />
+            <path d="M120 10 C68 10 26 44 14 90 C6 118 8 150 16 172 C24 200 38 224 58 238 C78 252 98 260 120 260 C142 260 162 252 182 238 C202 224 216 200 224 172 C232 150 234 118 226 90 C214 44 172 10 120 10 Z" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2"/>
           </svg>
-          {/* CSS 3D overlays */}
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 38% 28%, rgba(255,255,255,0.22) 0%, transparent 55%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.3) 100%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 28px rgba(0,0,0,0.45)', borderRadius: 28, pointerEvents: 'none' }} />
+          {/* CSS 3D overlay */}
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 35% 25%, rgba(255,255,255,0.15) 0%, transparent 55%)', pointerEvents: 'none' }}/>
+          <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 24px rgba(0,0,0,0.4)', borderRadius: size * 0.2, pointerEvents: 'none' }}/>
         </div>
       );
     };
@@ -236,7 +242,7 @@ export default function DriverProfile({ open, onClose }: Props) {
               <div style={{ position: 'absolute', top: -60, right: -60, width: 280, height: 280, borderRadius: '50%', background: `radial-gradient(circle, ${primaryColor}18 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 40, flexWrap: 'wrap', position: 'relative' }}>
-                <HelmetBadge custId={profile.cust_id} helmet={(profile as any).helmet} size={140} fallbackColor={primaryColor} fallbackLabel={shortLicense(primary?.group_name ?? 'R')} />
+                <HelmetBadge helmet={(profile as any).helmet} size={140} fallbackColor={primaryColor} fallbackLabel={shortLicense(primary?.group_name ?? 'R')} />
 
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 900, fontSize: 40, color: T.text, margin: '0 0 12px', letterSpacing: '-0.03em', lineHeight: 1 }}>{profile.display_name}</h1>

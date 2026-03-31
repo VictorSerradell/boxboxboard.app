@@ -67,6 +67,12 @@ const CATEGORY_STYLE: Record<
     accent: "#22C55E",
     label: "Dirt Road",
   },
+  Endurance: {
+    gradientDark: "linear-gradient(135deg, #1A0A2E 0%, #0A0514 100%)",
+    gradientLight: "linear-gradient(135deg, #F5F0FF 0%, #FAF7FF 100%)",
+    accent: "#E879F9",
+    label: "Endurance",
+  },
 };
 
 const LICENSE_CONFIG = {

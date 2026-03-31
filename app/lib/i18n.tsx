@@ -124,6 +124,7 @@ export interface Translations {
   catOval: string;
   catDirtRoad: string;
   catDirtOval: string;
+  catEndurance: string;
   starts: string;
   demoStatsNote: string;
   logout: string;
@@ -314,6 +315,7 @@ const translations: Record<Lang, Translations> = {
     catOval: "Oval",
     catDirtRoad: "Dirt Road",
     catDirtOval: "Dirt Oval",
+    catEndurance: "Endurance",
     starts: "starts",
     demoStatsNote: "Demo data — connect iRacing for real stats",
     logout: "Disconnect iRacing",
@@ -538,6 +540,7 @@ const translations: Record<Lang, Translations> = {
     catOval: "Óvalo",
     catDirtRoad: "Tierra/Carretera",
     catDirtOval: "Tierra/Óvalo",
+    catEndurance: "Resistencia",
     starts: "salidas",
     demoStatsNote: "Datos demo — conecta iRacing para stats reales",
     logout: "Desconectar iRacing",

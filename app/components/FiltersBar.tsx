@@ -32,6 +32,7 @@ const CATEGORIES: { label: string; value: CarCategory }[] = [
   { label: "Oval", value: "Oval" },
   { label: "Dirt Oval", value: "Dirt Oval" },
   { label: "Dirt Road", value: "Dirt Road" },
+  { label: "Endurance", value: "Endurance" },
 ];
 
 const LICENSES: { label: string; value: LicenseLevel; color: string }[] = [
@@ -568,7 +569,7 @@ export default function FiltersBar({
           style={{
             position: "sticky",
             top: 60,
-            zIndex: 90,
+            zIndex: 990,
             background: T.barBg,
             backdropFilter: "blur(20px)",
             borderBottom: `1px solid ${T.barBorder}`,
@@ -731,7 +732,7 @@ export default function FiltersBar({
       style={{
         position: "sticky",
         top: 60,
-        zIndex: 90,
+        zIndex: 990,
         background: T.barBg,
         backdropFilter: "blur(20px)",
         borderBottom: `1px solid ${T.barBorder}`,

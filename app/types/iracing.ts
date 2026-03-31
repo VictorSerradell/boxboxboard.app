@@ -25,15 +25,16 @@ export interface SeriesAsset {
 
 export type LicenseLevel = 0 | 1 | 2 | 3 | 4 | 5; // 0=Rookie, 1=D, 2=C, 3=B, 4=A, 5=Pro
 
-export type SessionType = "FIXED" | "OPEN" | "RANKED" | "UNRANKED";
+export type SessionType = 'FIXED' | 'OPEN' | 'RANKED' | 'UNRANKED';
 
 export type CarCategory =
-  | "Sports Car"
-  | "Formula Car"
-  | "Oval"
-  | "Dirt Oval"
-  | "Dirt Road"
-  | "Road";
+  | 'Sports Car'
+  | 'Formula Car'
+  | 'Oval'
+  | 'Dirt Oval'
+  | 'Dirt Road'
+  | 'Road'
+  | 'Endurance';
 
 export interface Car {
   car_id: number;
@@ -103,11 +104,7 @@ export interface SeriesSeason {
   start_date?: string;
   schedules: ScheduleWeek[];
   car_class_ids: number[];
-  allowed_licenses: {
-    group_name: string;
-    min_level: number;
-    max_level: number;
-  }[];
+  allowed_licenses: { group_name: string; min_level: number; max_level: number }[];
   rookie_season?: string;
   iracing_points?: boolean;
   race_points?: number;
@@ -119,7 +116,7 @@ export interface SeriesSeason {
   caution_laps_do_not_count?: boolean;
   complete?: boolean;
   rookie_season_name?: string;
-
+  
   // Computed/UI fields
   status?: SessionType;
   category?: CarCategory;
@@ -202,7 +199,7 @@ export interface FilterState {
   favoritesOnly: boolean;
   ownedOnly: boolean;
   searchQuery: string;
-  myLicense?: LicenseLevel | null;
+  myLicense: LicenseLevel | null;
 }
 
 export interface AppUser {

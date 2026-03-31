@@ -57,6 +57,7 @@ export interface Translations {
   raceSchedule: string;
   fullCalendar: string;
   seriesInfo: string;
+  topCars: string;
   seasonLabel: string;
   minLicense: string;
   teamDriving: string;
@@ -76,12 +77,6 @@ export interface Translations {
   addToSchedule: string;
   removeFromSchedule: string;
   copyLink: string;
-  detailsTab: string;
-  topCarTab: string;
-  top100GlobalLabel: string;
-  topCarMostUsed: string;
-  topCarSample: string;
-  topCarNoData: string;
   driverSearch: string;
   searchDriverPlaceholder: string;
   searchDriverHint: string;
@@ -216,6 +211,7 @@ const translations: Record<Lang, Translations> = {
     raceSchedule: "Race Schedule",
     fullCalendar: "Full Track Calendar",
     seriesInfo: "Series Info",
+    topCars: "Top Cars",
     seasonLabel: "Season",
     minLicense: "Min License",
     teamDriving: "Team Driving",
@@ -235,12 +231,6 @@ const translations: Record<Lang, Translations> = {
     addToSchedule: "Add to my schedule",
     removeFromSchedule: "Remove from schedule",
     copyLink: "Copy share link",
-    detailsTab: "Details",
-    topCarTab: "Top 100 Car",
-    top100GlobalLabel: "Top 100 global",
-    topCarMostUsed: "Most used car",
-    topCarSample: "Sample",
-    topCarNoData: "No data available for this series yet.",
     driverSearch: "Driver Search",
     searchDriverPlaceholder: "Search by driver name...",
     searchDriverHint: "Search any iRacing driver",
@@ -445,6 +435,7 @@ const translations: Record<Lang, Translations> = {
     raceSchedule: "Horario de Carreras",
     fullCalendar: "Calendario Completo",
     seriesInfo: "Info de Serie",
+    topCars: "Coches más usados",
     seasonLabel: "Temporada",
     minLicense: "Licencia Mín.",
     teamDriving: "Conducción en Equipo",
@@ -464,12 +455,6 @@ const translations: Record<Lang, Translations> = {
     addToSchedule: "Añadir a mi horario",
     removeFromSchedule: "Quitar del horario",
     copyLink: "Copiar enlace",
-    detailsTab: "Detalles",
-    topCarTab: "Coche Top 100",
-    top100GlobalLabel: "Top 100 global",
-    topCarMostUsed: "Coche más usado",
-    topCarSample: "Muestra",
-    topCarNoData: "Aún no hay datos disponibles para esta serie.",
     driverSearch: "Buscar Piloto",
     searchDriverPlaceholder: "Buscar por nombre de piloto...",
     searchDriverHint: "Busca cualquier piloto de iRacing",

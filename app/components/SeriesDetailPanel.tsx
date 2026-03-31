@@ -19,7 +19,6 @@ import {
   Users,
   Zap,
   Link,
-  Crown,
 } from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
 import { toggleFavoriteSeries } from "../lib/iracing-client";
@@ -126,16 +125,12 @@ export default function SeriesDetailPanel({
     has_data: boolean;
   } | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"details" | "top-car">("details");
-  const [topCar, setTopCar] = useState<{
-    car_id: number;
-    car_name: string;
-    uses: number;
-    sample_size: number;
-    has_data: boolean;
-    source?: string;
-  } | null>(null);
-  const [topCarLoading, setTopCarLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"info" | "cars">("info");
+  const [carStats, setCarStats] = useState<
+    { car_id: number; car_name: string; count: number; pct: string }[]
+  >([]);
+  const [carsLoading, setCarsLoading] = useState(false);
+  const [carsLoaded, setCarsLoaded] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { t } = useT();
@@ -143,10 +138,13 @@ export default function SeriesDetailPanel({
 
   useEffect(() => setLocalFav(isFavorite), [isFavorite]);
   useEffect(() => {
-    if (series) requestAnimationFrame(() => setVisible(true));
-    else setVisible(false);
+    if (series) {
+      requestAnimationFrame(() => setVisible(true));
+      setActiveTab("info");
+      setCarsLoaded(false);
+      setCarStats([]);
+    } else setVisible(false);
   }, [series]);
-  useEffect(() => setActiveTab("details"), [series?.series_id]);
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -175,26 +173,6 @@ export default function SeriesDetailPanel({
       })
       .catch(() => {})
       .finally(() => setStatsLoading(false));
-  }, [series?.series_id]);
-
-  useEffect(() => {
-    if (!series) return;
-    setTopCar(null);
-    setTopCarLoading(true);
-    const params = new URLSearchParams({
-      series_id: String(series.series_id),
-      season_year: String(series.season_year),
-      season_quarter: String(series.season_quarter),
-    });
-    fetch(`/api/iracing/series-top-car?${params}`, { credentials: "include" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && typeof data === "object") {
-          setTopCar(data);
-        }
-      })
-      .catch(() => {})
-      .finally(() => setTopCarLoading(false));
   }, [series?.series_id]);
 
   if (!series) return null;
@@ -334,10 +312,7 @@ export default function SeriesDetailPanel({
         onClick={onClose}
         style={{
           position: "fixed",
-          top: 64,
-          left: 0,
-          right: 0,
-          bottom: 0,
+          inset: 0,
           zIndex: 200,
           background: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.35)",
           backdropFilter: "blur(4px)",
@@ -350,7 +325,7 @@ export default function SeriesDetailPanel({
       <div
         style={{
           position: "fixed",
-          top: 64,
+          top: isMobile ? 0 : 0,
           right: 0,
           bottom: 0,
           zIndex: 201,
@@ -600,539 +575,703 @@ export default function SeriesDetailPanel({
           </div>
         </div>
 
-        <div
-          style={{
-            position: "sticky",
-            top: 102,
-            zIndex: 9,
-            display: "flex",
-            gap: 6,
-            padding: "10px 20px",
-            borderBottom: `1px solid ${T.sectionBorder}`,
-            background: T.panelBg,
-          }}
-        >
-          {(
-            [
-              { id: "details", label: t.detailsTab },
-              { id: "top-car", label: t.topCarTab },
-            ] as const
-          ).map((tab) => {
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  border: `1px solid ${active ? `${accent}66` : T.iconBtnBorder}`,
-                  borderRadius: 9,
-                  background: active ? `${accent}1A` : "transparent",
-                  color: active ? accent : T.iconBtnColor,
-                  fontFamily: "Syne, sans-serif",
-                  fontWeight: 700,
-                  fontSize: 12,
-                  padding: "7px 11px",
-                  cursor: "pointer",
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
         {/* ── CONTENIDO ──────────────────────────────────────── */}
         <div
           style={{
-            padding: "20px",
+            padding: "0 20px 20px",
             display: "flex",
             flexDirection: "column",
             gap: 24,
           }}
         >
-          {activeTab === "details" && (
-            <>
-          {/* Stats */}
-          <section>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 10,
-              }}
-            >
-              <SectionTitle>
-                <BarChart2
-                  size={10}
-                  style={{ display: "inline", marginRight: 5 }}
-                />
-                {t.stats}
-              </SectionTitle>
-              {statsLoading && (
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontFamily: "DM Mono, monospace",
-                    color: "#64748B",
-                  }}
-                >
-                  loading...
-                </span>
-              )}
-              {!statsLoading && realStats?.has_data && (
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontFamily: "DM Mono, monospace",
-                    color: "#22C55E",
-                    background: "rgba(34,197,94,0.1)",
-                    border: "1px solid rgba(34,197,94,0.25)",
-                    borderRadius: 4,
-                    padding: "1px 6px",
-                  }}
-                >
-                  LIVE
-                </span>
-              )}
-              {!statsLoading && !realStats?.has_data && (
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontFamily: "DM Mono, monospace",
-                    color: "#64748B",
-                    background: "rgba(100,116,139,0.1)",
-                    border: "1px solid rgba(100,116,139,0.2)",
-                    borderRadius: 4,
-                    padding: "1px 6px",
-                  }}
-                >
-                  EST
-                </span>
-              )}
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <StatBox
-                icon={<Zap size={11} />}
-                label={t.avgSof}
-                value={stats.avg_sof > 0 ? stats.avg_sof.toLocaleString() : "—"}
-                accent={accent}
-              />
-              <StatBox
-                icon={<Users size={11} />}
-                label={t.avgDrivers}
-                value={stats.avg_drivers > 0 ? String(stats.avg_drivers) : "—"}
-              />
-              <StatBox
-                icon={<BarChart2 size={11} />}
-                label={t.splits}
-                value={stats.splits > 0 ? String(stats.splits) : "—"}
-              />
-              <StatBox
-                icon={<Clock size={11} />}
-                label={t.raceTime}
-                value={duration}
-              />
-            </div>
-          </section>
+          {/* Tab selector */}
+          <div
+            style={{
+              display: "flex",
+              borderBottom: `1px solid ${T.sectionBorder}`,
+              gap: 4,
+              paddingTop: 20,
+            }}
+          >
+            {(
+              [
+                { id: "info", label: t.seriesInfo },
+                { id: "cars", label: t.topCars },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  if (tab.id === "cars" && !carsLoaded) {
+                    setCarsLoading(true);
+                    const currentWeek =
+                      getCurrentRaceWeek(
+                        series.season_year,
+                        series.season_quarter,
+                      ) ?? 0;
+                    const params = new URLSearchParams({
+                      series_id: String(series.series_id),
+                      race_week_num: String(currentWeek),
+                      season_year: String(series.season_year),
+                      season_quarter: String(series.season_quarter),
+                    });
+                    fetch(`/api/iracing/series-cars?${params}`, {
+                      credentials: "include",
+                    })
+                      .then((r) => r.json())
+                      .then((data) => {
+                        setCarStats(data.cars ?? []);
+                        setCarsLoaded(true);
+                      })
+                      .catch(() => {})
+                      .finally(() => setCarsLoading(false));
+                  }
+                }}
+                style={{
+                  padding: "10px 16px",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "Syne, sans-serif",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  color: activeTab === tab.id ? accent : "#64748B",
+                  borderBottom: `2px solid ${activeTab === tab.id ? accent : "transparent"}`,
+                  marginBottom: -1,
+                  transition: "all 0.15s",
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-          {/* Cars */}
-          <section>
-            <SectionTitle>
-              <Car size={10} style={{ display: "inline", marginRight: 5 }} />
-              {t.allowedCars}
-            </SectionTitle>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {cars.map((car, i) => (
+          {/* ── INFO TAB ── */}
+          {
+            activeTab === "info" && (
+              <>
+                {/* Stats */}
+                <section>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <SectionTitle>
+                      <BarChart2
+                        size={10}
+                        style={{ display: "inline", marginRight: 5 }}
+                      />
+                      {t.stats}
+                    </SectionTitle>
+                    {statsLoading && (
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontFamily: "DM Mono, monospace",
+                          color: "#64748B",
+                        }}
+                      >
+                        loading...
+                      </span>
+                    )}
+                    {!statsLoading && realStats?.has_data && (
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontFamily: "DM Mono, monospace",
+                          color: "#22C55E",
+                          background: "rgba(34,197,94,0.1)",
+                          border: "1px solid rgba(34,197,94,0.25)",
+                          borderRadius: 4,
+                          padding: "1px 6px",
+                        }}
+                      >
+                        LIVE
+                      </span>
+                    )}
+                    {!statsLoading && !realStats?.has_data && (
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontFamily: "DM Mono, monospace",
+                          color: "#64748B",
+                          background: "rgba(100,116,139,0.1)",
+                          border: "1px solid rgba(100,116,139,0.2)",
+                          borderRadius: 4,
+                          padding: "1px 6px",
+                        }}
+                      >
+                        EST
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <StatBox
+                      icon={<Zap size={11} />}
+                      label={t.avgSof}
+                      value={
+                        stats.avg_sof > 0 ? stats.avg_sof.toLocaleString() : "—"
+                      }
+                      accent={accent}
+                    />
+                    <StatBox
+                      icon={<Users size={11} />}
+                      label={t.avgDrivers}
+                      value={
+                        stats.avg_drivers > 0 ? String(stats.avg_drivers) : "—"
+                      }
+                    />
+                    <StatBox
+                      icon={<BarChart2 size={11} />}
+                      label={t.splits}
+                      value={stats.splits > 0 ? String(stats.splits) : "—"}
+                    />
+                    <StatBox
+                      icon={<Clock size={11} />}
+                      label={t.raceTime}
+                      value={duration}
+                    />
+                  </div>
+                </section>
+
+                {/* Cars */}
+                <section>
+                  <SectionTitle>
+                    <Car
+                      size={10}
+                      style={{ display: "inline", marginRight: 5 }}
+                    />
+                    {t.allowedCars}
+                  </SectionTitle>
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
+                  >
+                    {cars.map((car, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "10px 14px",
+                          borderRadius: 10,
+                          background: T.rowBg,
+                          border: `1px solid ${T.sectionBorder}`,
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 28,
+                              height: 28,
+                              borderRadius: 8,
+                              flexShrink: 0,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              background: car.owned
+                                ? "rgba(34,197,94,0.12)"
+                                : T.carIconBg,
+                              border: `1px solid ${car.owned ? "rgba(34,197,94,0.3)" : T.carIconBorder}`,
+                              color: car.owned ? "#22C55E" : T.iconBtnColor,
+                            }}
+                          >
+                            {car.owned ? (
+                              <Check size={13} strokeWidth={2.5} />
+                            ) : (
+                              <Lock size={12} strokeWidth={2} />
+                            )}
+                          </div>
+                          <span
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 500,
+                              color: car.owned ? T.textSecondary : T.textFaint,
+                            }}
+                          >
+                            {car.name}
+                          </span>
+                        </div>
+                        {car.free && (
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              fontFamily: "DM Mono, monospace",
+                              color: "#22C55E",
+                              background: "rgba(34,197,94,0.1)",
+                              border: "1px solid rgba(34,197,94,0.25)",
+                              borderRadius: 6,
+                              padding: "2px 7px",
+                            }}
+                          >
+                            {t.free}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Race Schedule */}
+                <section>
+                  <SectionTitle>
+                    <Clock
+                      size={10}
+                      style={{ display: "inline", marginRight: 5 }}
+                    />
+                    {t.raceSchedule}
+                  </SectionTitle>
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
+                  >
+                    {times.map((t, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          padding: "10px 14px",
+                          borderRadius: 10,
+                          background: T.rowBg,
+                          border: `1px solid ${T.sectionBorder}`,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: "50%",
+                            flexShrink: 0,
+                            background: accent,
+                            boxShadow: `0 0 6px ${accent}`,
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 500,
+                            color: T.textMuted,
+                            fontFamily: "DM Mono, monospace",
+                          }}
+                        >
+                          {t}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Full Calendar */}
+                <section>
+                  <SectionTitle>
+                    <Calendar
+                      size={10}
+                      style={{ display: "inline", marginRight: 5 }}
+                    />
+                    {t.fullCalendar}
+                  </SectionTitle>
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 4 }}
+                  >
+                    {series.schedules.map((week, i) => {
+                      const isActive = currentWeek === i;
+                      return (
+                        <div
+                          key={i}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 12,
+                            padding: "10px 14px",
+                            borderRadius: 10,
+                            background: isActive
+                              ? `${accent}15`
+                              : i % 2 === 0
+                                ? T.rowBg
+                                : T.rowBgAlt,
+                            border: `1px solid ${isActive ? accent + "45" : T.rowBorder}`,
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: accent,
+                              minWidth: 28,
+                              flexShrink: 0,
+                            }}
+                          >
+                            W{i + 1}
+                          </span>
+                          {isActive ? (
+                            <span
+                              style={{
+                                width: 10,
+                                height: 10,
+                                borderRadius: "50%",
+                                background: "#22C55E",
+                                flexShrink: 0,
+                                boxShadow: "0 0 8px #22C55E",
+                              }}
+                            />
+                          ) : (
+                            <Flag
+                              size={12}
+                              strokeWidth={1.8}
+                              color={T.flagColor}
+                              style={{ flexShrink: 0 }}
+                            />
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div
+                              style={{
+                                fontSize: 13,
+                                fontWeight: isActive ? 700 : 600,
+                                color: isActive
+                                  ? T.textPrimary
+                                  : T.textSecondary,
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {week.track.track_name}
+                            </div>
+                            {week.track.config_name && (
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  color: T.labelColor,
+                                  marginTop: 1,
+                                }}
+                              >
+                                {week.track.config_name}
+                              </div>
+                            )}
+                          </div>
+                          {isActive ? (
+                            <span
+                              style={{
+                                fontFamily: "DM Mono, monospace",
+                                fontSize: 9,
+                                fontWeight: 700,
+                                color: "#22C55E",
+                                background: "rgba(34,197,94,0.15)",
+                                border: "1px solid rgba(34,197,94,0.3)",
+                                borderRadius: 5,
+                                padding: "2px 7px",
+                                flexShrink: 0,
+                              }}
+                            >
+                              {t.now}
+                            </span>
+                          ) : (
+                            week.start_date && (
+                              <span
+                                style={{
+                                  fontFamily: "DM Mono, monospace",
+                                  fontSize: 10,
+                                  color: T.dateColor,
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {new Date(week.start_date).toLocaleDateString(
+                                  undefined,
+                                  { day: "numeric", month: "short" },
+                                )}
+                              </span>
+                            )
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+
+                {/* Series Info */}
+                <section>
+                  <SectionTitle>{t.seriesInfo}</SectionTitle>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 8,
+                    }}
+                  >
+                    {[
+                      {
+                        label: t.seasonLabel,
+                        value: `S${series.season_quarter} ${series.season_year}`,
+                      },
+                      {
+                        label: t.minLicense,
+                        value: series.allowed_licenses?.[0]?.group_name ?? "—",
+                      },
+                      {
+                        label: t.teamDriving,
+                        value: series.driver_changes ? t.yes : t.no,
+                      },
+                      {
+                        label: t.multiclass,
+                        value: series.multiclass ? t.yes : t.no,
+                      },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: 10,
+                          background: T.infoGridBg,
+                          border: `1px solid ${T.infoGridBorder}`,
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 10,
+                            fontFamily: "DM Mono, monospace",
+                            color: T.labelColor,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.1em",
+                            marginBottom: 4,
+                          }}
+                        >
+                          {item.label}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: T.textSecondary,
+                          }}
+                        >
+                          {item.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </>
+            ) /* end info tab */
+          }
+
+          {/* ── CARS TAB ── */}
+          {activeTab === "cars" && (
+            <section>
+              {/* Loading */}
+              {carsLoading && (
                 <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "10px 14px",
-                    borderRadius: 10,
-                    background: T.rowBg,
-                    border: `1px solid ${T.sectionBorder}`,
-                  }}
+                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
                 >
                   <div
-                    style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      padding: "14px 0",
+                      color: "#64748B",
+                      fontFamily: "DM Mono, monospace",
+                      fontSize: 12,
+                    }}
                   >
                     <div
                       style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: 8,
-                        flexShrink: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        background: car.owned
-                          ? "rgba(34,197,94,0.12)"
-                          : T.carIconBg,
-                        border: `1px solid ${car.owned ? "rgba(34,197,94,0.3)" : T.carIconBorder}`,
-                        color: car.owned ? "#22C55E" : T.iconBtnColor,
+                        width: 14,
+                        height: 14,
+                        borderRadius: "50%",
+                        border: `2px solid ${accent}`,
+                        borderTopColor: "transparent",
+                        animation: "spin 0.8s linear infinite",
                       }}
-                    >
-                      {car.owned ? (
-                        <Check size={13} strokeWidth={2.5} />
-                      ) : (
-                        <Lock size={12} strokeWidth={2} />
-                      )}
-                    </div>
-                    <span
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 500,
-                        color: car.owned ? T.textSecondary : T.textFaint,
-                      }}
-                    >
-                      {car.name}
-                    </span>
+                    />
+                    Analizando top 100 pilotos en carreras recientes...
                   </div>
-                  {car.free && (
+                  <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      style={{
+                        height: 52,
+                        borderRadius: 10,
+                        background: isDark
+                          ? "rgba(255,255,255,0.04)"
+                          : "rgba(0,0,0,0.04)",
+                        animation: "pulse 1.5s ease infinite",
+                      }}
+                    />
+                  ))}
+                  <style>{`@keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }`}</style>
+                </div>
+              )}
+
+              {/* Empty */}
+              {!carsLoading && carsLoaded && carStats.length === 0 && (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "40px 0",
+                    color: "#64748B",
+                    fontFamily: "DM Mono, monospace",
+                    fontSize: 12,
+                  }}
+                >
+                  No hay datos de carreras para esta semana todavía
+                </div>
+              )}
+
+              {/* Results */}
+              {!carsLoading && carStats.length > 0 && (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 6 }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <SectionTitle>
+                      <Car
+                        size={10}
+                        style={{ display: "inline", marginRight: 5 }}
+                      />
+                      {t.topCars}
+                    </SectionTitle>
                     <span
                       style={{
                         fontSize: 10,
-                        fontWeight: 700,
                         fontFamily: "DM Mono, monospace",
                         color: "#22C55E",
                         background: "rgba(34,197,94,0.1)",
                         border: "1px solid rgba(34,197,94,0.25)",
-                        borderRadius: 6,
-                        padding: "2px 7px",
+                        borderRadius: 4,
+                        padding: "1px 6px",
                       }}
                     >
-                      {t.free}
+                      LIVE
                     </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Race Schedule */}
-          <section>
-            <SectionTitle>
-              <Clock size={10} style={{ display: "inline", marginRight: 5 }} />
-              {t.raceSchedule}
-            </SectionTitle>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {times.map((t, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "10px 14px",
-                    borderRadius: 10,
-                    background: T.rowBg,
-                    border: `1px solid ${T.sectionBorder}`,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: "50%",
-                      flexShrink: 0,
-                      background: accent,
-                      boxShadow: `0 0 6px ${accent}`,
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 500,
-                      color: T.textMuted,
-                      fontFamily: "DM Mono, monospace",
-                    }}
-                  >
-                    {t}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Full Calendar */}
-          <section>
-            <SectionTitle>
-              <Calendar
-                size={10}
-                style={{ display: "inline", marginRight: 5 }}
-              />
-              {t.fullCalendar}
-            </SectionTitle>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {series.schedules.map((week, i) => {
-                const isActive = currentWeek === i;
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "10px 14px",
-                      borderRadius: 10,
-                      background: isActive
-                        ? `${accent}15`
-                        : i % 2 === 0
-                          ? T.rowBg
-                          : T.rowBgAlt,
-                      border: `1px solid ${isActive ? accent + "45" : T.rowBorder}`,
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: "DM Mono, monospace",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: accent,
-                        minWidth: 28,
-                        flexShrink: 0,
-                      }}
-                    >
-                      W{i + 1}
-                    </span>
-                    {isActive ? (
-                      <span
-                        style={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: "50%",
-                          background: "#22C55E",
-                          flexShrink: 0,
-                          boxShadow: "0 0 8px #22C55E",
-                        }}
-                      />
-                    ) : (
-                      <Flag
-                        size={12}
-                        strokeWidth={1.8}
-                        color={T.flagColor}
-                        style={{ flexShrink: 0 }}
-                      />
-                    )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                  </div>
+                  {carStats.slice(0, 10).map((car, i) => {
+                    const pct = parseFloat(car.pct);
+                    const isTop = i === 0;
+                    return (
                       <div
+                        key={car.car_id}
                         style={{
-                          fontSize: 13,
-                          fontWeight: isActive ? 700 : 600,
-                          color: isActive ? T.textPrimary : T.textSecondary,
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          padding: "12px 14px",
+                          borderRadius: 10,
+                          background: isTop ? `${accent}12` : T.rowBg,
+                          border: `1px solid ${isTop ? accent + "35" : T.sectionBorder}`,
+                          transition: "all 0.15s",
                         }}
                       >
-                        {week.track.track_name}
-                      </div>
-                      {week.track.config_name && (
+                        {/* Position */}
                         <div
                           style={{
-                            fontSize: 11,
-                            color: T.labelColor,
-                            marginTop: 1,
-                          }}
-                        >
-                          {week.track.config_name}
-                        </div>
-                      )}
-                    </div>
-                    {isActive ? (
-                      <span
-                        style={{
-                          fontFamily: "DM Mono, monospace",
-                          fontSize: 9,
-                          fontWeight: 700,
-                          color: "#22C55E",
-                          background: "rgba(34,197,94,0.15)",
-                          border: "1px solid rgba(34,197,94,0.3)",
-                          borderRadius: 5,
-                          padding: "2px 7px",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {t.now}
-                      </span>
-                    ) : (
-                      week.start_date && (
-                        <span
-                          style={{
-                            fontFamily: "DM Mono, monospace",
-                            fontSize: 10,
-                            color: T.dateColor,
+                            width: 24,
+                            height: 24,
+                            borderRadius: 8,
+                            background: isTop ? accent : T.rowBgAlt,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                             flexShrink: 0,
                           }}
                         >
-                          {new Date(week.start_date).toLocaleDateString(
-                            undefined,
-                            { day: "numeric", month: "short" },
-                          )}
-                        </span>
-                      )
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* Series Info */}
-          <section>
-            <SectionTitle>{t.seriesInfo}</SectionTitle>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 8,
-              }}
-            >
-              {[
-                {
-                  label: t.seasonLabel,
-                  value: `S${series.season_quarter} ${series.season_year}`,
-                },
-                {
-                  label: t.minLicense,
-                  value: series.allowed_licenses?.[0]?.group_name ?? "—",
-                },
-                {
-                  label: t.teamDriving,
-                  value: series.driver_changes ? t.yes : t.no,
-                },
-                {
-                  label: t.multiclass,
-                  value: series.multiclass ? t.yes : t.no,
-                },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  style={{
-                    padding: "10px 14px",
-                    borderRadius: 10,
-                    background: T.infoGridBg,
-                    border: `1px solid ${T.infoGridBorder}`,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 10,
-                      fontFamily: "DM Mono, monospace",
-                      color: T.labelColor,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                      marginBottom: 4,
-                    }}
-                  >
-                    {item.label}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: T.textSecondary,
-                    }}
-                  >
-                    {item.value}
-                  </div>
+                          <span
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: isTop ? "#fff" : "#64748B",
+                            }}
+                          >
+                            {i + 1}
+                          </span>
+                        </div>
+                        {/* Car name */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 600,
+                              color: T.textSecondary,
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {car.car_name}
+                          </div>
+                          {/* Bar */}
+                          <div
+                            style={{
+                              marginTop: 5,
+                              height: 4,
+                              borderRadius: 2,
+                              background: isDark
+                                ? "rgba(255,255,255,0.06)"
+                                : "rgba(0,0,0,0.06)",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div
+                              style={{
+                                height: "100%",
+                                borderRadius: 2,
+                                width: `${Math.min(pct, 100)}%`,
+                                background: isTop ? accent : `${accent}70`,
+                                transition: "width 0.6s ease",
+                              }}
+                            />
+                          </div>
+                        </div>
+                        {/* Pct */}
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontSize: 14,
+                              fontWeight: 700,
+                              color: isTop ? accent : T.textMuted,
+                            }}
+                          >
+                            {car.pct}%
+                          </div>
+                          <div
+                            style={{
+                              fontFamily: "DM Mono, monospace",
+                              fontSize: 10,
+                              color: "#64748B",
+                              marginTop: 1,
+                            }}
+                          >
+                            {car.count} pilotos
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
-          </section>
-            </>
-          )}
-
-          {activeTab === "top-car" && (
-            <section>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  marginBottom: 10,
-                }}
-              >
-                <SectionTitle>
-                  <Crown size={10} style={{ display: "inline", marginRight: 5 }} />
-                  {t.topCarMostUsed}
-                </SectionTitle>
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontFamily: "DM Mono, monospace",
-                    color: "#64748B",
-                    background: "rgba(100,116,139,0.1)",
-                    border: "1px solid rgba(100,116,139,0.2)",
-                    borderRadius: 4,
-                    padding: "1px 6px",
-                  }}
-                >
-                  {t.top100GlobalLabel}
-                </span>
-                {topCarLoading && (
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontFamily: "DM Mono, monospace",
-                      color: "#64748B",
-                    }}
-                  >
-                    loading...
-                  </span>
-                )}
-              </div>
-
-              <div
-                style={{
-                  borderRadius: 12,
-                  background: T.rowBg,
-                  border: `1px solid ${T.sectionBorder}`,
-                  padding: "14px",
-                }}
-              >
-                {topCar?.has_data ? (
-                  <>
-                    <div
-                      style={{
-                        fontFamily: "Syne, sans-serif",
-                        fontSize: 18,
-                        fontWeight: 800,
-                        color: T.textPrimary,
-                        marginBottom: 8,
-                        lineHeight: 1.25,
-                      }}
-                    >
-                      {topCar.car_name}
-                    </div>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <StatBox
-                        icon={<Car size={11} />}
-                        label={t.topCarMostUsed}
-                        value={`${topCar.uses}`}
-                        accent={accent}
-                      />
-                      <StatBox
-                        icon={<Users size={11} />}
-                        label={t.topCarSample}
-                        value={`${topCar.sample_size}`}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color: T.textMuted,
-                    }}
-                  >
-                    {topCarLoading ? "Loading..." : t.topCarNoData}
-                  </div>
-                )}
-              </div>
+              )}
             </section>
           )}
         </div>

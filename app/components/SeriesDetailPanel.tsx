@@ -334,7 +334,10 @@ export default function SeriesDetailPanel({
         onClick={onClose}
         style={{
           position: "fixed",
-          inset: 0,
+          top: 64,
+          left: 0,
+          right: 0,
+          bottom: 0,
           zIndex: 200,
           background: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.35)",
           backdropFilter: "blur(4px)",
@@ -347,7 +350,7 @@ export default function SeriesDetailPanel({
       <div
         style={{
           position: "fixed",
-          top: isMobile ? 0 : 0,
+          top: 64,
           right: 0,
           bottom: 0,
           zIndex: 201,

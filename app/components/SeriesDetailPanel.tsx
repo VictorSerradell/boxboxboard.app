@@ -19,6 +19,7 @@ import {
   Users,
   Zap,
   Link,
+  Crown,
 } from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
 import { toggleFavoriteSeries } from "../lib/iracing-client";
@@ -125,6 +126,16 @@ export default function SeriesDetailPanel({
     has_data: boolean;
   } | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"details" | "top-car">("details");
+  const [topCar, setTopCar] = useState<{
+    car_id: number;
+    car_name: string;
+    uses: number;
+    sample_size: number;
+    has_data: boolean;
+    source?: string;
+  } | null>(null);
+  const [topCarLoading, setTopCarLoading] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { t } = useT();
@@ -135,6 +146,7 @@ export default function SeriesDetailPanel({
     if (series) requestAnimationFrame(() => setVisible(true));
     else setVisible(false);
   }, [series]);
+  useEffect(() => setActiveTab("details"), [series?.series_id]);
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -163,6 +175,26 @@ export default function SeriesDetailPanel({
       })
       .catch(() => {})
       .finally(() => setStatsLoading(false));
+  }, [series?.series_id]);
+
+  useEffect(() => {
+    if (!series) return;
+    setTopCar(null);
+    setTopCarLoading(true);
+    const params = new URLSearchParams({
+      series_id: String(series.series_id),
+      season_year: String(series.season_year),
+      season_quarter: String(series.season_quarter),
+    });
+    fetch(`/api/iracing/series-top-car?${params}`, { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && typeof data === "object") {
+          setTopCar(data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setTopCarLoading(false));
   }, [series?.series_id]);
 
   if (!series) return null;
@@ -565,6 +597,47 @@ export default function SeriesDetailPanel({
           </div>
         </div>
 
+        <div
+          style={{
+            position: "sticky",
+            top: 102,
+            zIndex: 9,
+            display: "flex",
+            gap: 6,
+            padding: "10px 20px",
+            borderBottom: `1px solid ${T.sectionBorder}`,
+            background: T.panelBg,
+          }}
+        >
+          {(
+            [
+              { id: "details", label: t.detailsTab },
+              { id: "top-car", label: t.topCarTab },
+            ] as const
+          ).map((tab) => {
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  border: `1px solid ${active ? `${accent}66` : T.iconBtnBorder}`,
+                  borderRadius: 9,
+                  background: active ? `${accent}1A` : "transparent",
+                  color: active ? accent : T.iconBtnColor,
+                  fontFamily: "Syne, sans-serif",
+                  fontWeight: 700,
+                  fontSize: 12,
+                  padding: "7px 11px",
+                  cursor: "pointer",
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
         {/* ── CONTENIDO ──────────────────────────────────────── */}
         <div
           style={{
@@ -574,6 +647,8 @@ export default function SeriesDetailPanel({
             gap: 24,
           }}
         >
+          {activeTab === "details" && (
+            <>
           {/* Stats */}
           <section>
             <div
@@ -965,6 +1040,98 @@ export default function SeriesDetailPanel({
               ))}
             </div>
           </section>
+            </>
+          )}
+
+          {activeTab === "top-car" && (
+            <section>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 10,
+                }}
+              >
+                <SectionTitle>
+                  <Crown size={10} style={{ display: "inline", marginRight: 5 }} />
+                  {t.topCarMostUsed}
+                </SectionTitle>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontFamily: "DM Mono, monospace",
+                    color: "#64748B",
+                    background: "rgba(100,116,139,0.1)",
+                    border: "1px solid rgba(100,116,139,0.2)",
+                    borderRadius: 4,
+                    padding: "1px 6px",
+                  }}
+                >
+                  {t.top100GlobalLabel}
+                </span>
+                {topCarLoading && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontFamily: "DM Mono, monospace",
+                      color: "#64748B",
+                    }}
+                  >
+                    loading...
+                  </span>
+                )}
+              </div>
+
+              <div
+                style={{
+                  borderRadius: 12,
+                  background: T.rowBg,
+                  border: `1px solid ${T.sectionBorder}`,
+                  padding: "14px",
+                }}
+              >
+                {topCar?.has_data ? (
+                  <>
+                    <div
+                      style={{
+                        fontFamily: "Syne, sans-serif",
+                        fontSize: 18,
+                        fontWeight: 800,
+                        color: T.textPrimary,
+                        marginBottom: 8,
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {topCar.car_name}
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <StatBox
+                        icon={<Car size={11} />}
+                        label={t.topCarMostUsed}
+                        value={`${topCar.uses}`}
+                        accent={accent}
+                      />
+                      <StatBox
+                        icon={<Users size={11} />}
+                        label={t.topCarSample}
+                        value={`${topCar.sample_size}`}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: T.textMuted,
+                    }}
+                  >
+                    {topCarLoading ? "Loading..." : t.topCarNoData}
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </>

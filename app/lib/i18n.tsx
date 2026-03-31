@@ -76,6 +76,12 @@ export interface Translations {
   addToSchedule: string;
   removeFromSchedule: string;
   copyLink: string;
+  detailsTab: string;
+  topCarTab: string;
+  top100GlobalLabel: string;
+  topCarMostUsed: string;
+  topCarSample: string;
+  topCarNoData: string;
   driverSearch: string;
   searchDriverPlaceholder: string;
   searchDriverHint: string;
@@ -229,6 +235,12 @@ const translations: Record<Lang, Translations> = {
     addToSchedule: "Add to my schedule",
     removeFromSchedule: "Remove from schedule",
     copyLink: "Copy share link",
+    detailsTab: "Details",
+    topCarTab: "Top 100 Car",
+    top100GlobalLabel: "Top 100 global",
+    topCarMostUsed: "Most used car",
+    topCarSample: "Sample",
+    topCarNoData: "No data available for this series yet.",
     driverSearch: "Driver Search",
     searchDriverPlaceholder: "Search by driver name...",
     searchDriverHint: "Search any iRacing driver",
@@ -452,6 +464,12 @@ const translations: Record<Lang, Translations> = {
     addToSchedule: "Añadir a mi horario",
     removeFromSchedule: "Quitar del horario",
     copyLink: "Copiar enlace",
+    detailsTab: "Detalles",
+    topCarTab: "Coche Top 100",
+    top100GlobalLabel: "Top 100 global",
+    topCarMostUsed: "Coche más usado",
+    topCarSample: "Muestra",
+    topCarNoData: "Aún no hay datos disponibles para esta serie.",
     driverSearch: "Buscar Piloto",
     searchDriverPlaceholder: "Buscar por nombre de piloto...",
     searchDriverHint: "Busca cualquier piloto de iRacing",

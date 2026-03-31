@@ -35,7 +35,10 @@ async function apiFetch<T>(
   const url = new URL(`${API_BASE}/${path}`, window.location.origin);
   if (params)
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-  const res = await fetch(url.toString(), { credentials: "include" });
+  const res = await fetch(url.toString(), {
+    credentials: "include",
+    redirect: "follow",
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
     throw new IracingAPIError(res.status, err.error || `HTTP ${res.status}`);

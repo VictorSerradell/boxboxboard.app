@@ -86,16 +86,21 @@ export async function getSeriesSeasons(
   seasonQuarter: number,
 ): Promise<SeriesSeason[]> {
   try {
-    // Step 1: get season list from iRacing
-    // series/seasons does not accept filter params — returns all active series
-    const raw = await apiFetch<any>("series/seasons", {});
+    // Use dedicated endpoint that properly follows S3 links
+    const res = await fetch("/api/iracing/series-seasons", {
+      credentials: "include",
+    });
+    if (!res.ok) throw new IracingAPIError(res.status, "series-seasons failed");
+    const raw = await res.json();
 
     console.log(
       "[getSeriesSeasons] raw type:",
       typeof raw,
       Array.isArray(raw)
         ? `array[${(raw as any[]).length}]`
-        : Object.keys(raw ?? {}).join(","),
+        : Object.keys(raw ?? {})
+            .slice(0, 5)
+            .join(","),
     );
 
     // Step 2: get race guide for exact week start dates
@@ -127,21 +132,31 @@ export async function getSeriesSeasons(
       allSeasons.length,
     );
 
-    // Filter to requested season — iRacing returns ALL seasons
-    const seasons = allSeasons.filter((s: any) => {
+    // Filter to requested season — try exact match first, then just active
+    let seasons = allSeasons.filter((s: any) => {
       const yr = s.season_year ?? s.race_season?.season_year;
       const qt = s.season_quarter ?? s.race_season?.season_quarter;
       return yr === seasonYear && qt === seasonQuarter;
     });
 
-    console.log(
-      "[getSeriesSeasons] filtered to season:",
-      seasonYear,
-      seasonQuarter,
-      "→",
-      seasons.length,
-      "series",
-    );
+    // If no match (API may return only current season already), use all
+    if (seasons.length === 0) {
+      seasons = allSeasons;
+      console.log(
+        "[getSeriesSeasons] no season match, using all",
+        allSeasons.length,
+        "series",
+      );
+    } else {
+      console.log(
+        "[getSeriesSeasons] filtered to season:",
+        seasonYear,
+        seasonQuarter,
+        "→",
+        seasons.length,
+        "series",
+      );
+    }
 
     return seasons.map((s: any): SeriesSeason => {
       const schedules = (s.schedules ?? s.race_weeks ?? []).map((w: any) => ({
@@ -435,7 +450,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
       allowed_licenses: [{ group_name: "B", min_level: 2, max_level: 5 }],
       schedules: ms([8, 1, 2, 3, 6, 10]),
       status: "OPEN",
-      category: "Sports Car",
+      category: "Endurance",
       minLicenseLevel: 2,
       race_time_descriptors: [{ repeating: true, session_minutes: 480 }],
     },
@@ -519,9 +534,9 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
       allowed_licenses: [{ group_name: "C", min_level: 2, max_level: 5 }],
       schedules: ms([1, 6, 2, 7, 8, 9, 4]),
       status: "OPEN",
-      category: "Sports Car",
+      category: "Endurance",
       minLicenseLevel: 2,
-      race_time_descriptors: [{ repeating: true, session_minutes: 90 }],
+      race_time_descriptors: [{ repeating: true, session_minutes: 100 }],
     },
     {
       season_id: 4506,
@@ -668,8 +683,8 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
     {
       season_id: 4512,
       series_id: 312,
-      season_name: `LMP2 Prototype Challenge ${year} S${quarter}`,
-      series_name: "LMP2 Prototype Challenge",
+      season_name: `LMP2 Endurance Challenge ${year} S${quarter}`,
+      series_name: "LMP2 Endurance Challenge",
       series_short_name: "LMP2",
       season_year: year,
       season_quarter: quarter,
@@ -682,9 +697,9 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
       allowed_licenses: [{ group_name: "C", min_level: 2, max_level: 5 }],
       schedules: ms([8, 2, 1, 6, 10, 4, 3]),
       status: "OPEN",
-      category: "Sports Car",
+      category: "Endurance",
       minLicenseLevel: 2,
-      race_time_descriptors: [{ repeating: true, session_minutes: 60 }],
+      race_time_descriptors: [{ repeating: true, session_minutes: 120 }],
     },
   ];
 }

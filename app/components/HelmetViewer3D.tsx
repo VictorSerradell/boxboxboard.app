@@ -1,10 +1,6 @@
 "use client";
-// /app/components/HelmetViewer3D.tsx
-// 3D helmet viewer using Three.js — loaded dynamically (no SSR)
-
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Sphere } from "@react-three/drei";
 import * as THREE from "three";
 
 interface HelmetMeshProps {
@@ -19,95 +15,89 @@ function HelmetMesh({ color1, color2, color3 }: HelmetMeshProps) {
   useFrame((state) => {
     if (groupRef.current) {
       groupRef.current.rotation.y =
-        Math.sin(state.clock.elapsedTime * 0.4) * 0.3;
+        Math.sin(state.clock.elapsedTime * 0.5) * 0.25;
     }
   });
 
-  // Create helmet geometry using Three.js primitives
-  const helmetMat = useMemo(
+  const mat1 = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
+      new THREE.MeshPhongMaterial({
         color: color1,
-        roughness: 0.3,
-        metalness: 0.4,
+        shininess: 80,
+        specular: "#ffffff",
       }),
     [color1],
   );
-  const stripe1Mat = useMemo(
+  const mat2 = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
+      new THREE.MeshPhongMaterial({
         color: color2,
-        roughness: 0.3,
-        metalness: 0.4,
+        shininess: 80,
+        specular: "#ffffff",
       }),
     [color2],
   );
-  const stripe2Mat = useMemo(
+  const mat3 = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
+      new THREE.MeshPhongMaterial({
         color: color3,
-        roughness: 0.3,
-        metalness: 0.4,
+        shininess: 80,
+        specular: "#ffffff",
       }),
     [color3],
   );
-  const visorMat = useMemo(
+  const visor = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
-        color: "#001020",
-        roughness: 0.05,
-        metalness: 0.9,
-        envMapIntensity: 2,
+      new THREE.MeshPhongMaterial({
+        color: "#001830",
+        shininess: 200,
+        specular: "#88ccff",
+        transparent: true,
+        opacity: 0.92,
       }),
     [],
   );
 
   return (
-    <group ref={groupRef}>
-      {/* Main dome */}
-      <mesh position={[0, 0.15, 0]} castShadow>
-        <sphereGeometry args={[1, 64, 64, 0, Math.PI * 2, 0, Math.PI * 0.65]} />
-        <primitive object={helmetMat} />
+    <group ref={groupRef} rotation={[0.1, 0, 0]}>
+      {/* Main dome — top half sphere */}
+      <mesh castShadow>
+        <sphereGeometry args={[1, 64, 64, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
+        <primitive object={mat1} attach="material" />
       </mesh>
 
-      {/* Stripe band 1 */}
-      <mesh position={[0, -0.12, 0]} castShadow>
-        <cylinderGeometry
-          args={[1.005, 1.005, 0.18, 64, 1, true, 0, Math.PI * 2]}
-        />
-        <primitive object={stripe1Mat} />
+      {/* Stripe 1 */}
+      <mesh position={[0, -0.08, 0]}>
+        <cylinderGeometry args={[1.002, 1.002, 0.2, 64, 1, true]} />
+        <primitive object={mat2} attach="material" />
       </mesh>
 
-      {/* Stripe band 2 */}
-      <mesh position={[0, -0.32, 0]} castShadow>
-        <cylinderGeometry
-          args={[0.98, 0.98, 0.12, 64, 1, true, 0, Math.PI * 2]}
-        />
-        <primitive object={stripe2Mat} />
+      {/* Stripe 2 */}
+      <mesh position={[0, -0.3, 0]}>
+        <cylinderGeometry args={[0.99, 0.99, 0.13, 64, 1, true]} />
+        <primitive object={mat3} attach="material" />
       </mesh>
 
-      {/* Chin piece */}
-      <mesh position={[0, -0.5, 0.1]} castShadow>
-        <sphereGeometry
-          args={[0.75, 32, 32, 0, Math.PI * 2, Math.PI * 0.5, Math.PI * 0.35]}
-        />
-        <primitive object={helmetMat} />
+      {/* Chin lower */}
+      <mesh position={[0, -0.48, 0]}>
+        <cylinderGeometry args={[0.92, 0.7, 0.22, 64, 1, true]} />
+        <primitive object={mat1} attach="material" />
       </mesh>
 
-      {/* Visor */}
-      <mesh position={[0, 0.0, 0.88]} castShadow>
+      {/* Visor — clipped front sphere segment */}
+      <mesh position={[0, 0.04, 0.02]} rotation={[0.08, 0, 0]}>
         <sphereGeometry
           args={[
-            1.02,
+            1.015,
             64,
-            64,
-            Math.PI * 0.1,
-            Math.PI * 0.8,
-            Math.PI * 0.28,
-            Math.PI * 0.32,
+            32,
+            Math.PI * 0.12,
+            Math.PI * 0.76,
+            Math.PI * 0.22,
+            Math.PI * 0.36,
           ]}
         />
-        <primitive object={visorMat} />
+        <primitive object={visor} attach="material" />
       </mesh>
     </group>
   );
@@ -124,7 +114,7 @@ export default function HelmetViewer3D({
   color1,
   color2,
   color3,
-  size = 180,
+  size = 140,
 }: Props) {
   return (
     <div
@@ -136,17 +126,22 @@ export default function HelmetViewer3D({
         flexShrink: 0,
         boxShadow: `0 0 50px ${color1}50, 0 25px 60px rgba(0,0,0,0.6)`,
         border: "3px solid rgba(255,255,255,0.18)",
+        background: "#060C18",
       }}
     >
       <Canvas
-        camera={{ position: [0, 0.1, 3.2], fov: 40 }}
+        camera={{ position: [0, 0, 2.8], fov: 42 }}
         gl={{ antialias: true, alpha: true }}
-        style={{ width: "100%", height: "100%", background: "transparent" }}
+        style={{ width: "100%", height: "100%" }}
       >
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[4, 5, 4]} intensity={1.5} castShadow />
-        <pointLight position={[-3, -3, -3]} intensity={0.6} color="#88CCFF" />
-        <Environment preset="studio" />
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[3, 5, 5]} intensity={1.8} />
+        <directionalLight
+          position={[-3, -2, -3]}
+          intensity={0.4}
+          color="#88aaff"
+        />
+        <pointLight position={[0, 3, 3]} intensity={0.8} color="#ffffff" />
         <HelmetMesh color1={color1} color2={color2} color3={color3} />
       </Canvas>
     </div>

@@ -101,6 +101,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (e: any) {
     console.error("[series-stats]", e.message);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({
+      avg_sof: 0,
+      avg_drivers: 0,
+      splits: 0,
+      total_races: 0,
+      has_data: false,
+      error: e.message,
+    });
   }
 }

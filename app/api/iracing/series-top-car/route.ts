@@ -174,6 +174,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (e: any) {
     console.error("[series-top-car]", e.message);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({
+      has_data: false,
+      car_id: 0,
+      car_name: "",
+      uses: 0,
+      sample_size: 0,
+      source: "error_fallback",
+      error: e.message,
+    });
   }
 }

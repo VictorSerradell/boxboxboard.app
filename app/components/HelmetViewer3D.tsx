@@ -124,7 +124,7 @@ export default function HelmetViewer3D({
   color1,
   color2,
   color3,
-  size = 140,
+  size = 180,
 }: Props) {
   return (
     <div

@@ -140,6 +140,9 @@ export async function GET(request: NextRequest) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     path: "/",
+    ...(process.env.NODE_ENV === "production" && {
+      domain: ".boxboxboard.app",
+    }),
   };
 
   response.cookies.set("iracing_access_token", access_token, {
@@ -174,6 +177,9 @@ export async function GET(request: NextRequest) {
     sameSite: "lax",
     maxAge: refresh_token_expires_in ?? 3600,
     path: "/",
+    ...(process.env.NODE_ENV === "production" && {
+      domain: ".boxboxboard.app",
+    }),
   });
 
   // Limpiar cookies temporales del flujo

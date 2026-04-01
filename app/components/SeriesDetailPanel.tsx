@@ -89,6 +89,7 @@ const CATEGORY_ACCENT: Record<string, string> = {
   Oval: "#F97316",
   "Dirt Oval": "#EAB308",
   "Dirt Road": "#22C55E",
+  Endurance: "#E879F9",
 };
 
 const LICENSE_CONFIG = {
@@ -312,7 +313,10 @@ export default function SeriesDetailPanel({
         onClick={onClose}
         style={{
           position: "fixed",
-          inset: 0,
+          top: isMobile ? 0 : 64,
+          left: 0,
+          right: 0,
+          bottom: 0,
           zIndex: 200,
           background: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.35)",
           backdropFilter: "blur(4px)",
@@ -325,7 +329,7 @@ export default function SeriesDetailPanel({
       <div
         style={{
           position: "fixed",
-          top: isMobile ? 0 : 0,
+          top: isMobile ? 0 : 64,
           right: 0,
           bottom: 0,
           zIndex: 201,
@@ -453,6 +457,25 @@ export default function SeriesDetailPanel({
                 >
                   <Wrench size={10} /> {series.fixed_setup ? t.fixed : t.open}
                 </span>
+                {series.driver_changes && (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      padding: "4px 11px",
+                      borderRadius: 20,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      fontFamily: "DM Mono, monospace",
+                      background: "rgba(232,121,249,0.14)",
+                      border: "1px solid rgba(232,121,249,0.38)",
+                      color: "#E879F9",
+                    }}
+                  >
+                    👥 {t.teamDriving}
+                  </span>
+                )}
                 {series.official && (
                   <span
                     style={{

@@ -240,6 +240,27 @@ export default function SeriesCard({
             >
               {catStyle.label}
             </span>
+            {/* Endurance duration badge */}
+            {series.category === "Endurance" && duration !== "—" && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "2px 8px",
+                  borderRadius: 20,
+                  background: "rgba(232,121,249,0.15)",
+                  border: "1px solid rgba(232,121,249,0.35)",
+                  fontFamily: "DM Mono, monospace",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: "#E879F9",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                ⏱ {duration}
+              </span>
+            )}
             {currentWeek !== null && currentWeek < tracks.length && (
               <span
                 style={{

@@ -348,13 +348,13 @@ export default function SeriesDetailPanel({
         {/* ── HEADER ─────────────────────────────────────────── */}
         <div
           style={{
-            background: T.headerBg,
-            borderBottom: `1px solid ${accent}20`,
+            background: isDark
+              ? `linear-gradient(160deg, ${accent}22 0%, #0D1628 100%)`
+              : `linear-gradient(160deg, ${accent}14 0%, #FFFFFF 100%)`,
+            borderBottom: `1px solid ${accent}30`,
             padding: "20px 20px 18px",
-            position: "sticky",
-            top: 0,
-            zIndex: 10,
-            backdropFilter: "blur(20px)",
+            flexShrink: 0,
+            position: "relative",
           }}
         >
           <div
@@ -415,7 +415,7 @@ export default function SeriesDetailPanel({
                   fontFamily: "Syne, sans-serif",
                   fontSize: 22,
                   fontWeight: 900,
-                  color: T.textPrimary,
+                  color: isDark ? "#FFFFFF" : "#0F172A",
                   margin: "0 0 12px",
                   letterSpacing: "-0.4px",
                   lineHeight: 1.2,

@@ -1,4 +1,10 @@
 {
+  "app\\components\\DriverProfile.tsx -> ./HelmetViewer3D": {
+    "id": "app\\components\\DriverProfile.tsx -> ./HelmetViewer3D",
+    "files": [
+      "static/chunks/_app-pages-browser_app_components_HelmetViewer3D_tsx.js"
+    ]
+  },
   "app\\components\\TrackMap.tsx -> leaflet": {
     "id": "app\\components\\TrackMap.tsx -> leaflet",
     "files": [

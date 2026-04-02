@@ -308,12 +308,12 @@ export default function SeriesDetailPanel({
 
   return (
     <>
-      {/* Backdrop — starts below fixed header */}
+      {/* Backdrop — starts below fixed header + filters */}
       <div
         onClick={onClose}
         style={{
           position: "fixed",
-          top: isMobile ? 0 : 64,
+          top: isMobile ? 0 : 108,
           left: 0,
           right: 0,
           bottom: 0,
@@ -325,11 +325,11 @@ export default function SeriesDetailPanel({
         }}
       />
 
-      {/* Panel — slides in from right, below fixed header */}
+      {/* Panel — slides in from right, below fixed header + filters */}
       <div
         style={{
           position: "fixed",
-          top: isMobile ? 0 : 64,
+          top: isMobile ? 0 : 108,
           right: 0,
           bottom: 0,
           zIndex: 201,

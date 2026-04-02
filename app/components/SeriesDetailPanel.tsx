@@ -421,7 +421,7 @@ export default function SeriesDetailPanel({
                   lineHeight: 1.2,
                 }}
               >
-                {series.series_name}
+                {series.series_name ?? series.season_name ?? "—"}
               </h2>
 
               {/* Badges */}

@@ -424,7 +424,7 @@ export default function SeriesCard({
             letterSpacing: "-0.4px",
           }}
         >
-          {series.series_name}
+          {series.series_name ?? series.season_name ?? "—"}
         </h3>
 
         {/* Badges */}

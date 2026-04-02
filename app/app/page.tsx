@@ -24,7 +24,6 @@ import SeriesDetailPanel from "../components/SeriesDetailPanel";
 import ThemeToggle from "../components/ThemeToggle";
 import LangToggle from "../components/LangToggle";
 import DriverStats from "../components/DriverStats";
-
 import CalendarView from "../components/CalendarView";
 import ScheduleView from "../components/ScheduleView";
 import WeekChangeBanner from "../components/WeekChangeBanner";
@@ -395,8 +394,9 @@ export default function HomePage() {
       if (filters.searchQuery) {
         const q = filters.searchQuery.toLowerCase();
         if (
-          !s.series_name.toLowerCase().includes(q) &&
-          !(s.series_short_name ?? "").toLowerCase().includes(q)
+          !(s.series_name ?? "").toLowerCase().includes(q) &&
+          !(s.series_short_name ?? "").toLowerCase().includes(q) &&
+          !(s.season_name ?? "").toLowerCase().includes(q)
         )
           return false;
       }

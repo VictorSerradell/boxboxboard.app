@@ -172,10 +172,10 @@ export async function getSeriesSeasons(
 
       return {
         season_id: s.season_id,
-        season_name: s.season_name,
+        season_name: s.season_name ?? "",
         series_id: s.series_id,
-        series_name: s.series_name,
-        series_short_name: s.series_short_name,
+        series_name: s.series_name ?? s.season_name ?? "",
+        series_short_name: s.series_short_name ?? "",
         season_year: s.season_year ?? seasonYear,
         season_quarter: s.season_quarter ?? seasonQuarter,
         active: s.active ?? true,

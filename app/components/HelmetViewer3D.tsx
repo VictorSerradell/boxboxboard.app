@@ -59,32 +59,32 @@ function HelmetMesh({ color1, color2, color3 }: HelmetMeshProps) {
   );
 
   return (
-    <group ref={groupRef} rotation={[0.1, 0, 0]}>
-      {/* Main dome — top half sphere */}
+    <group ref={groupRef} rotation={[0, 0, 0]}>
+      {/* Main Helmet Shape - Using a Cone for a more helmet-like form */}
       <mesh castShadow>
-        <sphereGeometry args={[1, 64, 64, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
+        <coneGeometry args={[2.5, 1, 64, 1, true]} />
         <primitive object={mat1} attach="material" />
       </mesh>
 
-      {/* Stripe 1 */}
+      {/* Stripe 1 - Using a Cylinder for a cleaner look */}
       <mesh position={[0, -0.08, 0]}>
         <cylinderGeometry args={[1.002, 1.002, 0.2, 64, 1, true]} />
         <primitive object={mat2} attach="material" />
       </mesh>
 
-      {/* Stripe 2 */}
+      {/* Stripe 2 - Using a Cylinder for a cleaner look */}
       <mesh position={[0, -0.3, 0]}>
         <cylinderGeometry args={[0.99, 0.99, 0.13, 64, 1, true]} />
         <primitive object={mat3} attach="material" />
       </mesh>
 
-      {/* Chin lower */}
+      {/* Chin Lower - Using a Cylinder for a cleaner look */}
       <mesh position={[0, -0.48, 0]}>
         <cylinderGeometry args={[0.92, 0.7, 0.22, 64, 1, true]} />
         <primitive object={mat1} attach="material" />
       </mesh>
 
-      {/* Visor — clipped front sphere segment */}
+      {/* Visor - Simplified Visor Shape */}
       <mesh position={[0, 0.04, 0.02]} rotation={[0.08, 0, 0]}>
         <sphereGeometry
           args={[
@@ -144,6 +144,6 @@ export default function HelmetViewer3D({
         <pointLight position={[0, 3, 3]} intensity={0.8} color="#ffffff" />
         <HelmetMesh color1={color1} color2={color2} color3={color3} />
       </Canvas>
-    </div>
+    </div >
   );
 }

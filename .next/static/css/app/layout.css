@@ -1,253 +1,156 @@
 /*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[2].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[14].oneOf[2].use[2]!./node_modules/next/font/google/target.css?{"path":"app\\layout.tsx","import":"Syne","arguments":[{"subsets":["latin"],"weight":["400","500","600","700","800"],"variable":"--font-syne","display":"swap"}],"variableName":"syne"} ***!
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[2].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[14].oneOf[2].use[2]!./node_modules/next/font/google/target.css?{"path":"app\\layout.tsx","import":"Orbitron","arguments":[{"subsets":["latin"],"weight":["400","700","900"],"variable":"--font-orbitron","display":"swap"}],"variableName":"orbitron"} ***!
   \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/* greek */
+/* latin */
 @font-face {
-  font-family: '__Syne_c1a642';
+  font-family: '__Orbitron_10ea0f';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(/_next/static/media/0da54fcd0470ea43-s.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(/_next/static/media/680a7121f7a85e3f-s.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(/_next/static/media/9a4ee768fed045da-s.p.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 /* latin */
 @font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(/_next/static/media/8a1d8947e5852e30-s.p.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* greek */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(/_next/static/media/0da54fcd0470ea43-s.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(/_next/static/media/680a7121f7a85e3f-s.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(/_next/static/media/8a1d8947e5852e30-s.p.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* greek */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(/_next/static/media/0da54fcd0470ea43-s.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(/_next/static/media/680a7121f7a85e3f-s.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(/_next/static/media/8a1d8947e5852e30-s.p.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* greek */
-@font-face {
-  font-family: '__Syne_c1a642';
+  font-family: '__Orbitron_10ea0f';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url(/_next/static/media/0da54fcd0470ea43-s.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(/_next/static/media/680a7121f7a85e3f-s.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(/_next/static/media/9a4ee768fed045da-s.p.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 /* latin */
 @font-face {
-  font-family: '__Syne_c1a642';
+  font-family: '__Orbitron_10ea0f';
   font-style: normal;
-  font-weight: 700;
+  font-weight: 900;
   font-display: swap;
-  src: url(/_next/static/media/8a1d8947e5852e30-s.p.woff2) format('woff2');
+  src: url(/_next/static/media/9a4ee768fed045da-s.p.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* greek */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(/_next/static/media/0da54fcd0470ea43-s.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(/_next/static/media/680a7121f7a85e3f-s.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: '__Syne_c1a642';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(/_next/static/media/8a1d8947e5852e30-s.p.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}@font-face {font-family: '__Syne_Fallback_c1a642';src: local("Arial");ascent-override: 93.93%;descent-override: 27.93%;line-gap-override: 0.00%;size-adjust: 98.47%
-}.__className_c1a642 {font-family: '__Syne_c1a642', '__Syne_Fallback_c1a642';font-style: normal
-}.__variable_c1a642 {--font-syne: '__Syne_c1a642', '__Syne_Fallback_c1a642'
+}@font-face {font-family: '__Orbitron_Fallback_10ea0f';src: local("Arial");ascent-override: 81.50%;descent-override: 19.59%;line-gap-override: 0.00%;size-adjust: 124.05%
+}.__className_10ea0f {font-family: '__Orbitron_10ea0f', '__Orbitron_Fallback_10ea0f';font-style: normal
+}.__variable_10ea0f {--font-orbitron: '__Orbitron_10ea0f', '__Orbitron_Fallback_10ea0f'
 }
 
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[2].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[14].oneOf[2].use[2]!./node_modules/next/font/google/target.css?{"path":"app\\layout.tsx","import":"DM_Mono","arguments":[{"subsets":["latin"],"weight":["400","500"],"variable":"--font-dm-mono","display":"swap"}],"variableName":"dmMono"} ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/* latin-ext */
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[2].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[14].oneOf[2].use[2]!./node_modules/next/font/google/target.css?{"path":"app\\layout.tsx","import":"Rajdhani","arguments":[{"subsets":["latin"],"weight":["400","500","600","700"],"variable":"--font-rajdhani","display":"swap"}],"variableName":"rajdhani"} ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/* devanagari */
 @font-face {
-  font-family: '__DM_Mono_9ef920';
+  font-family: '__Rajdhani_4fe6d1';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(/_next/static/media/64418ffc17e50301-s.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(/_next/static/media/7e5a5c10421db7a0-s.woff2) format('woff2');
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
 }
-/* latin */
+/* latin-ext */
 @font-face {
-  font-family: '__DM_Mono_9ef920';
+  font-family: '__Rajdhani_4fe6d1';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(/_next/static/media/0e96d314a90a6138-s.p.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* latin-ext */
-@font-face {
-  font-family: '__DM_Mono_9ef920';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(/_next/static/media/ba43ea3467e29870-s.woff2) format('woff2');
+  src: url(/_next/static/media/573cbd3e993edffe-s.woff2) format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 /* latin */
 @font-face {
-  font-family: '__DM_Mono_9ef920';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(/_next/static/media/b7ea2ab4a8ad1f81-s.p.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}@font-face {font-family: '__DM_Mono_Fallback_9ef920';src: local("Arial");ascent-override: 73.71%;descent-override: 23.03%;line-gap-override: 0.00%;size-adjust: 134.59%
-}.__className_9ef920 {font-family: '__DM_Mono_9ef920', '__DM_Mono_Fallback_9ef920';font-style: normal
-}.__variable_9ef920 {--font-dm-mono: '__DM_Mono_9ef920', '__DM_Mono_Fallback_9ef920'
-}
-
-/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[2].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[14].oneOf[2].use[2]!./node_modules/next/font/google/target.css?{"path":"app\\layout.tsx","import":"DM_Sans","arguments":[{"subsets":["latin"],"weight":["300","400","500"],"variable":"--font-dm-sans","display":"swap"}],"variableName":"dmSans"} ***!
-  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/* latin-ext */
-@font-face {
-  font-family: '__DM_Sans_c95b6f';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(/_next/static/media/7ab938503e4547a1-s.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: '__DM_Sans_c95b6f';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(/_next/static/media/13971731025ec697-s.p.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* latin-ext */
-@font-face {
-  font-family: '__DM_Sans_c95b6f';
+  font-family: '__Rajdhani_4fe6d1';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(/_next/static/media/7ab938503e4547a1-s.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: '__DM_Sans_c95b6f';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(/_next/static/media/13971731025ec697-s.p.woff2) format('woff2');
+  src: url(/_next/static/media/4b657decd6407698-s.p.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+  font-family: '__Rajdhani_4fe6d1';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/_next/static/media/b009b118a8c58d8c-s.woff2) format('woff2');
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
 }
 /* latin-ext */
 @font-face {
-  font-family: '__DM_Sans_c95b6f';
+  font-family: '__Rajdhani_4fe6d1';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url(/_next/static/media/7ab938503e4547a1-s.woff2) format('woff2');
+  src: url(/_next/static/media/264c8506a75dd158-s.woff2) format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 /* latin */
 @font-face {
-  font-family: '__DM_Sans_c95b6f';
+  font-family: '__Rajdhani_4fe6d1';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url(/_next/static/media/13971731025ec697-s.p.woff2) format('woff2');
+  src: url(/_next/static/media/3d26d2f3aa81a833-s.p.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}@font-face {font-family: '__DM_Sans_Fallback_c95b6f';src: local("Arial");ascent-override: 94.90%;descent-override: 29.66%;line-gap-override: 0.00%;size-adjust: 104.53%
-}.__className_c95b6f {font-family: '__DM_Sans_c95b6f', '__DM_Sans_Fallback_c95b6f';font-style: normal
-}.__variable_c95b6f {--font-dm-sans: '__DM_Sans_c95b6f', '__DM_Sans_Fallback_c95b6f'
+}
+/* devanagari */
+@font-face {
+  font-family: '__Rajdhani_4fe6d1';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/_next/static/media/04971cd00c9d3b68-s.woff2) format('woff2');
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
+}
+/* latin-ext */
+@font-face {
+  font-family: '__Rajdhani_4fe6d1';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/_next/static/media/1a22315a480e72db-s.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: '__Rajdhani_4fe6d1';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/_next/static/media/6e1768769e6f59a2-s.p.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+  font-family: '__Rajdhani_4fe6d1';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/_next/static/media/67695be07a46cf4c-s.woff2) format('woff2');
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
+}
+/* latin-ext */
+@font-face {
+  font-family: '__Rajdhani_4fe6d1';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/_next/static/media/bcc69932347c6777-s.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: '__Rajdhani_4fe6d1';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/_next/static/media/ab2e3a11646b0499-s.p.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}@font-face {font-family: '__Rajdhani_Fallback_4fe6d1';src: local("Arial");ascent-override: 102.12%;descent-override: 37.99%;line-gap-override: 0.00%;size-adjust: 91.07%
+}.__className_4fe6d1 {font-family: '__Rajdhani_4fe6d1', '__Rajdhani_Fallback_4fe6d1';font-style: normal
+}.__variable_4fe6d1 {--font-rajdhani: '__Rajdhani_4fe6d1', '__Rajdhani_Fallback_4fe6d1'
 }
 
 /*!*************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!./app/globals.css ***!
   \*************************************************************************************************************************************************************************************************************************************************************/
-/* /app/globals.css */
+/* /app/globals.css — F1 Racing Theme */
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -793,57 +696,67 @@ video {
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
-@keyframes modalIn {
-    from { opacity: 0; transform: translateY(-16px) scale(0.98); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-/* ── CSS Theme Variables ─────────────────────────────────── */
+/* ── Racing Theme Variables ──────────────────────────────── */
 :root,
 [data-theme="dark"] {
-  --bg-base:        #060C18;
-  --bg-surface:     #070D19;
-  --bg-card:        rgba(255,255,255,0.05);
-  --bg-card-solid:  #0A1221;
-  --bg-header:      rgba(6,12,24,0.92);
-  --bg-footer:      rgba(0,0,0,0.3);
-  --bg-input:       rgba(255,255,255,0.05);
+  --bg-base:        #080808;
+  --bg-surface:     #0D0D12;
+  --bg-card:        #111118;
+  --bg-card-solid:  #111118;
+  --bg-header:      rgba(8,8,8,0.97);
+  --bg-footer:      rgba(0,0,0,0.5);
+  --bg-input:       rgba(255,255,255,0.04);
 
-  --border:         rgba(255,255,255,0.08);
-  --border-hover:   rgba(255,255,255,0.18);
-  --border-subtle:  rgba(255,255,255,0.05);
+  --border:         #1E1E2A;
+  --border-hover:   #2E2E3E;
+  --border-subtle:  #161620;
+  --border-accent:  rgba(232,0,45,0.25);
+
+  --accent:         #E8002D;
+  --accent-hover:   #FF1E3C;
+  --accent-dim:     rgba(232,0,45,0.12);
 
   --text-primary:   #FFFFFF;
-  --text-secondary: rgba(255,255,255,0.75);
-  --text-muted:     #64748B;
-  --text-faint:     #334155;
-  --text-dimmed:    #1E293B;
+  --text-secondary: #AAAABC;
+  --text-muted:     #555566;
+  --text-faint:     #2E2E3E;
+  --text-dimmed:    #1A1A24;
 
-  --skeleton-a:     #111520;
-  --skeleton-b:     #161B27;
+  --skeleton-a:     #111118;
+  --skeleton-b:     #1A1A22;
 }
 
 [data-theme="light"] {
-  --bg-base:        #F1F5F9;
+  --bg-base:        #F5F5F7;
   --bg-surface:     #FFFFFF;
-  --bg-card:        rgba(0,0,0,0.03);
+  --bg-card:        #FFFFFF;
   --bg-card-solid:  #FFFFFF;
-  --bg-header:      rgba(248,250,252,0.95);
+  --bg-header:      rgba(255,255,255,0.97);
   --bg-footer:      rgba(0,0,0,0.04);
   --bg-input:       rgba(0,0,0,0.04);
 
-  --border:         rgba(0,0,0,0.1);
-  --border-hover:   rgba(0,0,0,0.22);
-  --border-subtle:  rgba(0,0,0,0.06);
+  --border:         #E0E0E8;
+  --border-hover:   #C0C0CC;
+  --border-subtle:  #EBEBF0;
+  --border-accent:  rgba(232,0,45,0.2);
 
-  --text-primary:   #0F172A;
-  --text-secondary: #1E293B;
-  --text-muted:     #64748B;
-  --text-faint:     #94A3B8;
-  --text-dimmed:    #CBD5E1;
+  --accent:         #E8002D;
+  --accent-hover:   #C8001D;
+  --accent-dim:     rgba(232,0,45,0.08);
 
-  --skeleton-a:     #E2E8F0;
-  --skeleton-b:     #CBD5E1;
+  --text-primary:   #0A0A0F;
+  --text-secondary: #444450;
+  --text-muted:     #888896;
+  --text-faint:     #BBBBCC;
+  --text-dimmed:    #DDDDEE;
+
+  --skeleton-a:     #EBEBF0;
+  --skeleton-b:     #DDDDE8;
 }
 
 /* ── Base ────────────────────────────────────────────────── */
@@ -854,23 +767,39 @@ body {
   background: var(--bg-base);
   color: var(--text-primary);
   transition: background 0.25s ease, color 0.25s ease;
-  position: relative;
   margin: 0;
-  font-family: var(--font-dm-sans), 'DM Sans', system-ui, sans-serif;
+  font-family: 'Rajdhani', system-ui, sans-serif;
 }
 
+/* ── Racing Typography ───────────────────────────────────── */
+.font-orbitron  { font-family: 'Orbitron', monospace; }
+.font-rajdhani  { font-family: 'Rajdhani', sans-serif; }
+
 /* ── Scrollbar ───────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; opacity: 0.4; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
 
 /* ── Skeleton ────────────────────────────────────────────── */
 
-/* ── Font family aliases via next/font CSS variables ────── */
-/* Allows inline styles using fontFamily: "Syne, sans-serif" to work */
+/* ── Font aliases ────────────────────────────────────────── */
 :root {
-  --font-family-syne:    var(--font-syne, 'Syne', system-ui, sans-serif);
-  --font-family-mono:    var(--font-dm-mono, 'DM Mono', 'Courier New', monospace);
-  --font-family-sans:    var(--font-dm-sans, 'DM Sans', system-ui, sans-serif);
+  --font-family-heading: 'Orbitron', monospace;
+  --font-family-body:    'Rajdhani', sans-serif;
+  --font-family-mono:    'Orbitron', monospace;
+}
+
+/* ── Racing accent line on inputs/focus ─────────────────── */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent) !important;
+}
+
+/* ── Chip active state ───────────────────────────────────── */
+.chip-active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
 }

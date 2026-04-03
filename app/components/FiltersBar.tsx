@@ -77,33 +77,21 @@ export default function FiltersBar({
     autoLicense !== undefined ? autoLicense : (safeFilters.myLicense ?? null);
 
   const T = {
-    barBg: isDark ? "rgba(6,12,24,0.94)" : "rgba(248,250,252,0.96)",
-    barBorder: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)",
-    divider: isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.10)",
-    groupLabel: isDark ? "#334155" : "#94A3B8",
+    barBg: isDark ? "rgba(8,8,8,0.97)" : "rgba(255,255,255,0.97)",
+    barBorder: isDark ? "#1E1E2A" : "#E0E0E8",
+    divider: isDark ? "#1E1E2A" : "#E0E0E8",
+    groupLabel: isDark ? "#444455" : "#999AAA",
     chipDefault: isDark
-      ? {
-          color: "#64748B",
-          border: "rgba(255,255,255,0.10)",
-          bg: "transparent",
-        }
-      : { color: "#64748B", border: "rgba(0,0,0,0.12)", bg: "transparent" },
+      ? { color: "#555566", border: "#2A2A3A", bg: "transparent" }
+      : { color: "#888899", border: "#D8D8E8", bg: "transparent" },
     chipHover: isDark
-      ? {
-          color: "#E2E8F0",
-          border: "rgba(255,255,255,0.2)",
-          bg: "rgba(255,255,255,0.05)",
-        }
-      : {
-          color: "#1E293B",
-          border: "rgba(0,0,0,0.22)",
-          bg: "rgba(0,0,0,0.04)",
-        },
-    searchBg: isDark ? "#0A1221" : "#FFFFFF",
-    searchBorder: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.12)",
-    searchText: isDark ? "#FFFFFF" : "#0F172A",
-    searchPlaceholder: isDark ? "#334155" : "#CBD5E1",
-    resetColor: isDark ? "#475569" : "#94A3B8",
+      ? { color: "#AAAABC", border: "#3E3E4E", bg: "rgba(255,255,255,0.04)" }
+      : { color: "#333344", border: "#B8B8C8", bg: "rgba(0,0,0,0.03)" },
+    searchBg: isDark ? "#111118" : "#FFFFFF",
+    searchBorder: isDark ? "#2A2A3A" : "#D8D8E8",
+    searchText: isDark ? "#FFFFFF" : "#0A0A0F",
+    searchPlaceholder: isDark ? "#444455" : "#CCCCDD",
+    resetColor: isDark ? "#555566" : "#888899",
   };
 
   function toggleCategory(cat: CarCategory) {
@@ -177,7 +165,7 @@ export default function FiltersBar({
           color: active ? (color ?? "#3B9EFF") : c.color,
           fontSize: 13,
           fontWeight: 600,
-          fontFamily: "Syne, sans-serif",
+          fontFamily: "Rajdhani, sans-serif",
           cursor: "pointer",
           whiteSpace: "nowrap",
           transition: "all 0.15s ease",
@@ -218,7 +206,7 @@ export default function FiltersBar({
       {/* Type */}
       <span
         style={{
-          fontFamily: "DM Mono, monospace",
+          fontFamily: "Orbitron, monospace",
           fontSize: 10,
           color: T.groupLabel,
           textTransform: "uppercase",
@@ -261,7 +249,7 @@ export default function FiltersBar({
       {/* License */}
       <span
         style={{
-          fontFamily: "DM Mono, monospace",
+          fontFamily: "Orbitron, monospace",
           fontSize: 10,
           color: T.groupLabel,
           textTransform: "uppercase",
@@ -293,7 +281,7 @@ export default function FiltersBar({
       {/* Status */}
       <span
         style={{
-          fontFamily: "DM Mono, monospace",
+          fontFamily: "Orbitron, monospace",
           fontSize: 10,
           color: T.groupLabel,
           textTransform: "uppercase",
@@ -363,7 +351,7 @@ export default function FiltersBar({
             color: T.resetColor,
             fontSize: 13,
             fontWeight: 600,
-            fontFamily: "Syne, sans-serif",
+            fontFamily: "Rajdhani, sans-serif",
             cursor: "pointer",
           }}
           onMouseEnter={(e) => {
@@ -402,7 +390,7 @@ export default function FiltersBar({
           >
             <span
               style={{
-                fontFamily: "DM Mono, monospace",
+                fontFamily: "Orbitron, monospace",
                 fontSize: 10,
                 color: T.groupLabel,
                 textTransform: "uppercase",
@@ -435,7 +423,7 @@ export default function FiltersBar({
                     color: active ? lic.color : T.chipDefault.color,
                     fontSize: 12,
                     fontWeight: 700,
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     cursor: "pointer",
                     transition: "all 0.15s",
                     flexShrink: 0,
@@ -483,7 +471,7 @@ export default function FiltersBar({
                   borderRadius: 20,
                   border: `1px solid ${lic.color}50`,
                   background: lic.color + "15",
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 11,
                   fontWeight: 700,
                   color: lic.color,
@@ -537,7 +525,7 @@ export default function FiltersBar({
               width: 200,
               outline: "none",
               transition: "all 0.15s",
-              fontFamily: "DM Sans, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
             }}
             onFocus={(e) => {
               e.currentTarget.style.width = "256px";
@@ -609,7 +597,7 @@ export default function FiltersBar({
                 paddingTop: 8,
                 paddingBottom: 8,
                 outline: "none",
-                fontFamily: "DM Sans, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 boxSizing: "border-box",
               }}
             />
@@ -625,7 +613,7 @@ export default function FiltersBar({
               border: `1px solid ${activeCount > 0 ? "rgba(59,158,255,0.4)" : T.barBorder}`,
               background: activeCount > 0 ? "rgba(59,158,255,0.1)" : T.searchBg,
               color: activeCount > 0 ? "#3B9EFF" : T.groupLabel,
-              fontFamily: "Syne, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
               fontWeight: 600,
               fontSize: 13,
               cursor: "pointer",
@@ -692,7 +680,7 @@ export default function FiltersBar({
               >
                 <span
                   style={{
-                    fontFamily: "Syne, sans-serif",
+                    fontFamily: "Rajdhani, sans-serif",
                     fontWeight: 800,
                     fontSize: 16,
                     color: "var(--text-primary)",

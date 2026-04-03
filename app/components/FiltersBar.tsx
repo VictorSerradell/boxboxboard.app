@@ -1,1306 +1,745 @@
 "use client";
+// /app/components/FiltersBar.tsx
+
+import { useState } from "react";
+import {
+  Heart,
+  Shield,
+  RotateCcw,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
+import type {
+  FilterState,
+  CarCategory,
+  LicenseLevel,
+  SessionType,
+} from "../types/iracing";
+import { useTheme } from "../lib/theme";
 import { useT } from "../lib/i18n";
 import { useIsMobile } from "../lib/useBreakpoint";
-// /app/components/SeriesDetailPanel.tsx
 
-import { useEffect, useState } from "react";
-import {
-  X,
-  Heart,
-  Lock,
-  Check,
-  Clock,
-  Calendar,
-  Wrench,
-  Flag,
-  Trophy,
-  Car,
-  BarChart2,
-  Users,
-  Zap,
-  Link,
-} from "lucide-react";
-import type { SeriesSeason } from "../types/iracing";
-import { toggleFavoriteSeries } from "../lib/iracing-client";
-import { getCurrentRaceWeek } from "../lib/season-week";
-import { useTheme } from "../lib/theme";
-
-interface Props {
-  series: SeriesSeason | null;
-  isFavorite: boolean;
-  onClose: () => void;
-  onFavoriteToggle: (seriesId: number, newFavs: number[]) => void;
+interface FiltersBarProps {
+  filters: FilterState;
+  onChange: (newFilters: FilterState) => void;
+  autoLicense?: LicenseLevel | null; // detected from connected account
 }
 
-const DEMO_CARS: Record<
-  number,
-  { name: string; owned: boolean; free: boolean }[]
-> = {
-  301: [
-    { name: "Porsche 911 GT3 R (992)", owned: true, free: false },
-    { name: "Ferrari 296 GT3", owned: false, free: false },
-    { name: "BMW M4 GT3", owned: true, free: false },
-    { name: "Lamborghini Huracán GT3 EVO", owned: false, free: false },
-  ],
-  302: [{ name: "Porsche 911 GT3 Cup (992)", owned: true, free: false }],
-  303: [{ name: "Dallara F3", owned: false, free: true }],
-  304: [
-    { name: "NASCAR Cup Series Chevrolet", owned: true, free: false },
-    { name: "NASCAR Cup Series Ford", owned: false, free: false },
-    { name: "NASCAR Cup Series Toyota", owned: false, free: false },
-  ],
-  305: [
-    { name: "Porsche 963 GTP", owned: false, free: false },
-    { name: "Acura ARX-06 GTP", owned: true, free: false },
-    { name: "Porsche 911 GT3 R (992)", owned: true, free: false },
-    { name: "Aston Martin Vantage GT3", owned: false, free: false },
-  ],
-  308: [{ name: "Dallara IR18", owned: false, free: false }],
-  310: [{ name: "Super Formula SF23", owned: false, free: false }],
-  312: [{ name: "ORECA LMP2 07", owned: true, free: false }],
-};
+const CATEGORIES: { label: string; value: CarCategory }[] = [
+  { label: "Sports Car", value: "Sports Car" },
+  { label: "Formula", value: "Formula Car" },
+  { label: "Oval", value: "Oval" },
+  { label: "Dirt Oval", value: "Dirt Oval" },
+  { label: "Dirt Road", value: "Dirt Road" },
+  { label: "Endurance", value: "Endurance" },
+];
 
-const DEMO_TIMES: Record<number, string[]> = {
-  301: ["Sat 14:00 UTC", "Sat 20:00 UTC", "Sun 02:00 UTC"],
-  302: ["Tue 18:00 UTC", "Sat 17:00 UTC"],
-  303: ["Every 2h repeating"],
-  304: ["Every 2h repeating"],
-  305: ["Wed 18:00 UTC", "Sat 19:00 UTC"],
-  308: ["Every 4h repeating"],
-};
+const LICENSES: { label: string; value: LicenseLevel; color: string }[] = [
+  { label: "Rookie", value: 0, color: "#FF4444" },
+  { label: "D", value: 1, color: "#F97316" },
+  { label: "C", value: 2, color: "#EAB308" },
+  { label: "B", value: 3, color: "#22C55E" },
+  { label: "A", value: 4, color: "#3B9EFF" },
+];
 
-const DEMO_STATS: Record<
-  number,
-  { avg_sof: number; avg_drivers: number; splits: number }
-> = {
-  301: { avg_sof: 3120, avg_drivers: 22, splits: 1 },
-  302: { avg_sof: 5840, avg_drivers: 30, splits: 2 },
-  303: { avg_sof: 2650, avg_drivers: 18, splits: 3 },
-  304: { avg_sof: 4200, avg_drivers: 36, splits: 4 },
-  305: { avg_sof: 3580, avg_drivers: 40, splits: 2 },
-  308: { avg_sof: 6100, avg_drivers: 24, splits: 1 },
-  310: { avg_sof: 4900, avg_drivers: 20, splits: 1 },
-  312: { avg_sof: 2900, avg_drivers: 32, splits: 2 },
-};
+const STATUSES: { label: string; value: SessionType; color: string }[] = [
+  { label: "Fixed", value: "FIXED", color: "#3B9EFF" },
+  { label: "Open", value: "OPEN", color: "#22C55E" },
+  { label: "Ranked", value: "RANKED", color: "#A855F7" },
+  { label: "Unranked", value: "UNRANKED", color: "#64748B" },
+];
 
-const CATEGORY_ACCENT: Record<string, string> = {
-  "Sports Car": "#3B9EFF",
-  "Formula Car": "#A855F7",
-  Oval: "#F97316",
-  "Dirt Oval": "#EAB308",
-  "Dirt Road": "#22C55E",
-  Endurance: "#E879F9",
-};
-
-const LICENSE_CONFIG = {
-  0: { label: "Rookie", color: "#FF4444" },
-  1: { label: "D", color: "#F97316" },
-  2: { label: "C", color: "#EAB308" },
-  3: { label: "B", color: "#22C55E" },
-  4: { label: "A", color: "#3B9EFF" },
-  5: { label: "PRO", color: "#A855F7" },
-} as const;
-
-function getSessionDuration(series: SeriesSeason): string {
-  const td = series.race_time_descriptors;
-  if (!td?.[0]?.session_minutes) return "—";
-  const mins = td[0].session_minutes;
-  if (mins >= 60)
-    return `${Math.floor(mins / 60)}h${mins % 60 > 0 ? ` ${mins % 60}m` : ""}`;
-  return `${mins}m`;
-}
-
-export default function SeriesDetailPanel({
-  series,
-  isFavorite,
-  onClose,
-  onFavoriteToggle,
-}: Props) {
-  const [localFav, setLocalFav] = useState(isFavorite);
-  const [visible, setVisible] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [realStats, setRealStats] = useState<{
-    avg_sof: number;
-    avg_drivers: number;
-    splits: number;
-    has_data: boolean;
-  } | null>(null);
-  const [statsLoading, setStatsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"info" | "cars">("info");
-  const [carStats, setCarStats] = useState<
-    { car_id: number; car_name: string; count: number; pct: string }[]
-  >([]);
-  const [carsLoading, setCarsLoading] = useState(false);
-  const [carsLoaded, setCarsLoaded] = useState(false);
+export default function FiltersBar({
+  filters,
+  onChange,
+  autoLicense,
+}: FiltersBarProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { t } = useT();
   const isMobile = useIsMobile();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  useEffect(() => setLocalFav(isFavorite), [isFavorite]);
-  useEffect(() => {
-    if (series) {
-      requestAnimationFrame(() => setVisible(true));
-      setActiveTab("info");
-      setCarsLoaded(false);
-      setCarStats([]);
-    } else setVisible(false);
-  }, [series]);
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  // Fetch real stats when series opens
-  useEffect(() => {
-    if (!series) return;
-    setRealStats(null);
-    setStatsLoading(true);
-    const currentWeek =
-      getCurrentRaceWeek(series.season_year, series.season_quarter) ?? 0;
-    const params = new URLSearchParams({
-      series_id: String(series.series_id),
-      race_week_num: String(currentWeek),
-      season_year: String(series.season_year),
-      season_quarter: String(series.season_quarter),
-    });
-    fetch(`/api/iracing/series-stats?${params}`, { credentials: "include" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.has_data) setRealStats(data);
-      })
-      .catch(() => {})
-      .finally(() => setStatsLoading(false));
-  }, [series?.series_id]);
-
-  if (!series) return null;
-
-  const accent = CATEGORY_ACCENT[series.category ?? ""] ?? "#3B9EFF";
-  const licConfig =
-    LICENSE_CONFIG[series.minLicenseLevel as keyof typeof LICENSE_CONFIG] ??
-    LICENSE_CONFIG[0];
-  const duration = getSessionDuration(series);
-  const cars = DEMO_CARS[series.series_id] ?? [
-    { name: "Series car", owned: false, free: false },
-  ];
-  const times = DEMO_TIMES[series.series_id] ?? ["Every 2h repeating"];
-  const demoStats = DEMO_STATS[series.series_id] ?? {
-    avg_sof: 2000,
-    avg_drivers: 20,
-    splits: 1,
+  // Guard after hooks — filters can arrive undefined during SSR hydration
+  const safeFilters = filters ?? {
+    categories: [],
+    licenses: [],
+    statuses: [],
+    favoritesOnly: false,
+    ownedOnly: false,
+    searchQuery: "",
+    myLicense: null,
   };
-  const stats = realStats ?? demoStats;
-  const currentWeek = getCurrentRaceWeek(
-    series.season_year,
-    series.season_quarter,
-  );
 
-  // Theme-aware local tokens
+  // If account is connected, auto-license overrides manual
+  const effectiveLicense =
+    autoLicense !== undefined ? autoLicense : (safeFilters.myLicense ?? null);
+
   const T = {
-    panelBg: isDark ? "#0D0D12" : "#FFFFFF",
-    headerBg: isDark
-      ? `linear-gradient(160deg, ${accent}18 0%, #0D0D12 100%)`
-      : `linear-gradient(160deg, ${accent}10 0%, #FAFAFA 100%)`,
-    sectionBorder: isDark ? "#1E1E2A" : "#E8E8F0",
-    rowBg: isDark ? "#141418" : "#F8F8FC",
-    rowBgAlt: isDark ? "#111116" : "#F5F5FA",
-    rowBorder: isDark ? "#1E1E2A" : "#E8E8F0",
-    labelColor: isDark ? "#444455" : "#888899",
-    textPrimary: isDark ? "#FFFFFF" : "#0A0A0F",
-    textSecondary: isDark ? "#CCCCDC" : "#222230",
-    textMuted: isDark ? "#888898" : "#666677",
-    textFaint: isDark ? "#444455" : "#AAAABC",
-    statValue: isDark ? "#FFFFFF" : "#0A0A0F",
-    iconBtnBg: isDark ? "#1A1A22" : "#F0F0F8",
-    iconBtnBorder: isDark ? "#2A2A38" : "#D8D8E8",
-    iconBtnColor: isDark ? "#555566" : "#888899",
-    flagColor: isDark ? "#2E2E3E" : "#CCCCDD",
-    carIconBg: isDark ? "#141418" : "#F0F0F8",
-    carIconBorder: isDark ? "#2A2A38" : "#D8D8E8",
-    dateColor: isDark ? "#444455" : "#888899",
-    infoGridBg: isDark ? "#141418" : "#F8F8FC",
-    infoGridBorder: isDark ? "#1E1E2A" : "#E8E8F0",
+    barBg: isDark ? "rgba(6,12,24,0.94)" : "rgba(248,250,252,0.96)",
+    barBorder: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)",
+    divider: isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.10)",
+    groupLabel: isDark ? "#334155" : "#94A3B8",
+    chipDefault: isDark
+      ? {
+          color: "#64748B",
+          border: "rgba(255,255,255,0.10)",
+          bg: "transparent",
+        }
+      : { color: "#64748B", border: "rgba(0,0,0,0.12)", bg: "transparent" },
+    chipHover: isDark
+      ? {
+          color: "#E2E8F0",
+          border: "rgba(255,255,255,0.2)",
+          bg: "rgba(255,255,255,0.05)",
+        }
+      : {
+          color: "#1E293B",
+          border: "rgba(0,0,0,0.22)",
+          bg: "rgba(0,0,0,0.04)",
+        },
+    searchBg: isDark ? "#0A1221" : "#FFFFFF",
+    searchBorder: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.12)",
+    searchText: isDark ? "#FFFFFF" : "#0F172A",
+    searchPlaceholder: isDark ? "#334155" : "#CBD5E1",
+    resetColor: isDark ? "#475569" : "#94A3B8",
   };
 
-  function handleFav() {
-    const newFavs = toggleFavoriteSeries(series!.series_id);
-    setLocalFav(!localFav);
-    onFavoriteToggle(series!.series_id, newFavs);
+  function toggleCategory(cat: CarCategory) {
+    const cats = safeFilters.categories.includes(cat)
+      ? safeFilters.categories.filter((c) => c !== cat)
+      : [...safeFilters.categories, cat];
+    onChange({ ...filters, categories: cats });
   }
 
-  function copyLink() {
-    const url = new URL(window.location.href);
-    url.searchParams.set("series", String(series!.series_id));
-    navigator.clipboard.writeText(url.toString()).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+  function toggleLicense(lic: LicenseLevel) {
+    const lics = safeFilters.licenses.includes(lic)
+      ? safeFilters.licenses.filter((l) => l !== lic)
+      : [...safeFilters.licenses, lic];
+    onChange({ ...filters, licenses: lics });
+  }
+
+  function toggleStatus(s: SessionType) {
+    const stats = safeFilters.statuses.includes(s)
+      ? safeFilters.statuses.filter((x) => x !== s)
+      : [...safeFilters.statuses, s];
+    onChange({ ...filters, statuses: stats });
+  }
+
+  function reset() {
+    onChange({
+      categories: [],
+      licenses: [],
+      statuses: [],
+      favoritesOnly: false,
+      ownedOnly: false,
+      searchQuery: "",
+      myLicense: null,
     });
   }
 
-  const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-    <p
-      style={{
-        fontFamily: "Orbitron, monospace",
-        fontSize: 10,
-        fontWeight: 600,
-        color: T.labelColor,
-        letterSpacing: "0.14em",
-        textTransform: "uppercase",
-        margin: "0 0 10px",
-      }}
-    >
-      {children}
-    </p>
-  );
+  const hasActiveFilters =
+    safeFilters.categories.length > 0 ||
+    safeFilters.licenses.length > 0 ||
+    safeFilters.statuses.length > 0 ||
+    safeFilters.favoritesOnly ||
+    safeFilters.ownedOnly ||
+    safeFilters.searchQuery.length > 0 ||
+    (safeFilters.myLicense ?? null) !== null;
 
-  const StatBox = ({
-    icon,
+  // Chip helper
+  function chip({
     label,
-    value,
-    accent: a,
+    active,
+    color,
+    onClick,
+    children,
   }: {
-    icon: React.ReactNode;
-    label: string;
-    value: string;
-    accent?: string;
-  }) => (
-    <div
-      style={{
-        flex: 1,
-        padding: "12px 14px",
-        borderRadius: 10,
-        background: T.rowBg,
-        border: `1px solid ${T.sectionBorder}`,
-        display: "flex",
-        flexDirection: "column",
-        gap: 5,
-      }}
-    >
-      <span
+    label?: string;
+    active: boolean;
+    color?: string;
+    onClick: () => void;
+    children?: React.ReactNode;
+  }) {
+    const c = T.chipDefault;
+    return (
+      <button
+        onClick={onClick}
         style={{
-          display: "flex",
+          display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          color: T.labelColor,
-          fontSize: 10,
-          fontFamily: "Orbitron, monospace",
-          textTransform: "uppercase",
-          letterSpacing: "0.1em",
+          padding: "5px 12px",
+          borderRadius: 20,
+          border: `1px solid ${active ? (color ?? "#3B9EFF") + "50" : c.border}`,
+          background: active ? (color ?? "#3B9EFF") + "15" : c.bg,
+          color: active ? (color ?? "#3B9EFF") : c.color,
+          fontSize: 13,
+          fontWeight: 600,
+          fontFamily: "Syne, sans-serif",
+          cursor: "pointer",
+          whiteSpace: "nowrap",
+          transition: "all 0.15s ease",
+        }}
+        onMouseEnter={(e) => {
+          if (!active) {
+            const el = e.currentTarget as HTMLElement;
+            el.style.color = T.chipHover.color;
+            el.style.borderColor = T.chipHover.border;
+            el.style.background = T.chipHover.bg;
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!active) {
+            const el = e.currentTarget as HTMLElement;
+            el.style.color = c.color;
+            el.style.borderColor = c.border;
+            el.style.background = c.bg;
+          }
         }}
       >
-        {icon} {label}
-      </span>
+        {children}
+        {label}
+      </button>
+    );
+  }
+
+  // Shared filters content
+  const filtersContent = (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        flexWrap: "wrap",
+      }}
+    >
+      {/* Type */}
       <span
         style={{
-          fontSize: 18,
-          fontWeight: 800,
-          fontFamily: "Rajdhani, sans-serif",
-          color: a ?? T.statValue,
+          fontFamily: "DM Mono, monospace",
+          fontSize: 10,
+          color: T.groupLabel,
+          textTransform: "uppercase",
+          letterSpacing: "0.12em",
+          whiteSpace: "nowrap",
         }}
-      >
-        {value}
-      </span>
-    </div>
-  );
+      >{`${t.filterType}`}</span>
+      {CATEGORIES.map((cat) => (
+        <div key={cat.value}>
+          {chip({
+            label: cat.label,
+            active: safeFilters.categories.includes(cat.value),
+            onClick: () => toggleCategory(cat.value),
+            children: (
+              <span
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: "currentColor",
+                  opacity: 0.8,
+                  flexShrink: 0,
+                }}
+              />
+            ),
+          })}
+        </div>
+      ))}
 
-  return (
-    <>
-      {/* Backdrop — starts below fixed header + filters */}
       <div
-        onClick={onClose}
         style={{
-          position: "fixed",
-          top: isMobile ? 0 : 108,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 200,
-          background: isDark ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.2)",
-          backdropFilter: "blur(2px)",
-          opacity: visible ? 1 : 0,
-          transition: "opacity 0.25s ease",
+          width: 1,
+          height: 22,
+          background: T.divider,
+          flexShrink: 0,
+          margin: "0 2px",
         }}
       />
 
-      {/* Panel — slides in from right, below fixed header + filters */}
+      {/* License */}
+      <span
+        style={{
+          fontFamily: "DM Mono, monospace",
+          fontSize: 10,
+          color: T.groupLabel,
+          textTransform: "uppercase",
+          letterSpacing: "0.12em",
+          whiteSpace: "nowrap",
+        }}
+      >{`${t.filterLicense}`}</span>
+      {LICENSES.map((lic) => (
+        <div key={lic.value}>
+          {chip({
+            label: lic.label,
+            active: safeFilters.licenses.includes(lic.value),
+            color: lic.color,
+            onClick: () => toggleLicense(lic.value),
+          })}
+        </div>
+      ))}
+
       <div
         style={{
-          position: "fixed",
-          top: isMobile ? 0 : 108,
-          right: 0,
-          bottom: 0,
-          zIndex: 201,
-          width: isMobile ? "100vw" : "min(520px, 100vw)",
-          background: T.panelBg,
-          borderLeft: isMobile ? "none" : `1px solid ${accent}30`,
-          borderTop: isMobile ? "none" : `1px solid rgba(255,255,255,0.06)`,
-          display: "flex",
-          flexDirection: "column",
-          transform: visible ? "translateX(0)" : "translateX(100%)",
-          transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
-          overflowY: "auto",
-          boxShadow: "-8px 0 40px rgba(0,0,0,0.4)",
+          width: 1,
+          height: 22,
+          background: T.divider,
+          flexShrink: 0,
+          margin: "0 2px",
         }}
-      >
-        {/* ── HEADER ─────────────────────────────────────────── */}
-        <div
+      />
+
+      {/* Status */}
+      <span
+        style={{
+          fontFamily: "DM Mono, monospace",
+          fontSize: 10,
+          color: T.groupLabel,
+          textTransform: "uppercase",
+          letterSpacing: "0.12em",
+          whiteSpace: "nowrap",
+        }}
+      >{`${t.filterStatus}`}</span>
+      {STATUSES.map((s) => (
+        <div key={s.value}>
+          {chip({
+            label: s.label,
+            active: safeFilters.statuses.includes(s.value),
+            color: s.color,
+            onClick: () => toggleStatus(s.value),
+          })}
+        </div>
+      ))}
+
+      <div
+        style={{
+          width: 1,
+          height: 22,
+          background: T.divider,
+          flexShrink: 0,
+          margin: "0 2px",
+        }}
+      />
+
+      {chip({
+        label: t.filterFavorites,
+        active: safeFilters.favoritesOnly,
+        color: "#EF4444",
+        onClick: () =>
+          onChange({ ...filters, favoritesOnly: !safeFilters.favoritesOnly }),
+        children: (
+          <Heart
+            size={12}
+            fill={safeFilters.favoritesOnly ? "currentColor" : "none"}
+          />
+        ),
+      })}
+      {chip({
+        label: t.filterOwned,
+        active: safeFilters.ownedOnly,
+        color: "#F97316",
+        onClick: () =>
+          onChange({ ...filters, ownedOnly: !safeFilters.ownedOnly }),
+        children: (
+          <Shield
+            size={12}
+            fill={safeFilters.ownedOnly ? "currentColor" : "none"}
+          />
+        ),
+      })}
+
+      {hasActiveFilters && (
+        <button
+          onClick={reset}
           style={{
-            background: isDark
-              ? `linear-gradient(160deg, ${accent}22 0%, #0D1628 100%)`
-              : `linear-gradient(160deg, ${accent}14 0%, #FFFFFF 100%)`,
-            borderBottom: `1px solid ${accent}30`,
-            padding: "20px 20px 18px",
-            flexShrink: 0,
-            position: "relative",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 5,
+            padding: "5px 12px",
+            borderRadius: 20,
+            border: "1px solid transparent",
+            background: "transparent",
+            color: T.resetColor,
+            fontSize: 13,
+            fontWeight: 600,
+            fontFamily: "Syne, sans-serif",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.color = "#EF4444";
+            (e.currentTarget as HTMLElement).style.borderColor =
+              "rgba(239,68,68,0.25)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.color = T.resetColor;
+            (e.currentTarget as HTMLElement).style.borderColor = "transparent";
           }}
         >
+          <RotateCcw size={11} /> {t.filterReset}
+        </button>
+      )}
+
+      {/* My License selector */}
+      {autoLicense === undefined && (
+        <>
           <div
             style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 3,
-              background: `linear-gradient(90deg, ${accent}, ${accent}00)`,
+              width: 1,
+              height: 22,
+              background: T.divider,
+              flexShrink: 0,
+              margin: "0 2px",
             }}
           />
-
           <div
             style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              gap: 12,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              flexWrap: "nowrap",
             }}
           >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              {/* Categoría */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 7,
-                  marginBottom: 10,
-                }}
-              >
-                <div
-                  style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: "50%",
-                    background: accent,
-                    boxShadow: `0 0 8px ${accent}`,
-                  }}
-                />
-                <span
-                  style={{
-                    fontFamily: "Rajdhani, sans-serif",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: accent,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {series.category ?? t.catRoad}
-                </span>
-              </div>
-
-              {/* Nombre */}
-              <h2
-                style={{
-                  fontFamily: "Rajdhani, sans-serif",
-                  fontSize: 22,
-                  fontWeight: 900,
-                  color: isDark ? "#FFFFFF" : "#0F172A",
-                  margin: "0 0 12px",
-                  letterSpacing: "-0.4px",
-                  lineHeight: 1.2,
-                }}
-              >
-                {series.series_name ?? series.season_name ?? "—"}
-              </h2>
-
-              {/* Badges */}
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                <span
-                  style={{
-                    padding: "4px 11px",
-                    borderRadius: 20,
-                    fontSize: 12,
-                    fontWeight: 700,
-                    fontFamily: "Orbitron, monospace",
-                    background: licConfig.color + "22",
-                    border: `1px solid ${licConfig.color}50`,
-                    color: licConfig.color,
-                  }}
-                >
-                  {licConfig.label}
-                </span>
-                <span
+            <span
+              style={{
+                fontFamily: "DM Mono, monospace",
+                fontSize: 10,
+                color: T.groupLabel,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.myLicenseLabel}
+            </span>
+            {LICENSES.map((lic) => {
+              const active = safeFilters.myLicense === lic.value;
+              return (
+                <button
+                  key={lic.value}
+                  onClick={() =>
+                    onChange({
+                      ...filters,
+                      myLicense: active ? null : lic.value,
+                    })
+                  }
+                  title={t.myLicenseTooltip}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 5,
-                    padding: "4px 11px",
+                    padding: "4px 10px",
                     borderRadius: 20,
+                    border: `1px solid ${active ? lic.color + "60" : T.chipDefault.border}`,
+                    background: active ? lic.color + "18" : "transparent",
+                    color: active ? lic.color : T.chipDefault.color,
                     fontSize: 12,
                     fontWeight: 700,
-                    fontFamily: "Orbitron, monospace",
-                    background: series.fixed_setup
-                      ? "rgba(59,158,255,0.14)"
-                      : "rgba(34,197,94,0.14)",
-                    border: `1px solid ${series.fixed_setup ? "rgba(59,158,255,0.35)" : "rgba(34,197,94,0.35)"}`,
-                    color: series.fixed_setup ? "#3B9EFF" : "#22C55E",
+                    fontFamily: "DM Mono, monospace",
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                    flexShrink: 0,
                   }}
                 >
-                  <Wrench size={10} /> {series.fixed_setup ? t.fixed : t.open}
-                </span>
-                {series.driver_changes && (
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 5,
-                      padding: "4px 11px",
-                      borderRadius: 20,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      fontFamily: "Orbitron, monospace",
-                      background: "rgba(232,121,249,0.14)",
-                      border: "1px solid rgba(232,121,249,0.38)",
-                      color: "#E879F9",
-                    }}
-                  >
-                    👥 {t.teamDriving}
-                  </span>
-                )}
-                {series.official && (
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 5,
-                      padding: "4px 11px",
-                      borderRadius: 20,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      fontFamily: "Orbitron, monospace",
-                      background: "rgba(234,179,8,0.14)",
-                      border: "1px solid rgba(234,179,8,0.38)",
-                      color: "#EAB308",
-                    }}
-                  >
-                    <Trophy size={10} /> {t.official}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Botones de acción */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-                flexShrink: 0,
-              }}
-            >
-              {/* Cerrar */}
-              <button
-                onClick={onClose}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: T.iconBtnBg,
-                  border: `1px solid ${T.iconBtnBorder}`,
-                  color: T.iconBtnColor,
-                }}
-              >
-                <X size={16} />
-              </button>
-              {/* Copiar link */}
-              <button
-                onClick={copyLink}
-                title={t.copyLink}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: copied ? "rgba(34,197,94,0.15)" : T.iconBtnBg,
-                  border: `1px solid ${copied ? "rgba(34,197,94,0.4)" : T.iconBtnBorder}`,
-                  color: copied ? "#22C55E" : T.iconBtnColor,
-                  transition: "all 0.2s",
-                }}
-              >
-                {copied ? (
-                  <Check size={15} strokeWidth={2.5} />
-                ) : (
-                  <Link size={14} strokeWidth={2} />
-                )}
-              </button>
-              {/* Favorito */}
-              <button
-                onClick={handleFav}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: localFav ? "rgba(239,68,68,0.18)" : T.iconBtnBg,
-                  border: `1px solid ${localFav ? "rgba(239,68,68,0.45)" : T.iconBtnBorder}`,
-                  color: localFav ? "#EF4444" : T.iconBtnColor,
-                }}
-              >
-                <Heart
-                  size={15}
-                  fill={localFav ? "currentColor" : "none"}
-                  strokeWidth={2}
-                />
-              </button>
-              {/* Owned */}
-              <div
-                title={series.isOwned ? t.contentOwned : t.missingContent}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: series.isOwned
-                    ? "rgba(34,197,94,0.15)"
-                    : T.iconBtnBg,
-                  border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.35)" : T.iconBtnBorder}`,
-                  color: series.isOwned ? "#22C55E" : T.iconBtnColor,
-                }}
-              >
-                {series.isOwned ? (
-                  <Check size={15} strokeWidth={2.5} />
-                ) : (
-                  <Lock size={14} strokeWidth={2} />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── CONTENIDO ──────────────────────────────────────── */}
-        <div
-          style={{
-            padding: "0 20px 20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 24,
-          }}
-        >
-          {/* Tab selector */}
-          <div
-            style={{
-              display: "flex",
-              borderBottom: `1px solid ${T.sectionBorder}`,
-              gap: 4,
-              paddingTop: 20,
-            }}
-          >
-            {(
-              [
-                { id: "info", label: t.seriesInfo },
-                { id: "cars", label: t.topCars },
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  if (tab.id === "cars" && !carsLoaded) {
-                    setCarsLoading(true);
-                    const currentWeek =
-                      getCurrentRaceWeek(
-                        series.season_year,
-                        series.season_quarter,
-                      ) ?? 0;
-                    const params = new URLSearchParams({
-                      series_id: String(series.series_id),
-                      race_week_num: String(currentWeek),
-                      season_year: String(series.season_year),
-                      season_quarter: String(series.season_quarter),
-                    });
-                    fetch(`/api/iracing/series-cars?${params}`, {
-                      credentials: "include",
-                    })
-                      .then((r) => r.json())
-                      .then((data) => {
-                        setCarStats(data.cars ?? []);
-                        setCarsLoaded(true);
-                      })
-                      .catch(() => {})
-                      .finally(() => setCarsLoading(false));
-                  }
-                }}
-                style={{
-                  padding: "10px 16px",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontFamily: "Rajdhani, sans-serif",
-                  fontWeight: 700,
-                  fontSize: 13,
-                  color: activeTab === tab.id ? accent : "#64748B",
-                  borderBottom: `2px solid ${activeTab === tab.id ? accent : "transparent"}`,
-                  marginBottom: -1,
-                  transition: "all 0.15s",
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* ── INFO TAB ── */}
-          {
-            activeTab === "info" && (
-              <>
-                {/* Stats */}
-                <section>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <SectionTitle>
-                      <BarChart2
-                        size={10}
-                        style={{ display: "inline", marginRight: 5 }}
-                      />
-                      {t.stats}
-                    </SectionTitle>
-                    {statsLoading && (
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontFamily: "Orbitron, monospace",
-                          color: "#64748B",
-                        }}
-                      >
-                        loading...
-                      </span>
-                    )}
-                    {!statsLoading && realStats?.has_data && (
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontFamily: "Orbitron, monospace",
-                          color: "#22C55E",
-                          background: "rgba(34,197,94,0.1)",
-                          border: "1px solid rgba(34,197,94,0.25)",
-                          borderRadius: 4,
-                          padding: "1px 6px",
-                        }}
-                      >
-                        LIVE
-                      </span>
-                    )}
-                    {!statsLoading && !realStats?.has_data && (
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontFamily: "Orbitron, monospace",
-                          color: "#64748B",
-                          background: "rgba(100,116,139,0.1)",
-                          border: "1px solid rgba(100,116,139,0.2)",
-                          borderRadius: 4,
-                          padding: "1px 6px",
-                        }}
-                      >
-                        EST
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <StatBox
-                      icon={<Zap size={11} />}
-                      label={t.avgSof}
-                      value={
-                        stats.avg_sof > 0 ? stats.avg_sof.toLocaleString() : "—"
-                      }
-                      accent={accent}
-                    />
-                    <StatBox
-                      icon={<Users size={11} />}
-                      label={t.avgDrivers}
-                      value={
-                        stats.avg_drivers > 0 ? String(stats.avg_drivers) : "—"
-                      }
-                    />
-                    <StatBox
-                      icon={<BarChart2 size={11} />}
-                      label={t.splits}
-                      value={stats.splits > 0 ? String(stats.splits) : "—"}
-                    />
-                    <StatBox
-                      icon={<Clock size={11} />}
-                      label={t.raceTime}
-                      value={duration}
-                    />
-                  </div>
-                </section>
-
-                {/* Cars */}
-                <section>
-                  <SectionTitle>
-                    <Car
-                      size={10}
-                      style={{ display: "inline", marginRight: 5 }}
-                    />
-                    {t.allowedCars}
-                  </SectionTitle>
-                  <div
-                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
-                  >
-                    {cars.map((car, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: "10px 14px",
-                          borderRadius: 10,
-                          background: T.rowBg,
-                          border: `1px solid ${T.sectionBorder}`,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 10,
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: 28,
-                              height: 28,
-                              borderRadius: 8,
-                              flexShrink: 0,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              background: car.owned
-                                ? "rgba(34,197,94,0.12)"
-                                : T.carIconBg,
-                              border: `1px solid ${car.owned ? "rgba(34,197,94,0.3)" : T.carIconBorder}`,
-                              color: car.owned ? "#22C55E" : T.iconBtnColor,
-                            }}
-                          >
-                            {car.owned ? (
-                              <Check size={13} strokeWidth={2.5} />
-                            ) : (
-                              <Lock size={12} strokeWidth={2} />
-                            )}
-                          </div>
-                          <span
-                            style={{
-                              fontSize: 13,
-                              fontWeight: 500,
-                              color: car.owned ? T.textSecondary : T.textFaint,
-                            }}
-                          >
-                            {car.name}
-                          </span>
-                        </div>
-                        {car.free && (
-                          <span
-                            style={{
-                              fontSize: 10,
-                              fontWeight: 700,
-                              fontFamily: "Orbitron, monospace",
-                              color: "#22C55E",
-                              background: "rgba(34,197,94,0.1)",
-                              border: "1px solid rgba(34,197,94,0.25)",
-                              borderRadius: 6,
-                              padding: "2px 7px",
-                            }}
-                          >
-                            {t.free}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Race Schedule */}
-                <section>
-                  <SectionTitle>
-                    <Clock
-                      size={10}
-                      style={{ display: "inline", marginRight: 5 }}
-                    />
-                    {t.raceSchedule}
-                  </SectionTitle>
-                  <div
-                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
-                  >
-                    {times.map((t, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 12,
-                          padding: "10px 14px",
-                          borderRadius: 10,
-                          background: T.rowBg,
-                          border: `1px solid ${T.sectionBorder}`,
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: "50%",
-                            flexShrink: 0,
-                            background: accent,
-                            boxShadow: `0 0 6px ${accent}`,
-                          }}
-                        />
-                        <span
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 500,
-                            color: T.textMuted,
-                            fontFamily: "Orbitron, monospace",
-                          }}
-                        >
-                          {t}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Full Calendar */}
-                <section>
-                  <SectionTitle>
-                    <Calendar
-                      size={10}
-                      style={{ display: "inline", marginRight: 5 }}
-                    />
-                    {t.fullCalendar}
-                  </SectionTitle>
-                  <div
-                    style={{ display: "flex", flexDirection: "column", gap: 4 }}
-                  >
-                    {series.schedules.map((week, i) => {
-                      const isActive = currentWeek === i;
-                      return (
-                        <div
-                          key={i}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 12,
-                            padding: "10px 14px",
-                            borderRadius: 10,
-                            background: isActive
-                              ? `${accent}15`
-                              : i % 2 === 0
-                                ? T.rowBg
-                                : T.rowBgAlt,
-                            border: `1px solid ${isActive ? accent + "45" : T.rowBorder}`,
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontFamily: "Orbitron, monospace",
-                              fontSize: 11,
-                              fontWeight: 700,
-                              color: accent,
-                              minWidth: 28,
-                              flexShrink: 0,
-                            }}
-                          >
-                            W{i + 1}
-                          </span>
-                          {isActive ? (
-                            <span
-                              style={{
-                                width: 10,
-                                height: 10,
-                                borderRadius: "50%",
-                                background: "#22C55E",
-                                flexShrink: 0,
-                                boxShadow: "0 0 8px #22C55E",
-                              }}
-                            />
-                          ) : (
-                            <Flag
-                              size={12}
-                              strokeWidth={1.8}
-                              color={T.flagColor}
-                              style={{ flexShrink: 0 }}
-                            />
-                          )}
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div
-                              style={{
-                                fontSize: 13,
-                                fontWeight: isActive ? 700 : 600,
-                                color: isActive
-                                  ? T.textPrimary
-                                  : T.textSecondary,
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {week.track.track_name}
-                            </div>
-                            {week.track.config_name && (
-                              <div
-                                style={{
-                                  fontSize: 11,
-                                  color: T.labelColor,
-                                  marginTop: 1,
-                                }}
-                              >
-                                {week.track.config_name}
-                              </div>
-                            )}
-                          </div>
-                          {isActive ? (
-                            <span
-                              style={{
-                                fontFamily: "Orbitron, monospace",
-                                fontSize: 9,
-                                fontWeight: 700,
-                                color: "#22C55E",
-                                background: "rgba(34,197,94,0.15)",
-                                border: "1px solid rgba(34,197,94,0.3)",
-                                borderRadius: 5,
-                                padding: "2px 7px",
-                                flexShrink: 0,
-                              }}
-                            >
-                              {t.now}
-                            </span>
-                          ) : (
-                            week.start_date && (
-                              <span
-                                style={{
-                                  fontFamily: "Orbitron, monospace",
-                                  fontSize: 10,
-                                  color: T.dateColor,
-                                  flexShrink: 0,
-                                }}
-                              >
-                                {new Date(week.start_date).toLocaleDateString(
-                                  undefined,
-                                  { day: "numeric", month: "short" },
-                                )}
-                              </span>
-                            )
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-
-                {/* Series Info */}
-                <section>
-                  <SectionTitle>{t.seriesInfo}</SectionTitle>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: 8,
-                    }}
-                  >
-                    {[
-                      {
-                        label: t.seasonLabel,
-                        value: `S${series.season_quarter} ${series.season_year}`,
-                      },
-                      {
-                        label: t.minLicense,
-                        value: series.allowed_licenses?.[0]?.group_name ?? "—",
-                      },
-                      {
-                        label: t.teamDriving,
-                        value: series.driver_changes ? t.yes : t.no,
-                      },
-                      {
-                        label: t.multiclass,
-                        value: series.multiclass ? t.yes : t.no,
-                      },
-                    ].map((item) => (
-                      <div
-                        key={item.label}
-                        style={{
-                          padding: "10px 14px",
-                          borderRadius: 10,
-                          background: T.infoGridBg,
-                          border: `1px solid ${T.infoGridBorder}`,
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: 10,
-                            fontFamily: "Orbitron, monospace",
-                            color: T.labelColor,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.1em",
-                            marginBottom: 4,
-                          }}
-                        >
-                          {item.label}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 14,
-                            fontWeight: 600,
-                            color: T.textSecondary,
-                          }}
-                        >
-                          {item.value}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </>
-            ) /* end info tab */
-          }
-
-          {/* ── CARS TAB ── */}
-          {activeTab === "cars" && (
-            <section>
-              {/* Loading */}
-              {carsLoading && (
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                      padding: "14px 0",
-                      color: "#64748B",
-                      fontFamily: "Orbitron, monospace",
-                      fontSize: 12,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 14,
-                        height: 14,
-                        borderRadius: "50%",
-                        border: `2px solid ${accent}`,
-                        borderTopColor: "transparent",
-                        animation: "spin 0.8s linear infinite",
-                      }}
-                    />
-                    Analizando top 100 pilotos en carreras recientes...
-                  </div>
-                  <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div
-                      key={i}
-                      style={{
-                        height: 52,
-                        borderRadius: 10,
-                        background: isDark
-                          ? "rgba(255,255,255,0.04)"
-                          : "rgba(0,0,0,0.04)",
-                        animation: "pulse 1.5s ease infinite",
-                      }}
-                    />
-                  ))}
-                  <style>{`@keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }`}</style>
-                </div>
-              )}
-
-              {/* Empty */}
-              {!carsLoading && carsLoaded && carStats.length === 0 && (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "40px 0",
-                    color: "#64748B",
-                    fontFamily: "Orbitron, monospace",
-                    fontSize: 12,
-                  }}
-                >
-                  No hay datos de carreras para esta semana todavía
-                </div>
-              )}
-
-              {/* Results */}
-              {!carsLoading && carStats.length > 0 && (
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 6 }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 6,
-                    }}
-                  >
-                    <SectionTitle>
-                      <Car
-                        size={10}
-                        style={{ display: "inline", marginRight: 5 }}
-                      />
-                      {t.topCars}
-                    </SectionTitle>
+                  {active && (
                     <span
                       style={{
-                        fontSize: 10,
-                        fontFamily: "Orbitron, monospace",
-                        color: "#22C55E",
-                        background: "rgba(34,197,94,0.1)",
-                        border: "1px solid rgba(34,197,94,0.25)",
-                        borderRadius: 4,
-                        padding: "1px 6px",
+                        width: 5,
+                        height: 5,
+                        borderRadius: "50%",
+                        background: lic.color,
                       }}
-                    >
-                      LIVE
-                    </span>
-                  </div>
-                  {carStats.slice(0, 10).map((car, i) => {
-                    const pct = parseFloat(car.pct);
-                    const isTop = i === 0;
-                    return (
-                      <div
-                        key={car.car_id}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 12,
-                          padding: "12px 14px",
-                          borderRadius: 10,
-                          background: isTop ? `${accent}12` : T.rowBg,
-                          border: `1px solid ${isTop ? accent + "35" : T.sectionBorder}`,
-                          transition: "all 0.15s",
-                        }}
-                      >
-                        {/* Position */}
-                        <div
-                          style={{
-                            width: 24,
-                            height: 24,
-                            borderRadius: 8,
-                            background: isTop ? accent : T.rowBgAlt,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontFamily: "Orbitron, monospace",
-                              fontSize: 11,
-                              fontWeight: 700,
-                              color: isTop ? "#fff" : "#64748B",
-                            }}
-                          >
-                            {i + 1}
-                          </span>
-                        </div>
-                        {/* Car name */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={{
-                              fontSize: 13,
-                              fontWeight: 600,
-                              color: T.textSecondary,
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                            }}
-                          >
-                            {car.car_name}
-                          </div>
-                          {/* Bar */}
-                          <div
-                            style={{
-                              marginTop: 5,
-                              height: 4,
-                              borderRadius: 2,
-                              background: isDark
-                                ? "rgba(255,255,255,0.06)"
-                                : "rgba(0,0,0,0.06)",
-                              overflow: "hidden",
-                            }}
-                          >
-                            <div
-                              style={{
-                                height: "100%",
-                                borderRadius: 2,
-                                width: `${Math.min(pct, 100)}%`,
-                                background: isTop ? accent : `${accent}70`,
-                                transition: "width 0.6s ease",
-                              }}
-                            />
-                          </div>
-                        </div>
-                        {/* Pct */}
-                        <div style={{ textAlign: "right", flexShrink: 0 }}>
-                          <div
-                            style={{
-                              fontFamily: "Orbitron, monospace",
-                              fontSize: 14,
-                              fontWeight: 700,
-                              color: isTop ? accent : T.textMuted,
-                            }}
-                          >
-                            {car.pct}%
-                          </div>
-                          <div
-                            style={{
-                              fontFamily: "Orbitron, monospace",
-                              fontSize: 10,
-                              color: "#64748B",
-                              marginTop: 1,
-                            }}
-                          >
-                            {car.count} pilotos
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-          )}
+                    />
+                  )}
+                  {lic.label}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+      {autoLicense !== undefined &&
+        autoLicense !== null &&
+        (() => {
+          const lic = LICENSES.find((l) => l.value === autoLicense);
+          if (!lic) return null;
+          return (
+            <>
+              <div
+                style={{
+                  width: 1,
+                  height: 22,
+                  background: T.divider,
+                  flexShrink: 0,
+                  margin: "0 2px",
+                }}
+              />
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                  padding: "4px 10px",
+                  borderRadius: 20,
+                  border: `1px solid ${lic.color}50`,
+                  background: lic.color + "15",
+                  fontFamily: "DM Mono, monospace",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: lic.color,
+                }}
+              >
+                <span
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: "50%",
+                    background: lic.color,
+                  }}
+                />
+                {t.myLicenseLabel}: {lic.label}
+              </span>
+            </>
+          );
+        })()}
+
+      {/* Search — desktop only inline */}
+      {!isMobile && (
+        <div style={{ position: "relative", marginLeft: "auto" }}>
+          <Search
+            size={13}
+            style={{
+              position: "absolute",
+              left: 10,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: T.searchPlaceholder,
+              pointerEvents: "none",
+            }}
+          />
+          <input
+            type="text"
+            placeholder={t.searchPlaceholder}
+            value={safeFilters.searchQuery}
+            onChange={(e) =>
+              onChange({ ...filters, searchQuery: e.target.value })
+            }
+            style={{
+              background: T.searchBg,
+              border: `1px solid ${T.searchBorder}`,
+              borderRadius: 10,
+              fontSize: 13,
+              color: T.searchText,
+              paddingLeft: 32,
+              paddingRight: 16,
+              paddingTop: 7,
+              paddingBottom: 7,
+              width: 200,
+              outline: "none",
+              transition: "all 0.15s",
+              fontFamily: "DM Sans, sans-serif",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.width = "256px";
+              e.currentTarget.style.borderColor = "rgba(59,158,255,0.4)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.width = "200px";
+              e.currentTarget.style.borderColor = T.searchBorder;
+            }}
+          />
         </div>
-      </div>
-    </>
+      )}
+    </div>
+  );
+
+  // ── Mobile: compact bar + drawer ─────────────────────────────
+  if (isMobile) {
+    const activeCount =
+      safeFilters.categories.length +
+      safeFilters.licenses.length +
+      safeFilters.statuses.length +
+      (safeFilters.favoritesOnly ? 1 : 0) +
+      (safeFilters.ownedOnly ? 1 : 0) +
+      (safeFilters.myLicense !== null ? 1 : 0);
+    return (
+      <>
+        {/* Compact mobile bar: search + filter button */}
+        <div
+          style={{
+            position: "sticky",
+            top: 60,
+            zIndex: 990,
+            background: T.barBg,
+            backdropFilter: "blur(20px)",
+            borderBottom: `1px solid ${T.barBorder}`,
+            padding: "8px 12px",
+            display: "flex",
+            gap: 8,
+          }}
+        >
+          <div style={{ position: "relative", flex: 1 }}>
+            <Search
+              size={13}
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: T.searchPlaceholder,
+                pointerEvents: "none",
+              }}
+            />
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              value={safeFilters.searchQuery}
+              onChange={(e) =>
+                onChange({ ...filters, searchQuery: e.target.value })
+              }
+              style={{
+                width: "100%",
+                background: T.searchBg,
+                border: `1px solid ${T.searchBorder}`,
+                borderRadius: 10,
+                fontSize: 13,
+                color: T.searchText,
+                paddingLeft: 32,
+                paddingRight: 12,
+                paddingTop: 8,
+                paddingBottom: 8,
+                outline: "none",
+                fontFamily: "DM Sans, sans-serif",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+          <button
+            onClick={() => setDrawerOpen(true)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 14px",
+              borderRadius: 10,
+              border: `1px solid ${activeCount > 0 ? "rgba(59,158,255,0.4)" : T.barBorder}`,
+              background: activeCount > 0 ? "rgba(59,158,255,0.1)" : T.searchBg,
+              color: activeCount > 0 ? "#3B9EFF" : T.groupLabel,
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 600,
+              fontSize: 13,
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
+          >
+            <SlidersHorizontal size={14} />
+            {activeCount > 0 && (
+              <span
+                style={{
+                  background: "#3B9EFF",
+                  color: "white",
+                  borderRadius: "50%",
+                  width: 16,
+                  height: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 10,
+                  fontWeight: 800,
+                }}
+              >
+                {activeCount}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Drawer overlay */}
+        {drawerOpen && (
+          <>
+            <div
+              onClick={() => setDrawerOpen(false)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 150,
+                background: "rgba(0,0,0,0.5)",
+                backdropFilter: "blur(4px)",
+              }}
+            />
+            <div
+              style={{
+                position: "fixed",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                zIndex: 151,
+                background: T.barBg,
+                borderTop: `2px solid rgba(59,158,255,0.3)`,
+                borderRadius: "16px 16px 0 0",
+                padding: "20px 16px 32px",
+                maxHeight: "80vh",
+                overflowY: "auto",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 16,
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "Syne, sans-serif",
+                    fontWeight: 800,
+                    fontSize: 16,
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  Filters
+                </span>
+                <button
+                  onClick={() => setDrawerOpen(false)}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    border: `1px solid ${T.barBorder}`,
+                    background: T.searchBg,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: T.groupLabel,
+                  }}
+                >
+                  <X size={15} />
+                </button>
+              </div>
+              {filtersContent}
+            </div>
+          </>
+        )}
+      </>
+    );
+  }
+
+  // ── Desktop: sticky bar ───────────────────────────────────────
+  return (
+    <div
+      style={{
+        position: "sticky",
+        top: 60,
+        zIndex: 990,
+        background: T.barBg,
+        backdropFilter: "blur(20px)",
+        borderBottom: `1px solid ${T.barBorder}`,
+        padding: "10px 24px",
+      }}
+    >
+      {filtersContent}
+    </div>
   );
 }

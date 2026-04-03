@@ -35,43 +35,37 @@ interface SeriesCardProps {
 
 const CATEGORY_STYLE: Record<
   string,
-  { gradientDark: string; gradientLight: string; accent: string; label: string }
+  { accent: string; label: string; borderColor: string }
 > = {
   "Sports Car": {
-    gradientDark: "linear-gradient(135deg, #0E2A4A 0%, #070F1C 100%)",
-    gradientLight: "linear-gradient(135deg, #EBF4FF 0%, #F0F7FF 100%)",
     accent: "#3B9EFF",
     label: "Sports Car",
+    borderColor: "rgba(59,158,255,0.35)",
   },
   "Formula Car": {
-    gradientDark: "linear-gradient(135deg, #2A0E4A 0%, #10071C 100%)",
-    gradientLight: "linear-gradient(135deg, #F5EEFF 0%, #F9F5FF 100%)",
     accent: "#A855F7",
     label: "Formula",
+    borderColor: "rgba(168,85,247,0.35)",
   },
   Oval: {
-    gradientDark: "linear-gradient(135deg, #2A1800 0%, #120A00 100%)",
-    gradientLight: "linear-gradient(135deg, #FFF4EB 0%, #FFF8F2 100%)",
     accent: "#F97316",
     label: "Oval",
+    borderColor: "rgba(249,115,22,0.35)",
   },
   "Dirt Oval": {
-    gradientDark: "linear-gradient(135deg, #2A2000 0%, #121000 100%)",
-    gradientLight: "linear-gradient(135deg, #FEFCE8 0%, #FFFDF2 100%)",
     accent: "#EAB308",
     label: "Dirt Oval",
+    borderColor: "rgba(234,179,8,0.35)",
   },
   "Dirt Road": {
-    gradientDark: "linear-gradient(135deg, #0A2A14 0%, #041209 100%)",
-    gradientLight: "linear-gradient(135deg, #EDFAF2 0%, #F2FCF5 100%)",
     accent: "#22C55E",
     label: "Dirt Road",
+    borderColor: "rgba(34,197,94,0.35)",
   },
   Endurance: {
-    gradientDark: "linear-gradient(135deg, #1A0A2E 0%, #0A0514 100%)",
-    gradientLight: "linear-gradient(135deg, #F5F0FF 0%, #FAF7FF 100%)",
     accent: "#E879F9",
     label: "Endurance",
+    borderColor: "rgba(232,121,249,0.35)",
   },
 };
 
@@ -125,40 +119,37 @@ export default function SeriesCard({
   );
   const accent = catStyle.accent;
 
-  // Theme-aware local tokens
   const T = {
-    cardBg: isDark ? "#070D19" : "#FFFFFF",
-    cardBorder: hovered
-      ? accent + "55"
-      : isDark
-        ? "rgba(255,255,255,0.08)"
-        : "rgba(0,0,0,0.10)",
+    cardBg: isDark ? "#111118" : "#FFFFFF",
+    cardBorder: hovered ? accent + "60" : isDark ? "#1E1E2A" : "#E0E0E8",
     cardShadow: hovered
       ? isDark
-        ? `0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px ${accent}25`
-        : `0 16px 40px rgba(0,0,0,0.12), 0 0 0 1px ${accent}30`
+        ? `0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px ${accent}40`
+        : `0 12px 32px rgba(0,0,0,0.12), 0 0 0 1px ${accent}30`
       : isDark
-        ? "0 4px 20px rgba(0,0,0,0.5)"
-        : "0 2px 12px rgba(0,0,0,0.08)",
-    headerGrad: isDark ? catStyle.gradientDark : catStyle.gradientLight,
-    seriesName: isDark ? "#FFFFFF" : "#0F172A",
-    trackRowBg: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
-    trackRowBorder: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.07)",
-    trackName: isDark ? "rgba(255,255,255,0.8)" : "#1E293B",
-    trackConfig: isDark ? "rgba(255,255,255,0.35)" : "#94A3B8",
-    trackNameActive: isDark ? "rgba(255,255,255,0.95)" : "#0F172A",
-    trackConfigActive: isDark ? "rgba(255,255,255,0.55)" : "#64748B",
-    flagColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
-    moreTracksBg: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.03)",
-    moreTracksBorder: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)",
-    moreTracksText: isDark ? "#475569" : "#94A3B8",
-    sectionBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
-    labelColor: isDark ? "#64748B" : "#94A3B8",
-    statValue: isDark ? "rgba(255,255,255,0.82)" : "#1E293B",
-    footerBg: isDark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.04)",
-    iconBtnBg: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
-    iconBtnBorder: isDark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.12)",
-    iconBtnColor: isDark ? "#475569" : "#94A3B8",
+        ? "0 2px 12px rgba(0,0,0,0.6)"
+        : "0 1px 6px rgba(0,0,0,0.06)",
+    headerGrad: isDark
+      ? `linear-gradient(160deg, ${accent}18 0%, #0D0D12 100%)`
+      : `linear-gradient(160deg, ${accent}10 0%, #FAFAFA 100%)`,
+    seriesName: isDark ? "#FFFFFF" : "#0A0A0F",
+    trackRowBg: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
+    trackRowBorder: isDark ? "#1A1A24" : "#EBEBF0",
+    trackName: isDark ? "rgba(255,255,255,0.75)" : "#222230",
+    trackConfig: isDark ? "rgba(255,255,255,0.3)" : "#888899",
+    trackNameActive: isDark ? "#FFFFFF" : "#0A0A0F",
+    trackConfigActive: isDark ? "rgba(255,255,255,0.5)" : "#555566",
+    flagColor: isDark ? "#2E2E3E" : "#DDDDEE",
+    moreTracksBg: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
+    moreTracksBorder: isDark ? "#1A1A24" : "#EBEBF0",
+    moreTracksText: isDark ? "#2E2E3E" : "#CCCCDD",
+    sectionBorder: isDark ? "#1A1A24" : "#EBEBF0",
+    labelColor: isDark ? "#555566" : "#888899",
+    statValue: isDark ? "rgba(255,255,255,0.9)" : "#111118",
+    footerBg: isDark ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.03)",
+    iconBtnBg: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+    iconBtnBorder: isDark ? "#2E2E3E" : "#E0E0E8",
+    iconBtnColor: isDark ? "#444455" : "#999AAA",
   };
 
   function handleFavClick(e: React.MouseEvent) {
@@ -193,19 +184,20 @@ export default function SeriesCard({
       <div
         style={{
           background: T.headerGrad,
-          padding: "18px 18px 16px",
+          padding: "14px 16px 12px",
           position: "relative",
+          borderBottom: `1px solid ${T.sectionBorder}`,
         }}
       >
+        {/* Top accent line */}
         <div
           style={{
             position: "absolute",
             top: 0,
             left: 0,
             right: 0,
-            height: 3,
-            background: `linear-gradient(90deg, ${accent} 0%, ${accent}00 100%)`,
-            borderRadius: "16px 16px 0 0",
+            height: 2,
+            background: accent,
           }}
         />
 
@@ -230,7 +222,7 @@ export default function SeriesCard({
             />
             <span
               style={{
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Orbitron, monospace",
                 fontSize: 11,
                 fontWeight: 700,
                 color: accent,
@@ -251,7 +243,7 @@ export default function SeriesCard({
                   borderRadius: 20,
                   background: "rgba(232,121,249,0.15)",
                   border: "1px solid rgba(232,121,249,0.35)",
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 10,
                   fontWeight: 700,
                   color: "#E879F9",
@@ -271,7 +263,7 @@ export default function SeriesCard({
                   borderRadius: 20,
                   background: "rgba(34,197,94,0.15)",
                   border: "1px solid rgba(34,197,94,0.35)",
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 10,
                   fontWeight: 700,
                   color: "#22C55E",
@@ -300,7 +292,7 @@ export default function SeriesCard({
                   borderRadius: 20,
                   background: "rgba(168,85,247,0.15)",
                   border: "1px solid rgba(168,85,247,0.35)",
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 10,
                   fontWeight: 700,
                   color: "#A855F7",
@@ -415,13 +407,14 @@ export default function SeriesCard({
         {/* Nombre */}
         <h3
           style={{
-            fontFamily: "Syne, sans-serif",
-            fontSize: 18,
-            fontWeight: 900,
+            fontFamily: "Rajdhani, sans-serif",
+            fontSize: 16,
+            fontWeight: 700,
             color: T.seriesName,
             lineHeight: 1.2,
-            margin: "0 0 14px",
-            letterSpacing: "-0.4px",
+            margin: "0 0 10px",
+            letterSpacing: "0.02em",
+            textTransform: "uppercase",
           }}
         >
           {series.series_name ?? series.season_name ?? "—"}
@@ -435,7 +428,7 @@ export default function SeriesCard({
               borderRadius: 20,
               fontSize: 12,
               fontWeight: 700,
-              fontFamily: "DM Mono, monospace",
+              fontFamily: "Orbitron, monospace",
               background: licConfig.color + "22",
               border: `1px solid ${licConfig.color}50`,
               color: licConfig.color,
@@ -452,7 +445,7 @@ export default function SeriesCard({
               borderRadius: 20,
               fontSize: 12,
               fontWeight: 700,
-              fontFamily: "DM Mono, monospace",
+              fontFamily: "Orbitron, monospace",
               background: series.fixed_setup
                 ? "rgba(59,158,255,0.14)"
                 : "rgba(34,197,94,0.14)",
@@ -473,7 +466,7 @@ export default function SeriesCard({
                 borderRadius: 20,
                 fontSize: 12,
                 fontWeight: 700,
-                fontFamily: "DM Mono, monospace",
+                fontFamily: "Orbitron, monospace",
                 background: "rgba(234,179,8,0.14)",
                 border: "1px solid rgba(234,179,8,0.38)",
                 color: "#EAB308",
@@ -503,7 +496,7 @@ export default function SeriesCard({
         >
           <span
             style={{
-              fontFamily: "DM Mono, monospace",
+              fontFamily: "Orbitron, monospace",
               fontSize: 10,
               fontWeight: 600,
               color: T.labelColor,
@@ -515,7 +508,7 @@ export default function SeriesCard({
           </span>
           <span
             style={{
-              fontFamily: "DM Mono, monospace",
+              fontFamily: "Orbitron, monospace",
               fontSize: 10,
               color: accent + "AA",
             }}
@@ -543,7 +536,7 @@ export default function SeriesCard({
               >
                 <span
                   style={{
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     fontSize: 10,
                     fontWeight: 700,
                     color: accent,
@@ -600,7 +593,7 @@ export default function SeriesCard({
                 {isActive && (
                   <span
                     style={{
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       fontSize: 9,
                       fontWeight: 700,
                       color: "#22C55E",
@@ -629,7 +622,7 @@ export default function SeriesCard({
             >
               <span
                 style={{
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 11,
                   color: T.moreTracksText,
                 }}
@@ -679,7 +672,7 @@ export default function SeriesCard({
                 display: "flex",
                 alignItems: "center",
                 gap: 5,
-                fontFamily: "DM Mono, monospace",
+                fontFamily: "Orbitron, monospace",
                 fontSize: 10,
                 textTransform: "uppercase",
                 letterSpacing: "0.1em",
@@ -690,7 +683,7 @@ export default function SeriesCard({
             </span>
             <span
               style={{
-                fontFamily: "DM Mono, monospace",
+                fontFamily: "Orbitron, monospace",
                 fontSize: 15,
                 fontWeight: 700,
                 color: stat.accent ? accent : T.statValue,

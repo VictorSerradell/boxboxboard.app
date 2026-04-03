@@ -389,15 +389,15 @@ export default function DriverProfile({ open, onClose }: Props) {
   const [tab, setTab] = useState<"stats" | "races">("stats");
 
   const T = {
-    bg: isDark ? "#060C18" : "#F1F5F9",
-    card: isDark ? "#0A1221" : "#FFFFFF",
-    border: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
-    input: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-    text: isDark ? "#F1F5F9" : "#0F172A",
-    muted: isDark ? "#64748B" : "#94A3B8",
-    faint: isDark ? "#334155" : "#CBD5E1",
-    row: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
-    hover: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)",
+    bg: isDark ? "#080808" : "#F5F5F7",
+    card: isDark ? "#111118" : "#FFFFFF",
+    border: isDark ? "#1E1E2A" : "#E0E0E8",
+    input: isDark ? "#1A1A22" : "#F0F0F8",
+    text: isDark ? "#FFFFFF" : "#0A0A0F",
+    muted: isDark ? "#555566" : "#888899",
+    faint: isDark ? "#2E2E3E" : "#DDDDEE",
+    row: isDark ? "#141418" : "#F8F8FC",
+    hover: isDark ? "#1A1A22" : "#F0F0F8",
   };
 
   const shimmer = (dark: boolean): CSSProperties => ({
@@ -530,7 +530,7 @@ export default function DriverProfile({ open, onClose }: Props) {
               border: "1px solid transparent",
               cursor: "pointer",
               color: T.muted,
-              fontFamily: "Syne, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
               fontWeight: 600,
               fontSize: 14,
               padding: "8px 14px",
@@ -555,7 +555,7 @@ export default function DriverProfile({ open, onClose }: Props) {
           <span style={{ color: T.faint }}>|</span>
           <span
             style={{
-              fontFamily: "Syne, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
               fontWeight: 800,
               fontSize: 17,
               color: T.text,
@@ -800,21 +800,11 @@ export default function DriverProfile({ open, onClose }: Props) {
                   position: "relative",
                 }}
               >
-                {/* 3D helmet viewer with SVG fallback */}
-                {profile.helmet ? (
-                  <HelmetViewer3D
-                    color1={`#${profile.helmet.color1}`}
-                    color2={`#${profile.helmet.color2}`}
-                    color3={`#${profile.helmet.color3}`}
-                    size={140}
-                  />
-                ) : (
-                  <HelmetBadge helmet={profile.helmet} size={140} />
-                )}
+                <HelmetBadge helmet={profile.helmet} size={140} />
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <h1
                     style={{
-                      fontFamily: "Syne, sans-serif",
+                      fontFamily: "Rajdhani, sans-serif",
                       fontWeight: 900,
                       fontSize: 40,
                       color: T.text,
@@ -836,7 +826,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     {profile.club_name && (
                       <span
                         style={{
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                           fontSize: 13,
                           color: T.muted,
                           background: isDark
@@ -853,7 +843,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     {profile.member_since && (
                       <span
                         style={{
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                           fontSize: 13,
                           color: T.muted,
                         }}
@@ -863,7 +853,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     )}
                     <span
                       style={{
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         fontSize: 13,
                         color: T.faint,
                       }}
@@ -876,7 +866,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
                     <div
                       style={{
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         fontWeight: 900,
                         fontSize: 52,
                         lineHeight: 1,
@@ -889,7 +879,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     </div>
                     <div
                       style={{
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         fontSize: 16,
                         color: primaryColor,
                         fontWeight: 700,
@@ -901,7 +891,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     </div>
                     <div
                       style={{
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         fontSize: 12,
                         color: T.muted,
                         marginTop: 6,
@@ -979,7 +969,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     </div>
                     <div
                       style={{
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         fontWeight: 900,
                         fontSize: 26,
                         color: T.text,
@@ -990,7 +980,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     </div>
                     <div
                       style={{
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         fontSize: 10.5,
                         color: T.muted,
                         textTransform: "uppercase",
@@ -1022,7 +1012,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    fontFamily: "Syne, sans-serif",
+                    fontFamily: "Rajdhani, sans-serif",
                     fontWeight: 700,
                     fontSize: 15,
                     color: tab === tabId ? "#3B9EFF" : T.muted,
@@ -1049,7 +1039,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                   <p
                     style={{
                       color: T.muted,
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       fontSize: 13,
                     }}
                   >
@@ -1104,7 +1094,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                       >
                         <span
                           style={{
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             fontSize: 19,
                             fontWeight: 900,
                             color,
@@ -1117,7 +1107,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                       <div style={{ flex: 1 }}>
                         <div
                           style={{
-                            fontFamily: "Syne, sans-serif",
+                            fontFamily: "Rajdhani, sans-serif",
                             fontWeight: 700,
                             fontSize: 14,
                             color: catColor,
@@ -1132,7 +1122,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                           <div>
                             <div
                               style={{
-                                fontFamily: "DM Mono, monospace",
+                                fontFamily: "Orbitron, monospace",
                                 fontWeight: 900,
                                 fontSize: 24,
                                 color: "#60A5FA",
@@ -1143,7 +1133,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                             </div>
                             <div
                               style={{
-                                fontFamily: "DM Mono, monospace",
+                                fontFamily: "Orbitron, monospace",
                                 fontSize: 9.5,
                                 color: T.muted,
                                 textTransform: "uppercase",
@@ -1157,7 +1147,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                           <div>
                             <div
                               style={{
-                                fontFamily: "DM Mono, monospace",
+                                fontFamily: "Orbitron, monospace",
                                 fontWeight: 900,
                                 fontSize: 24,
                                 color,
@@ -1168,7 +1158,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                             </div>
                             <div
                               style={{
-                                fontFamily: "DM Mono, monospace",
+                                fontFamily: "Orbitron, monospace",
                                 fontSize: 9.5,
                                 color: T.muted,
                                 textTransform: "uppercase",
@@ -1196,7 +1186,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                   <p
                     style={{
                       color: T.muted,
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       fontSize: 13,
                       textAlign: "center",
                       padding: "40px 0",
@@ -1263,7 +1253,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                       >
                         <span
                           style={{
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             fontWeight: 900,
                             fontSize: 14,
                             color: isPodium ? "#EAB308" : T.muted,
@@ -1275,7 +1265,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
                           style={{
-                            fontFamily: "Syne, sans-serif",
+                            fontFamily: "Rajdhani, sans-serif",
                             fontWeight: 700,
                             fontSize: 14,
                             color: T.text,
@@ -1296,7 +1286,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                         >
                           <span
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontSize: 11,
                               color: T.muted,
                             }}
@@ -1309,7 +1299,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: 4,
-                                fontFamily: "DM Mono, monospace",
+                                fontFamily: "Orbitron, monospace",
                                 fontSize: 11,
                                 color: T.muted,
                               }}
@@ -1346,7 +1336,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                             )}
                             <span
                               style={{
-                                fontFamily: "DM Mono, monospace",
+                                fontFamily: "Orbitron, monospace",
                                 fontWeight: 800,
                                 fontSize: 16,
                                 color: iRatingColor,
@@ -1362,7 +1352,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                           </div>
                           <div
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontSize: 9.5,
                               color: T.muted,
                               textTransform: "uppercase",
@@ -1375,7 +1365,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                         <div style={{ textAlign: "center" }}>
                           <div
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontWeight: 700,
                               fontSize: 16,
                               color: T.text,
@@ -1385,7 +1375,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                           </div>
                           <div
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontSize: 9.5,
                               color: T.muted,
                               textTransform: "uppercase",
@@ -1399,7 +1389,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                           <div style={{ textAlign: "center" }}>
                             <div
                               style={{
-                                fontFamily: "DM Mono, monospace",
+                                fontFamily: "Orbitron, monospace",
                                 fontWeight: 700,
                                 fontSize: 16,
                                 color: "#F97316",
@@ -1409,7 +1399,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                             </div>
                             <div
                               style={{
-                                fontFamily: "DM Mono, monospace",
+                                fontFamily: "Orbitron, monospace",
                                 fontSize: 9.5,
                                 color: T.muted,
                                 textTransform: "uppercase",
@@ -1497,7 +1487,7 @@ export default function DriverProfile({ open, onClose }: Props) {
             </div>
             <span
               style={{
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 fontWeight: 800,
                 fontSize: 19,
                 color: isDark ? "#F1F5F9" : "#0F172A",
@@ -1565,7 +1555,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                   : "rgba(0,0,0,0.04)",
                 border: `1.5px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
                 color: isDark ? "#F1F5F9" : "#0F172A",
-                fontFamily: "DM Sans, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 fontSize: 15,
                 outline: "none",
                 boxSizing: "border-box",
@@ -1638,7 +1628,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
-                      fontFamily: "Syne, sans-serif",
+                      fontFamily: "Rajdhani, sans-serif",
                       fontWeight: 700,
                       fontSize: 14,
                       color: isDark ? "#F1F5F9" : "#0F172A",
@@ -1648,7 +1638,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                   </div>
                   <div
                     style={{
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       fontSize: 11,
                       color: isDark ? "#64748B" : "#94A3B8",
                       marginTop: 2,
@@ -1659,7 +1649,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                 </div>
                 <span
                   style={{
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     fontSize: 11,
                     color: isDark ? "#334155" : "#CBD5E1",
                     padding: "3px 8px",
@@ -1700,7 +1690,7 @@ export default function DriverProfile({ open, onClose }: Props) {
             </div>
             <p
               style={{
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 fontWeight: 700,
                 fontSize: 17,
                 color: isDark ? "#E2E8F0" : "#1E293B",
@@ -1711,7 +1701,7 @@ export default function DriverProfile({ open, onClose }: Props) {
             </p>
             <p
               style={{
-                fontFamily: "DM Sans, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 fontSize: 14,
                 color: isDark ? "#64748B" : "#94A3B8",
                 margin: 0,
@@ -1728,7 +1718,7 @@ export default function DriverProfile({ open, onClose }: Props) {
               padding: "36px 28px",
               textAlign: "center",
               color: isDark ? "#64748B" : "#94A3B8",
-              fontFamily: "DM Mono, monospace",
+              fontFamily: "Orbitron, monospace",
               fontSize: 13,
             }}
           >

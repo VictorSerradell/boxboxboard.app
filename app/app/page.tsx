@@ -197,19 +197,19 @@ export default function HomePage() {
   const isDark = theme === "dark";
   const { t } = useT();
   const T = {
-    border: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
-    cardBg: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
-    cardBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.09)",
-    textMuted: isDark ? "#64748B" : "#94A3B8",
-    textFaint: isDark ? "#334155" : "#94A3B8",
-    textDimmed: isDark ? "#1E293B" : "#CBD5E1",
-    footerBg: isDark ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.04)",
-    divider: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
-    emptyIcon: isDark ? "#334155" : "#CBD5E1",
-    emptyTitle: isDark ? "#475569" : "#94A3B8",
-    emptyText: isDark ? "#334155" : "#CBD5E1",
-    btnBorder: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.12)",
-    btnColor: isDark ? "#64748B" : "#94A3B8",
+    border: isDark ? "#1E1E2A" : "#E0E0E8",
+    cardBg: isDark ? "#111118" : "#FFFFFF",
+    cardBorder: isDark ? "#1E1E2A" : "#E0E0E8",
+    textMuted: isDark ? "#555566" : "#888899",
+    textFaint: isDark ? "#444455" : "#AAAABC",
+    textDimmed: isDark ? "#2A2A36" : "#DDDDEE",
+    footerBg: isDark ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.03)",
+    divider: isDark ? "#1A1A24" : "#EBEBF0",
+    emptyIcon: isDark ? "#2A2A38" : "#DDDDEE",
+    emptyTitle: isDark ? "#444455" : "#999AAA",
+    emptyText: isDark ? "#2A2A38" : "#CCCCDD",
+    btnBorder: isDark ? "#2A2A3A" : "#E0E0E8",
+    btnColor: isDark ? "#555566" : "#888899",
   };
 
   // Derive auto-license from connected account (highest level across categories)
@@ -429,7 +429,6 @@ export default function HomePage() {
           height: 64,
           zIndex: 1000,
           background: "var(--bg-header)",
-          backdropFilter: "blur(20px)",
           borderBottom: "1px solid var(--border)",
           display: "flex",
           alignItems: "center",
@@ -451,24 +450,19 @@ export default function HomePage() {
           <img
             src="/icon.png"
             alt="BoxBoxBoard"
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 10,
-              boxShadow: "0 0 20px rgba(59,158,255,0.3)",
-            }}
+            style={{ width: 28, height: 28, borderRadius: 4 }}
           />
           {!isMobile && (
             <span
               style={{
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Orbitron, monospace",
                 fontWeight: 900,
-                fontSize: 20,
+                fontSize: 15,
                 color: "var(--text-primary)",
-                letterSpacing: "-0.5px",
+                letterSpacing: "0.05em",
               }}
             >
-              BoxBoxBoard
+              BOX<span style={{ color: "var(--accent)" }}>BOX</span>
             </span>
           )}
         </a>
@@ -509,7 +503,7 @@ export default function HomePage() {
                       borderRadius: 8,
                       border: "none",
                       cursor: "pointer",
-                      fontFamily: "Syne, sans-serif",
+                      fontFamily: "Rajdhani, sans-serif",
                       fontWeight: 700,
                       fontSize: 13,
                       background: active
@@ -564,7 +558,7 @@ export default function HomePage() {
                     borderRadius: 10,
                     border: "none",
                     cursor: "pointer",
-                    fontFamily: "Syne, sans-serif",
+                    fontFamily: "Rajdhani, sans-serif",
                     fontWeight: 600,
                     fontSize: 13,
                     background: active
@@ -590,7 +584,7 @@ export default function HomePage() {
                   borderRadius: 10,
                   border: "none",
                   cursor: "pointer",
-                  fontFamily: "Syne, sans-serif",
+                  fontFamily: "Rajdhani, sans-serif",
                   fontWeight: 600,
                   fontSize: 13,
                   background: "transparent",
@@ -629,7 +623,7 @@ export default function HomePage() {
                   border: "1px solid var(--border)",
                   background: "var(--bg-card)",
                   cursor: "pointer",
-                  fontFamily: "Syne, sans-serif",
+                  fontFamily: "Rajdhani, sans-serif",
                   fontWeight: 600,
                   fontSize: 13,
                   color: "var(--text-muted)",
@@ -672,7 +666,7 @@ export default function HomePage() {
                   borderRadius: 10,
                   border: "none",
                   cursor: "pointer",
-                  fontFamily: "Syne, sans-serif",
+                  fontFamily: "Rajdhani, sans-serif",
                   fontWeight: 700,
                   fontSize: 13,
                   background: "linear-gradient(135deg, #3B9EFF, #2563EB)",
@@ -735,7 +729,7 @@ export default function HomePage() {
             <div>
               <p
                 style={{
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 10,
                   color: "var(--text-muted)",
                   textTransform: "uppercase",
@@ -765,7 +759,7 @@ export default function HomePage() {
                           ? "rgba(59,158,255,0.12)"
                           : "var(--bg-card)",
                         color: active ? "#3B9EFF" : "var(--text-muted)",
-                        fontFamily: "Syne, sans-serif",
+                        fontFamily: "Rajdhani, sans-serif",
                         fontWeight: 700,
                         fontSize: 14,
                         cursor: "pointer",
@@ -816,7 +810,7 @@ export default function HomePage() {
                     : "var(--bg-card)",
                 color:
                   activeSection === item.id ? "#3B9EFF" : "var(--text-primary)",
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 fontWeight: 600,
                 fontSize: 15,
                 cursor: "pointer",
@@ -833,7 +827,7 @@ export default function HomePage() {
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span
               style={{
-                fontFamily: "DM Mono, monospace",
+                fontFamily: "Orbitron, monospace",
                 fontSize: 11,
                 color: "var(--text-muted)",
                 textTransform: "uppercase",
@@ -859,7 +853,7 @@ export default function HomePage() {
                 border: "1px solid rgba(239,68,68,0.3)",
                 background: "rgba(239,68,68,0.08)",
                 color: "#EF4444",
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 fontWeight: 700,
                 fontSize: 15,
                 cursor: "pointer",
@@ -882,7 +876,7 @@ export default function HomePage() {
                 borderRadius: 12,
                 background: "linear-gradient(135deg, #3B9EFF, #2563EB)",
                 color: "white",
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 fontWeight: 700,
                 fontSize: 15,
                 border: "none",
@@ -971,12 +965,13 @@ export default function HomePage() {
         >
           <h1
             style={{
-              fontFamily: "Syne, sans-serif",
-              fontSize: isMobile ? 20 : 26,
+              fontFamily: "Orbitron, monospace",
+              fontSize: isMobile ? 16 : 22,
               fontWeight: 900,
               color: "var(--text-primary)",
-              letterSpacing: "-0.5px",
+              letterSpacing: "0.04em",
               margin: 0,
+              textTransform: "uppercase",
             }}
           >
             {currentSeason
@@ -985,7 +980,7 @@ export default function HomePage() {
           </h1>
           <span
             style={{
-              fontFamily: "DM Mono, monospace",
+              fontFamily: "Orbitron, monospace",
               fontSize: 13,
               color: T.textFaint,
             }}
@@ -995,7 +990,7 @@ export default function HomePage() {
           {!loading && (
             <span
               style={{
-                fontFamily: "DM Mono, monospace",
+                fontFamily: "Orbitron, monospace",
                 fontSize: 11,
                 fontWeight: 600,
                 color: "#22C55E",
@@ -1061,7 +1056,7 @@ export default function HomePage() {
                       : "transparent",
                   color:
                     viewMode === v.mode ? "var(--text-primary)" : T.textFaint,
-                  fontFamily: "Syne, sans-serif",
+                  fontFamily: "Rajdhani, sans-serif",
                   fontWeight: 600,
                   fontSize: 13,
                   transition: "all 0.15s",
@@ -1083,7 +1078,7 @@ export default function HomePage() {
                       color: "white",
                       fontSize: 9,
                       fontWeight: 800,
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                     }}
                   >
                     {v.badge}
@@ -1173,7 +1168,7 @@ export default function HomePage() {
                 </div>
                 <p
                   style={{
-                    fontFamily: "Syne, sans-serif",
+                    fontFamily: "Rajdhani, sans-serif",
                     fontSize: 20,
                     fontWeight: 800,
                     color: T.emptyTitle,
@@ -1206,7 +1201,7 @@ export default function HomePage() {
                     color: T.btnColor,
                     cursor: "pointer",
                     fontSize: 14,
-                    fontFamily: "Syne, sans-serif",
+                    fontFamily: "Rajdhani, sans-serif",
                     fontWeight: 600,
                   }}
                 >
@@ -1295,7 +1290,7 @@ export default function HomePage() {
                 </div>
                 <span
                   style={{
-                    fontFamily: "Syne, sans-serif",
+                    fontFamily: "Rajdhani, sans-serif",
                     fontWeight: 900,
                     fontSize: 17,
                     color: "var(--text-primary)",
@@ -1321,7 +1316,7 @@ export default function HomePage() {
               <div>
                 <p
                   style={{
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     fontSize: 10,
                     fontWeight: 600,
                     color: T.textDimmed,
@@ -1365,7 +1360,7 @@ export default function HomePage() {
               <div>
                 <p
                   style={{
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     fontSize: 10,
                     fontWeight: 600,
                     color: T.textDimmed,

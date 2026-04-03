@@ -200,29 +200,29 @@ export default function SeriesDetailPanel({
 
   // Theme-aware local tokens
   const T = {
-    panelBg: isDark ? "#070D19" : "#FFFFFF",
+    panelBg: isDark ? "#0D0D12" : "#FFFFFF",
     headerBg: isDark
-      ? `linear-gradient(160deg, ${accent}18 0%, #070D19 60%)`
-      : `linear-gradient(160deg, ${accent}10 0%, #FFFFFF 60%)`,
-    sectionBorder: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
-    rowBg: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
-    rowBgAlt: isDark ? "rgba(255,255,255,0.025)" : "rgba(0,0,0,0.02)",
-    rowBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
-    labelColor: isDark ? "#334155" : "#94A3B8",
-    textPrimary: isDark ? "#FFFFFF" : "#0F172A",
-    textSecondary: isDark ? "rgba(255,255,255,0.85)" : "#1E293B",
-    textMuted: isDark ? "rgba(255,255,255,0.8)" : "#334155",
-    textFaint: isDark ? "rgba(255,255,255,0.45)" : "#94A3B8",
-    statValue: isDark ? "rgba(255,255,255,0.9)" : "#0F172A",
-    iconBtnBg: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)",
-    iconBtnBorder: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)",
-    iconBtnColor: isDark ? "#64748B" : "#94A3B8",
-    flagColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
-    carIconBg: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-    carIconBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
-    dateColor: isDark ? "#334155" : "#94A3B8",
-    infoGridBg: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
-    infoGridBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
+      ? `linear-gradient(160deg, ${accent}18 0%, #0D0D12 100%)`
+      : `linear-gradient(160deg, ${accent}10 0%, #FAFAFA 100%)`,
+    sectionBorder: isDark ? "#1E1E2A" : "#E8E8F0",
+    rowBg: isDark ? "#141418" : "#F8F8FC",
+    rowBgAlt: isDark ? "#111116" : "#F5F5FA",
+    rowBorder: isDark ? "#1E1E2A" : "#E8E8F0",
+    labelColor: isDark ? "#444455" : "#888899",
+    textPrimary: isDark ? "#FFFFFF" : "#0A0A0F",
+    textSecondary: isDark ? "#CCCCDC" : "#222230",
+    textMuted: isDark ? "#888898" : "#666677",
+    textFaint: isDark ? "#444455" : "#AAAABC",
+    statValue: isDark ? "#FFFFFF" : "#0A0A0F",
+    iconBtnBg: isDark ? "#1A1A22" : "#F0F0F8",
+    iconBtnBorder: isDark ? "#2A2A38" : "#D8D8E8",
+    iconBtnColor: isDark ? "#555566" : "#888899",
+    flagColor: isDark ? "#2E2E3E" : "#CCCCDD",
+    carIconBg: isDark ? "#141418" : "#F0F0F8",
+    carIconBorder: isDark ? "#2A2A38" : "#D8D8E8",
+    dateColor: isDark ? "#444455" : "#888899",
+    infoGridBg: isDark ? "#141418" : "#F8F8FC",
+    infoGridBorder: isDark ? "#1E1E2A" : "#E8E8F0",
   };
 
   function handleFav() {
@@ -243,7 +243,7 @@ export default function SeriesDetailPanel({
   const SectionTitle = ({ children }: { children: React.ReactNode }) => (
     <p
       style={{
-        fontFamily: "DM Mono, monospace",
+        fontFamily: "Orbitron, monospace",
         fontSize: 10,
         fontWeight: 600,
         color: T.labelColor,
@@ -286,7 +286,7 @@ export default function SeriesDetailPanel({
           gap: 6,
           color: T.labelColor,
           fontSize: 10,
-          fontFamily: "DM Mono, monospace",
+          fontFamily: "Orbitron, monospace",
           textTransform: "uppercase",
           letterSpacing: "0.1em",
         }}
@@ -297,7 +297,7 @@ export default function SeriesDetailPanel({
         style={{
           fontSize: 18,
           fontWeight: 800,
-          fontFamily: "Syne, sans-serif",
+          fontFamily: "Rajdhani, sans-serif",
           color: a ?? T.statValue,
         }}
       >
@@ -397,7 +397,7 @@ export default function SeriesDetailPanel({
                 />
                 <span
                   style={{
-                    fontFamily: "Syne, sans-serif",
+                    fontFamily: "Rajdhani, sans-serif",
                     fontSize: 11,
                     fontWeight: 700,
                     color: accent,
@@ -412,7 +412,7 @@ export default function SeriesDetailPanel({
               {/* Nombre */}
               <h2
                 style={{
-                  fontFamily: "Syne, sans-serif",
+                  fontFamily: "Rajdhani, sans-serif",
                   fontSize: 22,
                   fontWeight: 900,
                   color: isDark ? "#FFFFFF" : "#0F172A",
@@ -432,7 +432,7 @@ export default function SeriesDetailPanel({
                     borderRadius: 20,
                     fontSize: 12,
                     fontWeight: 700,
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     background: licConfig.color + "22",
                     border: `1px solid ${licConfig.color}50`,
                     color: licConfig.color,
@@ -449,7 +449,7 @@ export default function SeriesDetailPanel({
                     borderRadius: 20,
                     fontSize: 12,
                     fontWeight: 700,
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     background: series.fixed_setup
                       ? "rgba(59,158,255,0.14)"
                       : "rgba(34,197,94,0.14)",
@@ -469,7 +469,7 @@ export default function SeriesDetailPanel({
                       borderRadius: 20,
                       fontSize: 12,
                       fontWeight: 700,
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       background: "rgba(232,121,249,0.14)",
                       border: "1px solid rgba(232,121,249,0.38)",
                       color: "#E879F9",
@@ -488,7 +488,7 @@ export default function SeriesDetailPanel({
                       borderRadius: 20,
                       fontSize: 12,
                       fontWeight: 700,
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       background: "rgba(234,179,8,0.14)",
                       border: "1px solid rgba(234,179,8,0.38)",
                       color: "#EAB308",
@@ -658,7 +658,7 @@ export default function SeriesDetailPanel({
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  fontFamily: "Syne, sans-serif",
+                  fontFamily: "Rajdhani, sans-serif",
                   fontWeight: 700,
                   fontSize: 13,
                   color: activeTab === tab.id ? accent : "#64748B",
@@ -697,7 +697,7 @@ export default function SeriesDetailPanel({
                       <span
                         style={{
                           fontSize: 10,
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                           color: "#64748B",
                         }}
                       >
@@ -708,7 +708,7 @@ export default function SeriesDetailPanel({
                       <span
                         style={{
                           fontSize: 10,
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                           color: "#22C55E",
                           background: "rgba(34,197,94,0.1)",
                           border: "1px solid rgba(34,197,94,0.25)",
@@ -723,7 +723,7 @@ export default function SeriesDetailPanel({
                       <span
                         style={{
                           fontSize: 10,
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                           color: "#64748B",
                           background: "rgba(100,116,139,0.1)",
                           border: "1px solid rgba(100,116,139,0.2)",
@@ -833,7 +833,7 @@ export default function SeriesDetailPanel({
                             style={{
                               fontSize: 10,
                               fontWeight: 700,
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               color: "#22C55E",
                               background: "rgba(34,197,94,0.1)",
                               border: "1px solid rgba(34,197,94,0.25)",
@@ -889,7 +889,7 @@ export default function SeriesDetailPanel({
                             fontSize: 13,
                             fontWeight: 500,
                             color: T.textMuted,
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                           }}
                         >
                           {t}
@@ -932,7 +932,7 @@ export default function SeriesDetailPanel({
                         >
                           <span
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontSize: 11,
                               fontWeight: 700,
                               color: accent,
@@ -991,7 +991,7 @@ export default function SeriesDetailPanel({
                           {isActive ? (
                             <span
                               style={{
-                                fontFamily: "DM Mono, monospace",
+                                fontFamily: "Orbitron, monospace",
                                 fontSize: 9,
                                 fontWeight: 700,
                                 color: "#22C55E",
@@ -1008,7 +1008,7 @@ export default function SeriesDetailPanel({
                             week.start_date && (
                               <span
                                 style={{
-                                  fontFamily: "DM Mono, monospace",
+                                  fontFamily: "Orbitron, monospace",
                                   fontSize: 10,
                                   color: T.dateColor,
                                   flexShrink: 0,
@@ -1067,7 +1067,7 @@ export default function SeriesDetailPanel({
                         <div
                           style={{
                             fontSize: 10,
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             color: T.labelColor,
                             textTransform: "uppercase",
                             letterSpacing: "0.1em",
@@ -1108,7 +1108,7 @@ export default function SeriesDetailPanel({
                       gap: 10,
                       padding: "14px 0",
                       color: "#64748B",
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       fontSize: 12,
                     }}
                   >
@@ -1149,7 +1149,7 @@ export default function SeriesDetailPanel({
                     textAlign: "center",
                     padding: "40px 0",
                     color: "#64748B",
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     fontSize: 12,
                   }}
                 >
@@ -1180,7 +1180,7 @@ export default function SeriesDetailPanel({
                     <span
                       style={{
                         fontSize: 10,
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         color: "#22C55E",
                         background: "rgba(34,197,94,0.1)",
                         border: "1px solid rgba(34,197,94,0.25)",
@@ -1223,7 +1223,7 @@ export default function SeriesDetailPanel({
                         >
                           <span
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontSize: 11,
                               fontWeight: 700,
                               color: isTop ? "#fff" : "#64748B",
@@ -1273,7 +1273,7 @@ export default function SeriesDetailPanel({
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
                           <div
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontSize: 14,
                               fontWeight: 700,
                               color: isTop ? accent : T.textMuted,
@@ -1283,7 +1283,7 @@ export default function SeriesDetailPanel({
                           </div>
                           <div
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontSize: 10,
                               color: "#64748B",
                               marginTop: 1,

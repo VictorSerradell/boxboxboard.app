@@ -1,26 +1,20 @@
 // /app/layout.tsx
 import type { Metadata, Viewport } from "next";
-import { Syne, DM_Mono, DM_Sans } from "next/font/google";
+import { Orbitron, Rajdhani } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./lib/theme";
 import { I18nProvider } from "./lib/i18n";
 
-const syne = Syne({
+const orbitron = Orbitron({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-syne",
+  weight: ["400", "700", "900"],
+  variable: "--font-orbitron",
   display: "swap",
 });
-const dmMono = DM_Mono({
+const rajdhani = Rajdhani({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-dm-mono",
-  display: "swap",
-});
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  variable: "--font-dm-sans",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-rajdhani",
   display: "swap",
 });
 
@@ -132,13 +126,13 @@ export const metadata: Metadata = {
   // Icons
   icons: {
     icon: [
-      { url: "/favicon-v2.ico" },
-      { url: "/favicon-32-v2.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.ico?v=2" },
+      { url: "/favicon-32.png?v=2", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png?v=2", sizes: "16x16", type: "image/png" },
     ],
-    apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
-    shortcut: "/favicon.ico",
-    other: [{ rel: "mask-icon", url: "/favicon.ico", color: "#3B9EFF" }],
+    apple: [{ url: "/icon-192.png?v=2", sizes: "192x192", type: "image/png" }],
+    shortcut: "/favicon.ico?v=2",
+    other: [{ rel: "mask-icon", url: "/favicon.ico?v=2", color: "#3B9EFF" }],
   },
 
   // Verification (add when available)
@@ -180,7 +174,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme="dark"
-      className={`${syne.variable} ${dmMono.variable} ${dmSans.variable}`}
+      className={`${orbitron.variable} ${rajdhani.variable}`}
     >
       <head>
         {/* JSON-LD Structured Data */}

@@ -10,7 +10,6 @@ import SeriesDetailPanel from '../components/SeriesDetailPanel';
 import ThemeToggle from '../components/ThemeToggle';
 import LangToggle from '../components/LangToggle';
 import DriverStats from '../components/DriverStats';
-import CompareBar from '../components/CompareBar';
 import CalendarView from '../components/CalendarView';
 import ScheduleView from '../components/ScheduleView';
 import WeekChangeBanner from '../components/WeekChangeBanner';
@@ -22,6 +21,7 @@ import { useT } from '../lib/i18n';
 import type { SeriesSeason, FilterState, SeasonInfo, AppUser } from '../types/iracing';
 import { getSeasonList, getSeriesSeasons, getFavoriteSeriesIds, getMemberInfo } from '../lib/iracing-client';
 import { useTheme } from '../lib/theme';
+import CompareBar from '../components/Comparebar';
 
 function SkeletonCard() {
   const { theme } = useTheme();

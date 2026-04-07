@@ -120,7 +120,7 @@ export default function SeriesCard({
   const accent = catStyle.accent;
 
   const T = {
-    cardBg: isDark ? "#111118" : "#FFFFFF",
+    cardBg: isDark ? "#1C1C1C" : "#FFFFFF",
     cardBorder: hovered ? accent + "60" : isDark ? "#1E1E2A" : "#E0E0E8",
     cardShadow: hovered
       ? isDark
@@ -130,26 +130,26 @@ export default function SeriesCard({
         ? "0 2px 12px rgba(0,0,0,0.6)"
         : "0 1px 6px rgba(0,0,0,0.06)",
     headerGrad: isDark
-      ? `linear-gradient(160deg, ${accent}18 0%, #0D0D12 100%)`
+      ? `linear-gradient(160deg, ${accent}20 0%, #181818 100%)`
       : `linear-gradient(160deg, ${accent}10 0%, #FAFAFA 100%)`,
     seriesName: isDark ? "#FFFFFF" : "#0A0A0F",
-    trackRowBg: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
-    trackRowBorder: isDark ? "#1A1A24" : "#EBEBF0",
-    trackName: isDark ? "rgba(255,255,255,0.75)" : "#222230",
-    trackConfig: isDark ? "rgba(255,255,255,0.3)" : "#888899",
-    trackNameActive: isDark ? "#FFFFFF" : "#0A0A0F",
-    trackConfigActive: isDark ? "rgba(255,255,255,0.5)" : "#555566",
-    flagColor: isDark ? "#2E2E3E" : "#DDDDEE",
-    moreTracksBg: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
+    trackRowBg: isDark ? "#222222" : "#F8F8F8",
+    trackRowBorder: isDark ? "#2A2A2A" : "#E8E8EC",
+    trackName: isDark ? "#CCCCCC" : "#222222",
+    trackConfig: isDark ? "#666666" : "#888888",
+    trackNameActive: isDark ? "#F0F0F0" : "#111111",
+    trackConfigActive: isDark ? "#999999" : "#555555",
+    flagColor: isDark ? "#3A3A3A" : "#CCCCCC",
+    moreTracksBg: isDark ? "#222222" : "#F8F8F8",
     moreTracksBorder: isDark ? "#1A1A24" : "#EBEBF0",
     moreTracksText: isDark ? "#2E2E3E" : "#CCCCDD",
-    sectionBorder: isDark ? "#1A1A24" : "#EBEBF0",
-    labelColor: isDark ? "#555566" : "#888899",
-    statValue: isDark ? "rgba(255,255,255,0.9)" : "#111118",
-    footerBg: isDark ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.03)",
+    sectionBorder: isDark ? "#252525" : "#EBEBEF",
+    labelColor: isDark ? "#555555" : "#999999",
+    statValue: isDark ? "#E8E8E8" : "#111111",
+    footerBg: isDark ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.02)",
     iconBtnBg: isDark ? "#141418" : "rgba(0,0,0,0.04)",
-    iconBtnBorder: isDark ? "#2E2E3E" : "#E0E0E8",
-    iconBtnColor: isDark ? "#444455" : "#999AAA",
+    iconBtnBorder: isDark ? "#333333" : "#E0E0E4",
+    iconBtnColor: isDark ? "#555555" : "#999999",
   };
 
   function handleFavClick(e: React.MouseEvent) {

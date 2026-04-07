@@ -317,16 +317,23 @@ function mapCategory(
   driverChanges?: boolean,
   sessionMinutes?: number,
 ): CarCategory {
-  // Detect endurance: driver changes enabled + race > 60 min, OR name contains endurance keywords
   const name = (seriesName ?? "").toLowerCase();
+  const mins = sessionMinutes ?? 0;
+
+  // Endurance: explicit name keywords OR driver_changes + long race (≥2h)
   if (
-    (driverChanges && (sessionMinutes ?? 0) > 60) ||
     name.includes("endurance") ||
-    name.includes("ires") ||
+    name.includes("endur") ||
     name.includes("24h") ||
     name.includes("24 h") ||
     name.includes("12h") ||
-    name.includes("6h ")
+    name.includes("6h ") ||
+    name.includes("ires") ||
+    name.includes("imsa") || // IMSA races are endurance-style
+    name.includes("le mans") ||
+    name.includes("daytona 24") ||
+    name.includes("sebring") ||
+    (driverChanges === true && mins >= 120)
   )
     return "Endurance";
 

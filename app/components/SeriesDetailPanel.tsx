@@ -97,7 +97,7 @@ const LICENSE_CONFIG = {
   1: { label: "D", color: "#F97316" },
   2: { label: "C", color: "#EAB308" },
   3: { label: "B", color: "#22C55E" },
-  4: { label: "A", color: "#3B9EFF" },
+  4: { label: "A", color: "#E8002D" },
   5: { label: "PRO", color: "#A855F7" },
 } as const;
 
@@ -336,7 +336,7 @@ export default function SeriesDetailPanel({
           width: isMobile ? "100vw" : "min(520px, 100vw)",
           background: T.panelBg,
           borderLeft: isMobile ? "none" : `1px solid ${accent}30`,
-          borderTop: isMobile ? "none" : `1px solid rgba(255,255,255,0.06)`,
+          borderTop: isMobile ? "none" : `1px solid #161620`,
           display: "flex",
           flexDirection: "column",
           transform: visible ? "translateX(0)" : "translateX(100%)",
@@ -451,10 +451,10 @@ export default function SeriesDetailPanel({
                     fontWeight: 700,
                     fontFamily: "Orbitron, monospace",
                     background: series.fixed_setup
-                      ? "rgba(59,158,255,0.14)"
+                      ? "rgba(232,0,45,0.10)"
                       : "rgba(34,197,94,0.14)",
-                    border: `1px solid ${series.fixed_setup ? "rgba(59,158,255,0.35)" : "rgba(34,197,94,0.35)"}`,
-                    color: series.fixed_setup ? "#3B9EFF" : "#22C55E",
+                    border: `1px solid ${series.fixed_setup ? "rgba(232,0,45,0.35)" : "rgba(34,197,94,0.35)"}`,
+                    color: series.fixed_setup ? "#E8002D" : "#22C55E",
                   }}
                 >
                   <Wrench size={10} /> {series.fixed_setup ? t.fixed : t.open}
@@ -661,7 +661,7 @@ export default function SeriesDetailPanel({
                   fontFamily: "Rajdhani, sans-serif",
                   fontWeight: 700,
                   fontSize: 13,
-                  color: activeTab === tab.id ? accent : "#64748B",
+                  color: activeTab === tab.id ? accent : "#666677",
                   borderBottom: `2px solid ${activeTab === tab.id ? accent : "transparent"}`,
                   marginBottom: -1,
                   transition: "all 0.15s",
@@ -698,7 +698,7 @@ export default function SeriesDetailPanel({
                         style={{
                           fontSize: 10,
                           fontFamily: "Orbitron, monospace",
-                          color: "#64748B",
+                          color: "#666677",
                         }}
                       >
                         loading...
@@ -724,7 +724,7 @@ export default function SeriesDetailPanel({
                         style={{
                           fontSize: 10,
                           fontFamily: "Orbitron, monospace",
-                          color: "#64748B",
+                          color: "#666677",
                           background: "rgba(100,116,139,0.1)",
                           border: "1px solid rgba(100,116,139,0.2)",
                           borderRadius: 4,
@@ -1107,7 +1107,7 @@ export default function SeriesDetailPanel({
                       alignItems: "center",
                       gap: 10,
                       padding: "14px 0",
-                      color: "#64748B",
+                      color: "#666677",
                       fontFamily: "Orbitron, monospace",
                       fontSize: 12,
                     }}
@@ -1131,9 +1131,7 @@ export default function SeriesDetailPanel({
                       style={{
                         height: 52,
                         borderRadius: 10,
-                        background: isDark
-                          ? "rgba(255,255,255,0.04)"
-                          : "rgba(0,0,0,0.04)",
+                        background: isDark ? "#111118" : "rgba(0,0,0,0.04)",
                         animation: "pulse 1.5s ease infinite",
                       }}
                     />
@@ -1148,7 +1146,7 @@ export default function SeriesDetailPanel({
                   style={{
                     textAlign: "center",
                     padding: "40px 0",
-                    color: "#64748B",
+                    color: "#666677",
                     fontFamily: "Orbitron, monospace",
                     fontSize: 12,
                   }}
@@ -1226,7 +1224,7 @@ export default function SeriesDetailPanel({
                               fontFamily: "Orbitron, monospace",
                               fontSize: 11,
                               fontWeight: 700,
-                              color: isTop ? "#fff" : "#64748B",
+                              color: isTop ? "#fff" : "#666677",
                             }}
                           >
                             {i + 1}
@@ -1253,7 +1251,7 @@ export default function SeriesDetailPanel({
                               height: 4,
                               borderRadius: 2,
                               background: isDark
-                                ? "rgba(255,255,255,0.06)"
+                                ? "#161620"
                                 : "rgba(0,0,0,0.06)",
                               overflow: "hidden",
                             }}
@@ -1285,7 +1283,7 @@ export default function SeriesDetailPanel({
                             style={{
                               fontFamily: "Orbitron, monospace",
                               fontSize: 10,
-                              color: "#64748B",
+                              color: "#666677",
                               marginTop: 1,
                             }}
                           >

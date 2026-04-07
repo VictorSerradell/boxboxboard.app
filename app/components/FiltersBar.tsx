@@ -40,14 +40,14 @@ const LICENSES: { label: string; value: LicenseLevel; color: string }[] = [
   { label: "D", value: 1, color: "#F97316" },
   { label: "C", value: 2, color: "#EAB308" },
   { label: "B", value: 3, color: "#22C55E" },
-  { label: "A", value: 4, color: "#3B9EFF" },
+  { label: "A", value: 4, color: "#E8002D" },
 ];
 
 const STATUSES: { label: string; value: SessionType; color: string }[] = [
-  { label: "Fixed", value: "FIXED", color: "#3B9EFF" },
+  { label: "Fixed", value: "FIXED", color: "#E8002D" },
   { label: "Open", value: "OPEN", color: "#22C55E" },
   { label: "Ranked", value: "RANKED", color: "#A855F7" },
-  { label: "Unranked", value: "UNRANKED", color: "#64748B" },
+  { label: "Unranked", value: "UNRANKED", color: "#666677" },
 ];
 
 export default function FiltersBar({
@@ -85,7 +85,7 @@ export default function FiltersBar({
       ? { color: "#555566", border: "#2A2A3A", bg: "transparent" }
       : { color: "#888899", border: "#D8D8E8", bg: "transparent" },
     chipHover: isDark
-      ? { color: "#AAAABC", border: "#3E3E4E", bg: "rgba(255,255,255,0.04)" }
+      ? { color: "#AAAABC", border: "#3E3E4E", bg: "#111118" }
       : { color: "#333344", border: "#B8B8C8", bg: "rgba(0,0,0,0.03)" },
     searchBg: isDark ? "#111118" : "#FFFFFF",
     searchBorder: isDark ? "#2A2A3A" : "#D8D8E8",
@@ -529,7 +529,7 @@ export default function FiltersBar({
             }}
             onFocus={(e) => {
               e.currentTarget.style.width = "256px";
-              e.currentTarget.style.borderColor = "rgba(59,158,255,0.4)";
+              e.currentTarget.style.borderColor = "rgba(232,0,45,0.1)";
             }}
             onBlur={(e) => {
               e.currentTarget.style.width = "200px";
@@ -610,8 +610,8 @@ export default function FiltersBar({
               gap: 6,
               padding: "8px 14px",
               borderRadius: 10,
-              border: `1px solid ${activeCount > 0 ? "rgba(59,158,255,0.4)" : T.barBorder}`,
-              background: activeCount > 0 ? "rgba(59,158,255,0.1)" : T.searchBg,
+              border: `1px solid ${activeCount > 0 ? "rgba(232,0,45,0.1)" : T.barBorder}`,
+              background: activeCount > 0 ? "rgba(232,0,45,0.1)" : T.searchBg,
               color: activeCount > 0 ? "#3B9EFF" : T.groupLabel,
               fontFamily: "Rajdhani, sans-serif",
               fontWeight: 600,
@@ -663,7 +663,7 @@ export default function FiltersBar({
                 right: 0,
                 zIndex: 151,
                 background: T.barBg,
-                borderTop: `2px solid rgba(59,158,255,0.3)`,
+                borderTop: `2px solid rgba(232,0,45,0.1)`,
                 borderRadius: "16px 16px 0 0",
                 padding: "20px 16px 32px",
                 maxHeight: "80vh",

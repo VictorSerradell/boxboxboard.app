@@ -402,8 +402,8 @@ export default function DriverProfile({ open, onClose }: Props) {
 
   const shimmer = (dark: boolean): CSSProperties => ({
     background: dark
-      ? "linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%)"
-      : "linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 75%)",
+      ? "linear-gradient(90deg, #111118 25%, rgba(255,255,255,0.09) 50%, #111118 75%)"
+      : "linear-gradient(90deg, rgba(0,0,0,0.04) 25%, #E0E0E8 50%, rgba(0,0,0,0.04) 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite linear",
   });
@@ -507,9 +507,7 @@ export default function DriverProfile({ open, onClose }: Props) {
             gap: 14,
             padding: "16px 32px",
             borderBottom: `1px solid ${T.border}`,
-            background: isDark
-              ? "rgba(6,12,24,0.95)"
-              : "rgba(248,250,252,0.95)",
+            background: isDark ? "rgba(8,8,8,0.97)" : "rgba(248,250,252,0.95)",
             backdropFilter: "blur(20px)",
             flexShrink: 0,
             position: "sticky",
@@ -770,10 +768,10 @@ export default function DriverProfile({ open, onClose }: Props) {
                 borderRadius: 32,
                 border: `1px solid ${isDark ? `${primaryColor}30` : `${primaryColor}20`}`,
                 background: isDark
-                  ? `linear-gradient(145deg, ${primaryColor}18 0%, #0A1221 55%, #060C18 100%)`
+                  ? `linear-gradient(145deg, ${primaryColor}18 0%, #111118 55%, #080808 100%)`
                   : `linear-gradient(145deg, ${primaryColor}10 0%, #FFFFFF 60%)`,
                 boxShadow: isDark
-                  ? `0 0 80px ${primaryColor}15, 0 32px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)`
+                  ? `0 0 80px ${primaryColor}15, 0 32px 64px rgba(0,0,0,0.5), inset 0 1px 0 #1E1E2A`
                   : `0 20px 48px rgba(0,0,0,0.1)`,
                 overflow: "hidden",
                 position: "relative",
@@ -829,9 +827,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                           fontFamily: "Orbitron, monospace",
                           fontSize: 13,
                           color: T.muted,
-                          background: isDark
-                            ? "rgba(255,255,255,0.06)"
-                            : "rgba(0,0,0,0.05)",
+                          background: isDark ? "#161620" : "rgba(0,0,0,0.05)",
                           padding: "4px 10px",
                           borderRadius: 8,
                           border: `1px solid ${T.border}`,
@@ -919,8 +915,8 @@ export default function DriverProfile({ open, onClose }: Props) {
                   {
                     label: "Total Starts",
                     value: profile.summary.total_starts.toLocaleString(),
-                    icon: <Flag size={22} color="#3B9EFF" />,
-                    glow: "#3B9EFF",
+                    icon: <Flag size={22} color="#E8002D" />,
+                    glow: "#E8002D",
                   },
                   {
                     label: "Wins",
@@ -1016,7 +1012,10 @@ export default function DriverProfile({ open, onClose }: Props) {
                     fontWeight: 700,
                     fontSize: 15,
                     color: tab === tabId ? "#3B9EFF" : T.muted,
-                    borderBottom: `2px solid ${tab === tabId ? "#3B9EFF" : "transparent"}`,
+                    borderBottom:
+                      tab === tabId
+                        ? "2px solid #E8002D"
+                        : "2px solid transparent",
                     marginBottom: -1,
                     transition: "all 0.2s",
                   }}
@@ -1049,7 +1048,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                 {licenses.map(([key, lic]: [string, any]) => {
                   if (!lic) return null;
                   const color =
-                    LICENSE_COLORS[lic.group_name ?? ""] ?? "#64748B";
+                    LICENSE_COLORS[lic.group_name ?? ""] ?? "#666677";
                   const catColor = CATEGORY_COLORS[key] ?? "#3B9EFF";
                   return (
                     <div
@@ -1223,7 +1222,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                         el.style.transform = "translateX(6px)";
                         el.style.borderColor = isWin
                           ? "rgba(234,179,8,0.5)"
-                          : "rgba(59,158,255,0.3)";
+                          : "rgba(232,0,45,0.3)";
                         el.style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)";
                       }}
                       onMouseLeave={(e) => {
@@ -1441,7 +1440,7 @@ export default function DriverProfile({ open, onClose }: Props) {
     >
       <style>{`
         @keyframes modalIn { from{opacity:0;transform:scale(0.96) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
-        .driver-input:focus { border-color: rgba(59,158,255,0.6) !important; box-shadow: 0 0 0 3px rgba(59,158,255,0.15), 0 0 20px rgba(59,158,255,0.1) !important; }
+        .driver-input:focus { border-color: rgba(232,0,45,0.6) !important; box-shadow: 0 0 0 3px rgba(232,0,45,0.12), 0 0 20px rgba(232,0,45,0.08) !important; }
       `}</style>
       <div
         style={{
@@ -1449,9 +1448,9 @@ export default function DriverProfile({ open, onClose }: Props) {
           maxWidth: 540,
           background: isDark ? "rgba(10,18,33,0.98)" : "#FFFFFF",
           borderRadius: 28,
-          border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
+          border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "#E0E0E8"}`,
           boxShadow: isDark
-            ? "0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)"
+            ? "0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px #141418"
             : "0 32px 80px rgba(0,0,0,0.2)",
           overflow: "hidden",
           animation: "modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1)",
@@ -1460,7 +1459,7 @@ export default function DriverProfile({ open, onClose }: Props) {
         <div
           style={{
             padding: "26px 26px 20px",
-            borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"}`,
+            borderBottom: `1px solid ${isDark ? "#1A1A26" : "rgba(0,0,0,0.07)"}`,
           }}
         >
           <div
@@ -1476,21 +1475,21 @@ export default function DriverProfile({ open, onClose }: Props) {
                 width: 36,
                 height: 36,
                 borderRadius: 10,
-                background: "rgba(59,158,255,0.12)",
-                border: "1px solid rgba(59,158,255,0.25)",
+                background: "rgba(232,0,45,0.10)",
+                border: "1px solid rgba(232,0,45,0.2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <User size={18} color="#3B9EFF" />
+              <User size={18} color="#E8002D" />
             </div>
             <span
               style={{
                 fontFamily: "Rajdhani, sans-serif",
                 fontWeight: 800,
                 fontSize: 19,
-                color: isDark ? "#F1F5F9" : "#0F172A",
+                color: isDark ? "#F5F5F7" : "#0F172A",
               }}
             >
               {t.driverSearch}
@@ -1502,7 +1501,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                 background: "none",
                 border: "1px solid transparent",
                 cursor: "pointer",
-                color: isDark ? "#64748B" : "#94A3B8",
+                color: isDark ? "#666677" : "#999AAA",
                 display: "flex",
                 padding: 8,
                 borderRadius: 10,
@@ -1510,19 +1509,17 @@ export default function DriverProfile({ open, onClose }: Props) {
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLElement;
-                el.style.background = isDark
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(0,0,0,0.06)";
+                el.style.background = isDark ? "#1E1E2A" : "rgba(0,0,0,0.06)";
                 el.style.borderColor = isDark
                   ? "rgba(255,255,255,0.12)"
                   : "rgba(0,0,0,0.1)";
-                el.style.color = isDark ? "#E2E8F0" : "#1E293B";
+                el.style.color = isDark ? "#E2E8F0" : "#222230";
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLElement;
                 el.style.background = "none";
                 el.style.borderColor = "transparent";
-                el.style.color = isDark ? "#64748B" : "#94A3B8";
+                el.style.color = isDark ? "#666677" : "#999AAA";
               }}
             >
               <X size={20} />
@@ -1531,7 +1528,7 @@ export default function DriverProfile({ open, onClose }: Props) {
           <div style={{ position: "relative" }}>
             <Search
               size={16}
-              color={isDark ? "#475569" : "#94A3B8"}
+              color={isDark ? "#555566" : "#999AAA"}
               style={{
                 position: "absolute",
                 left: 16,
@@ -1550,11 +1547,9 @@ export default function DriverProfile({ open, onClose }: Props) {
                 width: "100%",
                 padding: "14px 16px 14px 46px",
                 borderRadius: 16,
-                background: isDark
-                  ? "rgba(255,255,255,0.05)"
-                  : "rgba(0,0,0,0.04)",
+                background: isDark ? "#141418" : "rgba(0,0,0,0.04)",
                 border: `1.5px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
-                color: isDark ? "#F1F5F9" : "#0F172A",
+                color: isDark ? "#F5F5F7" : "#0F172A",
                 fontFamily: "Rajdhani, sans-serif",
                 fontSize: 15,
                 outline: "none",
@@ -1570,7 +1565,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                   top: "50%",
                   transform: "translateY(-50%)",
                   fontSize: 18,
-                  color: isDark ? "#64748B" : "#94A3B8",
+                  color: isDark ? "#666677" : "#999AAA",
                   letterSpacing: 2,
                 }}
               >
@@ -1595,7 +1590,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                   border: "none",
                   borderBottom:
                     i < results.length - 1
-                      ? `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`
+                      ? `1px solid ${isDark ? "#161620" : "rgba(0,0,0,0.06)"}`
                       : "none",
                   cursor: "pointer",
                   textAlign: "left",
@@ -1603,8 +1598,8 @@ export default function DriverProfile({ open, onClose }: Props) {
                 }}
                 onMouseEnter={(e) =>
                   ((e.currentTarget as HTMLElement).style.background = isDark
-                    ? "rgba(59,158,255,0.07)"
-                    : "rgba(59,158,255,0.05)")
+                    ? "rgba(232,0,45,0.06)"
+                    : "rgba(232,0,45,0.04)")
                 }
                 onMouseLeave={(e) =>
                   ((e.currentTarget as HTMLElement).style.background = "none")
@@ -1615,15 +1610,15 @@ export default function DriverProfile({ open, onClose }: Props) {
                     width: 40,
                     height: 40,
                     borderRadius: 12,
-                    background: "rgba(59,158,255,0.1)",
-                    border: "1px solid rgba(59,158,255,0.2)",
+                    background: "rgba(232,0,45,0.08)",
+                    border: "1px solid rgba(232,0,45,0.15)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexShrink: 0,
                   }}
                 >
-                  <User size={16} color="#3B9EFF" />
+                  <User size={16} color="#E8002D" />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
@@ -1631,7 +1626,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                       fontFamily: "Rajdhani, sans-serif",
                       fontWeight: 700,
                       fontSize: 14,
-                      color: isDark ? "#F1F5F9" : "#0F172A",
+                      color: isDark ? "#F5F5F7" : "#0F172A",
                     }}
                   >
                     {r.display_name}
@@ -1640,7 +1635,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                     style={{
                       fontFamily: "Orbitron, monospace",
                       fontSize: 11,
-                      color: isDark ? "#64748B" : "#94A3B8",
+                      color: isDark ? "#666677" : "#999AAA",
                       marginTop: 2,
                     }}
                   >
@@ -1651,11 +1646,9 @@ export default function DriverProfile({ open, onClose }: Props) {
                   style={{
                     fontFamily: "Orbitron, monospace",
                     fontSize: 11,
-                    color: isDark ? "#334155" : "#CBD5E1",
+                    color: isDark ? "#444455" : "#CCCCDD",
                     padding: "3px 8px",
-                    background: isDark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.04)",
+                    background: isDark ? "#141418" : "rgba(0,0,0,0.04)",
                     borderRadius: 6,
                   }}
                 >
@@ -1672,10 +1665,8 @@ export default function DriverProfile({ open, onClose }: Props) {
                 width: 64,
                 height: 64,
                 borderRadius: 20,
-                background: isDark
-                  ? "rgba(255,255,255,0.04)"
-                  : "rgba(0,0,0,0.04)",
-                border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                background: isDark ? "#111118" : "rgba(0,0,0,0.04)",
+                border: `1px solid ${isDark ? "#1E1E2A" : "#E0E0E8"}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -1685,7 +1676,7 @@ export default function DriverProfile({ open, onClose }: Props) {
               <User
                 size={28}
                 strokeWidth={1.5}
-                color={isDark ? "#334155" : "#CBD5E1"}
+                color={isDark ? "#444455" : "#CCCCDD"}
               />
             </div>
             <p
@@ -1693,7 +1684,7 @@ export default function DriverProfile({ open, onClose }: Props) {
                 fontFamily: "Rajdhani, sans-serif",
                 fontWeight: 700,
                 fontSize: 17,
-                color: isDark ? "#E2E8F0" : "#1E293B",
+                color: isDark ? "#E2E8F0" : "#222230",
                 margin: "0 0 10px",
               }}
             >
@@ -1703,7 +1694,7 @@ export default function DriverProfile({ open, onClose }: Props) {
               style={{
                 fontFamily: "Rajdhani, sans-serif",
                 fontSize: 14,
-                color: isDark ? "#64748B" : "#94A3B8",
+                color: isDark ? "#666677" : "#999AAA",
                 margin: 0,
                 lineHeight: 1.7,
               }}
@@ -1717,7 +1708,7 @@ export default function DriverProfile({ open, onClose }: Props) {
             style={{
               padding: "36px 28px",
               textAlign: "center",
-              color: isDark ? "#64748B" : "#94A3B8",
+              color: isDark ? "#666677" : "#999AAA",
               fontFamily: "Orbitron, monospace",
               fontSize: 13,
             }}

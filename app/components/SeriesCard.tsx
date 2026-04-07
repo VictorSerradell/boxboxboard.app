@@ -147,7 +147,7 @@ export default function SeriesCard({
     labelColor: isDark ? "#555566" : "#888899",
     statValue: isDark ? "rgba(255,255,255,0.9)" : "#111118",
     footerBg: isDark ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.03)",
-    iconBtnBg: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+    iconBtnBg: isDark ? "#141418" : "rgba(0,0,0,0.04)",
     iconBtnBorder: isDark ? "#2E2E3E" : "#E0E0E8",
     iconBtnColor: isDark ? "#444455" : "#999AAA",
   };
@@ -341,10 +341,8 @@ export default function SeriesCard({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: isComparing
-                    ? "rgba(59,158,255,0.2)"
-                    : T.iconBtnBg,
-                  border: `1px solid ${isComparing ? "rgba(59,158,255,0.5)" : T.iconBtnBorder}`,
+                  background: isComparing ? "rgba(232,0,45,0.12)" : T.iconBtnBg,
+                  border: `1px solid ${isComparing ? "rgba(232,0,45,0.5)" : T.iconBtnBorder}`,
                   color: isComparing ? "#3B9EFF" : T.iconBtnColor,
                   transition: "all 0.15s ease",
                 }}
@@ -447,10 +445,10 @@ export default function SeriesCard({
               fontWeight: 700,
               fontFamily: "Orbitron, monospace",
               background: series.fixed_setup
-                ? "rgba(59,158,255,0.14)"
+                ? "rgba(232,0,45,0.10)"
                 : "rgba(34,197,94,0.14)",
-              border: `1px solid ${series.fixed_setup ? "rgba(59,158,255,0.35)" : "rgba(34,197,94,0.35)"}`,
-              color: series.fixed_setup ? "#3B9EFF" : "#22C55E",
+              border: `1px solid ${series.fixed_setup ? "rgba(232,0,45,0.35)" : "rgba(34,197,94,0.35)"}`,
+              color: series.fixed_setup ? "#E8002D" : "#22C55E",
             }}
           >
             <Wrench size={10} strokeWidth={2.5} />{" "}

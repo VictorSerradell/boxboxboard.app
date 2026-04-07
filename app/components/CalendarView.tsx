@@ -1,9 +1,9 @@
-// /app/components/CalendarView.tsx
-// Vista de calendario global — filas = semanas, columnas = series
 "use client";
 import { useT } from "../lib/i18n";
 import { useIsMobile } from "../lib/useBreakpoint";
-import React, { ReactElement } from "react";
+// /app/components/CalendarView.tsx
+// Vista de calendario global — filas = semanas, columnas = series
+
 import { useState } from "react";
 import { Flag } from "lucide-react";
 import type { SeriesSeason } from "../types/iracing";
@@ -41,27 +41,27 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const T = {
-    bg: isDark ? "#060C18" : "#F1F5F9",
-    tableBg: isDark ? "#070D19" : "#FFFFFF",
-    headerBg: isDark ? "#0A1221" : "#F8FAFC",
-    border: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
+    bg: isDark ? "#080808" : "#F5F5F7",
+    tableBg: isDark ? "#0D0D12" : "#FFFFFF",
+    headerBg: isDark ? "#111118" : "#F8FAFC",
+    border: isDark ? "#161620" : "rgba(0,0,0,0.07)",
     borderStrong: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)",
     rowBg: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.01)",
     rowBgAlt: isDark ? "rgba(255,255,255,0.035)" : "rgba(0,0,0,0.025)",
-    rowHover: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-    colHover: isDark ? "rgba(59,158,255,0.04)" : "rgba(59,158,255,0.03)",
-    cellHover: isDark ? "rgba(59,158,255,0.08)" : "rgba(59,158,255,0.06)",
-    text: isDark ? "rgba(255,255,255,0.85)" : "#1E293B",
-    textMuted: isDark ? "#475569" : "#94A3B8",
-    textFaint: isDark ? "#334155" : "#CBD5E1",
-    weekLabel: isDark ? "#334155" : "#94A3B8",
-    trackName: isDark ? "rgba(255,255,255,0.78)" : "#334155",
-    configName: isDark ? "#334155" : "#94A3B8",
+    rowHover: isDark ? "#141418" : "rgba(0,0,0,0.04)",
+    colHover: isDark ? "rgba(232,0,45,0.1)" : "rgba(232,0,45,0.1)",
+    cellHover: isDark ? "rgba(232,0,45,0.1)" : "rgba(232,0,45,0.1)",
+    text: isDark ? "rgba(255,255,255,0.85)" : "#222230",
+    textMuted: isDark ? "#555566" : "#999AAA",
+    textFaint: isDark ? "#444455" : "#CCCCDD",
+    weekLabel: isDark ? "#444455" : "#999AAA",
+    trackName: isDark ? "rgba(255,255,255,0.78)" : "#444455",
+    configName: isDark ? "#444455" : "#999AAA",
     emptyCell: isDark ? "rgba(255,255,255,0.015)" : "rgba(0,0,0,0.015)",
-    chipBg: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
-    chipBorder: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.09)",
-    chipColor: isDark ? "#64748B" : "#94A3B8",
-    stickyBg: isDark ? "#070D19" : "#FFFFFF",
+    chipBg: isDark ? "#161620" : "rgba(0,0,0,0.05)",
+    chipBorder: isDark ? "rgba(255,255,255,0.10)" : "#E0E0E8",
+    chipColor: isDark ? "#666677" : "#999AAA",
+    stickyBg: isDark ? "#0D0D12" : "#FFFFFF",
   };
 
   // Sort series by category order, then by name
@@ -106,7 +106,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
       >
         <span
           style={{
-            fontFamily: "DM Mono, monospace",
+            fontFamily: "Orbitron, monospace",
             fontSize: 10,
             color: T.textMuted,
             textTransform: "uppercase",
@@ -120,12 +120,12 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
           style={{
             padding: "4px 12px",
             borderRadius: 20,
-            border: `1px solid ${!activeCategory ? "rgba(59,158,255,0.5)" : T.chipBorder}`,
-            background: !activeCategory ? "rgba(59,158,255,0.12)" : T.chipBg,
-            color: !activeCategory ? "#3B9EFF" : T.chipColor,
+            border: `1px solid ${!activeCategory ? "rgba(232,0,45,0.1)" : T.chipBorder}`,
+            background: !activeCategory ? "rgba(232,0,45,0.1)" : T.chipBg,
+            color: !activeCategory ? "#E8002D" : T.chipColor,
             fontSize: 12,
             fontWeight: 600,
-            fontFamily: "Syne, sans-serif",
+            fontFamily: "Rajdhani, sans-serif",
             cursor: "pointer",
           }}
         >
@@ -150,7 +150,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                 color: active ? accent : T.chipColor,
                 fontSize: 12,
                 fontWeight: 600,
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 cursor: "pointer",
               }}
             >
@@ -169,7 +169,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
         })}
         <span
           style={{
-            fontFamily: "DM Mono, monospace",
+            fontFamily: "Orbitron, monospace",
             fontSize: 11,
             color: T.textFaint,
             marginLeft: "auto",
@@ -225,7 +225,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
               >
                 <span
                   style={{
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     fontSize: 9,
                     color: T.weekLabel,
                     textTransform: "uppercase",
@@ -289,7 +289,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                       />
                       <span
                         style={{
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                           fontSize: 9,
                           color: accent,
                           textTransform: "uppercase",
@@ -304,7 +304,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                     </div>
                     <p
                       style={{
-                        fontFamily: "Syne, sans-serif",
+                        fontFamily: "Rajdhani, sans-serif",
                         fontWeight: 800,
                         fontSize: 11,
                         color: T.text,
@@ -379,7 +379,7 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                       )}
                       <span
                         style={{
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                           fontSize: 11,
                           fontWeight: 700,
                           color: isActiveWeek ? "#22C55E" : T.weekLabel,

@@ -80,16 +80,16 @@ export default function WeekChangeBanner({
 
   const T = {
     bg: isDark ? "#0A1628" : "#FFFFFF",
-    border: isDark ? "rgba(59,158,255,0.35)" : "rgba(59,158,255,0.3)",
+    border: isDark ? "rgba(232,0,45,0.1)" : "rgba(232,0,45,0.1)",
     shadow: isDark
       ? "0 8px 40px rgba(0,0,0,0.5)"
       : "0 8px 32px rgba(0,0,0,0.12)",
-    trackBg: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-    trackBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
-    text: isDark ? "rgba(255,255,255,0.85)" : "#1E293B",
-    textMuted: isDark ? "#64748B" : "#94A3B8",
-    closeBtn: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)",
-    closeBorder: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.10)",
+    trackBg: isDark ? "#141418" : "rgba(0,0,0,0.04)",
+    trackBorder: isDark ? "#1E1E2A" : "#E0E0E8",
+    text: isDark ? "rgba(255,255,255,0.85)" : "#222230",
+    textMuted: isDark ? "#666677" : "#999AAA",
+    closeBtn: isDark ? "#1A1A26" : "rgba(0,0,0,0.06)",
+    closeBorder: isDark ? "rgba(255,255,255,0.12)" : "#E0E0E8",
   };
 
   const isFirstVisit = !localStorage.getItem(
@@ -120,7 +120,7 @@ export default function WeekChangeBanner({
       <div
         style={{
           height: 3,
-          background: "linear-gradient(90deg, #3B9EFF, #A855F7)",
+          background: "linear-gradient(90deg, #E8002D, #FF4060)",
         }}
       />
 
@@ -141,23 +141,23 @@ export default function WeekChangeBanner({
                 width: 34,
                 height: 34,
                 borderRadius: 10,
-                background: "rgba(59,158,255,0.12)",
-                border: "1px solid rgba(59,158,255,0.25)",
+                background: "rgba(232,0,45,0.1)",
+                border: "1px solid rgba(232,0,45,0.1)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
               }}
             >
-              <Bell size={16} color="#3B9EFF" />
+              <Bell size={16} color="#E8002D" />
             </div>
             <div>
               <p
                 style={{
-                  fontFamily: "Syne, sans-serif",
+                  fontFamily: "Rajdhani, sans-serif",
                   fontWeight: 800,
                   fontSize: 14,
-                  color: "#3B9EFF",
+                  color: "#E8002D",
                   margin: 0,
                 }}
               >
@@ -165,7 +165,7 @@ export default function WeekChangeBanner({
               </p>
               <p
                 style={{
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 11,
                   color: T.textMuted,
                   margin: "2px 0 0",
@@ -202,7 +202,7 @@ export default function WeekChangeBanner({
           <div style={{ marginBottom: otherThisWeek.length > 0 ? 10 : 0 }}>
             <p
               style={{
-                fontFamily: "DM Mono, monospace",
+                fontFamily: "Orbitron, monospace",
                 fontSize: 10,
                 color: T.textMuted,
                 textTransform: "uppercase",
@@ -241,7 +241,7 @@ export default function WeekChangeBanner({
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p
                         style={{
-                          fontFamily: "Syne, sans-serif",
+                          fontFamily: "Rajdhani, sans-serif",
                           fontWeight: 700,
                           fontSize: 12,
                           color: "var(--text-primary)",
@@ -255,7 +255,7 @@ export default function WeekChangeBanner({
                       </p>
                       <p
                         style={{
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                           fontSize: 10,
                           color: T.textMuted,
                           margin: "1px 0 0",
@@ -288,7 +288,7 @@ export default function WeekChangeBanner({
           <div>
             <p
               style={{
-                fontFamily: "DM Mono, monospace",
+                fontFamily: "Orbitron, monospace",
                 fontSize: 10,
                 color: T.textMuted,
                 textTransform: "uppercase",
@@ -327,7 +327,7 @@ export default function WeekChangeBanner({
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p
                         style={{
-                          fontFamily: "Syne, sans-serif",
+                          fontFamily: "Rajdhani, sans-serif",
                           fontWeight: 600,
                           fontSize: 12,
                           color: T.text,
@@ -341,7 +341,7 @@ export default function WeekChangeBanner({
                       </p>
                       <p
                         style={{
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                           fontSize: 10,
                           color: T.textMuted,
                           margin: "1px 0 0",

@@ -197,7 +197,7 @@ export default function TrackMap({
             ${pin.trackName}${pin.configName ? ` · ${pin.configName}` : ""}
             ${pin.isActiveThisWeek ? " 🟢" : ""}
           </div>
-          <div style="font-size: 11px; color: #94A3B8; margin-top: 2px;">
+          <div style="font-size: 11px; color: #999AAA; margin-top: 2px;">
             ${pin.series.length} series · ${pin.country}
           </div>
         `,
@@ -224,9 +224,9 @@ export default function TrackMap({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: isDark ? "#070D19" : "#F1F5F9",
+          background: isDark ? "#0D0D12" : "#F5F5F7",
           borderRadius: 16,
-          color: "#64748B",
+          color: "#666677",
         }}
       >
         Loading map...
@@ -238,11 +238,11 @@ export default function TrackMap({
       {/* CSS for Leaflet */}
       <style>{`
         @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
-        .leaflet-container { background: ${isDark ? "#060C18" : "#F1F5F9"}; border-radius: 16px; }
-        .leaflet-tooltip { background: ${isDark ? "#0A1221" : "#FFFFFF"} !important; border: 1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} !important; color: ${isDark ? "#E2E8F0" : "#1E293B"} !important; border-radius: 8px !important; padding: 6px 10px !important; }
+        .leaflet-container { background: ${isDark ? "#080808" : "#F5F5F7"}; border-radius: 16px; }
+        .leaflet-tooltip { background: ${isDark ? "#111118" : "#FFFFFF"} !important; border: 1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} !important; color: ${isDark ? "#E2E8F0" : "#222230"} !important; border-radius: 8px !important; padding: 6px 10px !important; }
         .leaflet-tooltip-top:before { border-top-color: ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} !important; }
-        .leaflet-control-attribution { background: ${isDark ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.8)"} !important; color: ${isDark ? "#475569" : "#94A3B8"} !important; font-size: 9px !important; }
-        .leaflet-control-attribution a { color: ${isDark ? "#3B9EFF" : "#2563EB"} !important; }
+        .leaflet-control-attribution { background: ${isDark ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.8)"} !important; color: ${isDark ? "#555566" : "#999AAA"} !important; font-size: 9px !important; }
+        .leaflet-control-attribution a { color: ${isDark ? "#E8002D" : "#CC0020"} !important; }
       `}</style>
 
       {/* Category filters + stats */}
@@ -259,14 +259,12 @@ export default function TrackMap({
           style={{
             padding: "4px 12px",
             borderRadius: 20,
-            border: `1px solid ${!categoryFilter ? "rgba(59,158,255,0.5)" : isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
-            background: !categoryFilter
-              ? "rgba(59,158,255,0.12)"
-              : "transparent",
-            color: !categoryFilter ? "#3B9EFF" : "#64748B",
+            border: `1px solid ${!categoryFilter ? "rgba(232,0,45,0.15)" : isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
+            background: !categoryFilter ? "rgba(232,0,45,0.15)" : "transparent",
+            color: !categoryFilter ? "#E8002D" : "#666677",
             fontSize: 12,
             fontWeight: 600,
-            fontFamily: "Syne, sans-serif",
+            fontFamily: "Rajdhani, sans-serif",
             cursor: "pointer",
           }}
         >
@@ -288,10 +286,10 @@ export default function TrackMap({
                 borderRadius: 20,
                 border: `1px solid ${active ? color + "60" : isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
                 background: active ? color + "18" : "transparent",
-                color: active ? color : "#64748B",
+                color: active ? color : "#666677",
                 fontSize: 12,
                 fontWeight: 600,
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 cursor: "pointer",
               }}
             >
@@ -323,8 +321,8 @@ export default function TrackMap({
               alignItems: "center",
               gap: 5,
               fontSize: 11,
-              color: "#64748B",
-              fontFamily: "DM Mono, monospace",
+              color: "#666677",
+              fontFamily: "Orbitron, monospace",
             }}
           >
             <span
@@ -346,8 +344,8 @@ export default function TrackMap({
                 alignItems: "center",
                 gap: 5,
                 fontSize: 11,
-                color: "#64748B",
-                fontFamily: "DM Mono, monospace",
+                color: "#666677",
+                fontFamily: "Orbitron, monospace",
               }}
             >
               <span
@@ -373,7 +371,7 @@ export default function TrackMap({
           style={{
             height: 520,
             borderRadius: 16,
-            border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+            border: `1px solid ${isDark ? "#1E1E2A" : "#E0E0E8"}`,
             overflow: "hidden",
           }}
         />
@@ -387,7 +385,7 @@ export default function TrackMap({
               right: 12,
               zIndex: 1000,
               width: 300,
-              background: isDark ? "#0A1221" : "#FFFFFF",
+              background: isDark ? "#111118" : "#FFFFFF",
               border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)"}`,
               borderRadius: 14,
               overflow: "hidden",
@@ -400,10 +398,8 @@ export default function TrackMap({
             <div
               style={{
                 padding: "14px 16px 12px",
-                background: isDark
-                  ? "rgba(255,255,255,0.03)"
-                  : "rgba(0,0,0,0.02)",
-                borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                background: isDark ? "#0F0F14" : "rgba(0,0,0,0.02)",
+                borderBottom: `1px solid ${isDark ? "#1E1E2A" : "#E0E0E8"}`,
               }}
             >
               <div
@@ -417,7 +413,7 @@ export default function TrackMap({
                 <div>
                   <p
                     style={{
-                      fontFamily: "Syne, sans-serif",
+                      fontFamily: "Rajdhani, sans-serif",
                       fontWeight: 800,
                       fontSize: 14,
                       color: isDark ? "white" : "#0F172A",
@@ -440,9 +436,9 @@ export default function TrackMap({
                   </p>
                   <p
                     style={{
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       fontSize: 10,
-                      color: "#64748B",
+                      color: "#666677",
                       margin: 0,
                     }}
                   >
@@ -456,7 +452,7 @@ export default function TrackMap({
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    color: "#64748B",
+                    color: "#666677",
                     padding: 0,
                     fontSize: 16,
                     lineHeight: 1,
@@ -482,7 +478,7 @@ export default function TrackMap({
                       borderRadius: 20,
                       fontSize: 10,
                       fontWeight: 700,
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       background: (CATEGORY_COLORS[cat] ?? "#3B9EFF") + "18",
                       color: CATEGORY_COLORS[cat] ?? "#3B9EFF",
                     }}
@@ -523,7 +519,7 @@ export default function TrackMap({
                     }}
                     onMouseEnter={(e) =>
                       ((e.currentTarget as HTMLElement).style.background =
-                        isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)")
+                        isDark ? "#111118" : "rgba(0,0,0,0.03)")
                     }
                     onMouseLeave={(e) =>
                       ((e.currentTarget as HTMLElement).style.background =
@@ -544,7 +540,7 @@ export default function TrackMap({
                         fontFamily: "DM Sans, sans-serif",
                         fontSize: 12,
                         fontWeight: 500,
-                        color: isDark ? "rgba(255,255,255,0.8)" : "#1E293B",
+                        color: isDark ? "rgba(255,255,255,0.8)" : "#222230",
                         flex: 1,
                         whiteSpace: "nowrap",
                         overflow: "hidden",
@@ -564,7 +560,7 @@ export default function TrackMap({
                           borderRadius: 4,
                           padding: "1px 5px",
                           flexShrink: 0,
-                          fontFamily: "DM Mono, monospace",
+                          fontFamily: "Orbitron, monospace",
                         }}
                       >
                         NOW
@@ -574,8 +570,8 @@ export default function TrackMap({
                       <span
                         style={{
                           fontSize: 9,
-                          color: "#64748B",
-                          fontFamily: "DM Mono, monospace",
+                          color: "#666677",
+                          fontFamily: "Orbitron, monospace",
                           flexShrink: 0,
                         }}
                       >

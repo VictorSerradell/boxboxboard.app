@@ -1,5 +1,6 @@
 "use client";
 // /app/components/ScheduleView.tsx
+
 import { useState } from "react";
 import {
   CalendarClock,
@@ -34,7 +35,7 @@ const LICENSE_CONFIG = {
   1: { label: "D", color: "#F97316" },
   2: { label: "C", color: "#EAB308" },
   3: { label: "B", color: "#22C55E" },
-  4: { label: "A", color: "#3B9EFF" },
+  4: { label: "A", color: "#E8002D" },
   5: { label: "PRO", color: "#A855F7" },
 } as const;
 
@@ -66,20 +67,20 @@ export default function ScheduleView({
   const [exported, setExported] = useState(false);
 
   const T = {
-    border: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
-    cardBg: isDark ? "#070D19" : "#FFFFFF",
-    cardBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.09)",
-    rowBg: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-    rowBorder: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)",
-    text: isDark ? "rgba(255,255,255,0.88)" : "#1E293B",
-    textMuted: isDark ? "#64748B" : "#94A3B8",
-    textFaint: isDark ? "#334155" : "#CBD5E1",
-    weekHdrBg: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
-    weekHdrBorder: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
-    emptyBg: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-    emptyBorder: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
-    removeBtn: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)",
-    removeBtnBorder: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.09)",
+    border: isDark ? "#1A1A26" : "#E0E0E8",
+    cardBg: isDark ? "#0D0D12" : "#FFFFFF",
+    cardBorder: isDark ? "#1E1E2A" : "#E0E0E8",
+    rowBg: isDark ? "#0F0F14" : "rgba(0,0,0,0.02)",
+    rowBorder: isDark ? "#141418" : "rgba(0,0,0,0.06)",
+    text: isDark ? "rgba(255,255,255,0.88)" : "#222230",
+    textMuted: isDark ? "#666677" : "#999AAA",
+    textFaint: isDark ? "#444455" : "#CCCCDD",
+    weekHdrBg: isDark ? "#111118" : "rgba(0,0,0,0.04)",
+    weekHdrBorder: isDark ? "#1A1A26" : "#E0E0E8",
+    emptyBg: isDark ? "#0F0F14" : "rgba(0,0,0,0.02)",
+    emptyBorder: isDark ? "#1A1A26" : "#E0E0E8",
+    removeBtn: isDark ? "#1A1A26" : "rgba(0,0,0,0.05)",
+    removeBtnBorder: isDark ? "rgba(255,255,255,0.12)" : "#E0E0E8",
     flagColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
   };
 
@@ -116,7 +117,7 @@ export default function ScheduleView({
         </div>
         <p
           style={{
-            fontFamily: "Syne, sans-serif",
+            fontFamily: "Rajdhani, sans-serif",
             fontSize: 20,
             fontWeight: 800,
             color: T.textMuted,
@@ -184,10 +185,10 @@ export default function ScheduleView({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <CalendarClock size={18} color="#3B9EFF" />
+          <CalendarClock size={18} color="#E8002D" />
           <span
             style={{
-              fontFamily: "Syne, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
               fontWeight: 800,
               fontSize: 18,
               color: "var(--text-primary)",
@@ -198,7 +199,7 @@ export default function ScheduleView({
         </div>
         <span
           style={{
-            fontFamily: "DM Mono, monospace",
+            fontFamily: "Orbitron, monospace",
             fontSize: 12,
             color: T.textMuted,
           }}
@@ -223,7 +224,7 @@ export default function ScheduleView({
                   borderRadius: 20,
                   background: accent + "15",
                   border: `1px solid ${accent}35`,
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 10,
                   fontWeight: 700,
                   color: accent,
@@ -270,7 +271,7 @@ export default function ScheduleView({
               border: `1px solid ${exported ? "rgba(34,197,94,0.4)" : T.cardBorder}`,
               background: exported ? "rgba(34,197,94,0.1)" : T.cardBg,
               color: exported ? "#22C55E" : T.textMuted,
-              fontFamily: "Syne, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
               fontWeight: 600,
               fontSize: 13,
               transition: "all 0.2s",
@@ -293,7 +294,7 @@ export default function ScheduleView({
                 border: "1px solid rgba(66,133,244,0.4)",
                 background: "rgba(66,133,244,0.08)",
                 color: "#4285F4",
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 fontWeight: 600,
                 fontSize: 13,
                 textDecoration: "none",
@@ -338,7 +339,7 @@ export default function ScheduleView({
               )}
               <span
                 style={{
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 12,
                   fontWeight: 700,
                   color: week.isActive ? "#22C55E" : T.textMuted,
@@ -349,7 +350,7 @@ export default function ScheduleView({
               {week.isActive && (
                 <span
                   style={{
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     fontSize: 10,
                     fontWeight: 700,
                     color: "#22C55E",
@@ -365,7 +366,7 @@ export default function ScheduleView({
               {week.isPast && (
                 <span
                   style={{
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     fontSize: 10,
                     color: T.textFaint,
                   }}
@@ -375,7 +376,7 @@ export default function ScheduleView({
               )}
               <span
                 style={{
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 11,
                   color: T.textFaint,
                   marginLeft: "auto",
@@ -458,7 +459,7 @@ export default function ScheduleView({
                         />
                         <span
                           style={{
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             fontSize: 9,
                             fontWeight: 700,
                             color: accent,
@@ -471,7 +472,7 @@ export default function ScheduleView({
                       </div>
                       <p
                         style={{
-                          fontFamily: "Syne, sans-serif",
+                          fontFamily: "Rajdhani, sans-serif",
                           fontWeight: 800,
                           fontSize: 14,
                           color: "var(--text-primary)",
@@ -548,7 +549,7 @@ export default function ScheduleView({
                             borderRadius: 20,
                             fontSize: 11,
                             fontWeight: 700,
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             background: lic.color + "22",
                             border: `1px solid ${lic.color}40`,
                             color: lic.color,
@@ -565,7 +566,7 @@ export default function ScheduleView({
                             borderRadius: 20,
                             fontSize: 11,
                             fontWeight: 700,
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             background: T.rowBg,
                             border: `1px solid ${T.rowBorder}`,
                             color: T.textMuted,
@@ -582,7 +583,7 @@ export default function ScheduleView({
                             borderRadius: 20,
                             fontSize: 11,
                             fontWeight: 700,
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             background: T.rowBg,
                             border: `1px solid ${T.rowBorder}`,
                             color: T.textMuted,
@@ -600,7 +601,7 @@ export default function ScheduleView({
                               borderRadius: 20,
                               fontSize: 11,
                               fontWeight: 700,
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               background: "rgba(234,179,8,0.12)",
                               border: "1px solid rgba(234,179,8,0.3)",
                               color: "#EAB308",

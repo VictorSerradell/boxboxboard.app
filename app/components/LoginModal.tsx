@@ -19,12 +19,12 @@ export default function LoginModal({ onClose }: LoginModalProps) {
   }
 
   const bg = isDark ? "#0D1117" : "#FFFFFF";
-  const border = isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)";
+  const border = isDark ? "rgba(255,255,255,0.10)" : "#E0E0E8";
   const itemBg = isDark ? "#111520" : "#F8FAFC";
-  const itemBorder = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)";
-  const text = isDark ? "rgba(255,255,255,0.85)" : "#1E293B";
-  const muted = isDark ? "#64748B" : "#94A3B8";
-  const faint = isDark ? "#334155" : "#CBD5E1";
+  const itemBorder = isDark ? "#161620" : "#E0E0E8";
+  const text = isDark ? "rgba(255,255,255,0.85)" : "#222230";
+  const muted = isDark ? "#666677" : "#999AAA";
+  const faint = isDark ? "#444455" : "#CCCCDD";
 
   return (
     <div
@@ -90,8 +90,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
               width: 64,
               height: 64,
               borderRadius: 18,
-              background:
-                "linear-gradient(135deg, rgba(34,211,238,0.15), rgba(168,85,247,0.15))",
+              background: "rgba(232,0,45,0.08)",
               border: `1px solid ${border}`,
               display: "flex",
               alignItems: "center",
@@ -105,7 +104,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         {/* Title */}
         <h2
           style={{
-            fontFamily: "Syne, sans-serif",
+            fontFamily: "Rajdhani, sans-serif",
             fontWeight: 900,
             fontSize: 20,
             color: "var(--text-primary)",
@@ -185,14 +184,14 @@ export default function LoginModal({ onClose }: LoginModalProps) {
           style={{
             width: "100%",
             padding: "13px",
-            background: "linear-gradient(135deg, #06B6D4, #22D3EE)",
+            background: "#E8002D",
             border: "none",
             borderRadius: 12,
             cursor: "pointer",
-            fontFamily: "Syne, sans-serif",
+            fontFamily: "Rajdhani, sans-serif",
             fontWeight: 900,
             fontSize: 14,
-            color: "#0A1221",
+            color: "#111118",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

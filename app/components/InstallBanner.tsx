@@ -54,7 +54,7 @@ export default function InstallBanner() {
         zIndex: 1500,
         width: "min(380px, calc(100vw - 32px))",
         background: isDark ? "#0A1628" : "#FFFFFF",
-        border: `1px solid rgba(59,158,255,0.35)`,
+        border: `1px solid rgba(232,0,45,0.1)`,
         borderRadius: 14,
         boxShadow: isDark
           ? "0 8px 32px rgba(0,0,0,0.5)"
@@ -66,7 +66,7 @@ export default function InstallBanner() {
       <div
         style={{
           height: 3,
-          background: "linear-gradient(90deg, #3B9EFF, #A855F7)",
+          background: "linear-gradient(90deg, #E8002D, #FF4060)",
         }}
       />
       <div
@@ -100,7 +100,7 @@ export default function InstallBanner() {
             style={{
               fontFamily: "DM Sans, sans-serif",
               fontSize: 12,
-              color: isDark ? "#64748B" : "#94A3B8",
+              color: isDark ? "#666677" : "#999AAA",
               margin: "2px 0 0",
             }}
           >
@@ -119,7 +119,7 @@ export default function InstallBanner() {
               borderRadius: 8,
               border: "none",
               cursor: "pointer",
-              background: "linear-gradient(135deg, #3B9EFF, #2563EB)",
+              background: "#E8002D",
               color: "white",
               fontFamily: "Syne, sans-serif",
               fontWeight: 700,
@@ -135,14 +135,12 @@ export default function InstallBanner() {
               height: 30,
               borderRadius: 8,
               border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
-              background: isDark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(0,0,0,0.04)",
+              background: isDark ? "#141418" : "rgba(0,0,0,0.04)",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: isDark ? "#475569" : "#94A3B8",
+              color: isDark ? "#555566" : "#999AAA",
             }}
           >
             <X size={13} />

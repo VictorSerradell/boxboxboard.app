@@ -96,19 +96,19 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
   const licColor =
     LICENSE_COLORS[primary?.license ?? "D"] ??
     LICENSE_COLORS[(primary?.license ?? "").replace("Class ", "")] ??
-    "#64748B";
+    "#666677";
 
   const T = {
-    bg: isDark ? "#0A1221" : "#FFFFFF",
-    border: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)",
+    bg: isDark ? "#111118" : "#FFFFFF",
+    border: isDark ? "rgba(255,255,255,0.10)" : "#E0E0E8",
     shadow: isDark
       ? "0 8px 32px rgba(0,0,0,0.6)"
       : "0 8px 28px rgba(0,0,0,0.12)",
-    rowBg: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
-    rowBorder: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
-    text: isDark ? "rgba(255,255,255,0.85)" : "#1E293B",
-    textMuted: isDark ? "#475569" : "#94A3B8",
-    divider: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
+    rowBg: isDark ? "#111118" : "rgba(0,0,0,0.03)",
+    rowBorder: isDark ? "#1A1A26" : "#E0E0E8",
+    text: isDark ? "rgba(255,255,255,0.85)" : "#222230",
+    textMuted: isDark ? "#555566" : "#999AAA",
+    divider: isDark ? "#1A1A26" : "#E0E0E8",
     logoutBg: isDark ? "rgba(239,68,68,0.1)" : "rgba(239,68,68,0.08)",
     logoutBorder: isDark ? "rgba(239,68,68,0.25)" : "rgba(239,68,68,0.2)",
   };
@@ -149,7 +149,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
             borderRadius: 6,
             background: licColor + "25",
             border: `1px solid ${licColor}50`,
-            fontFamily: "DM Mono, monospace",
+            fontFamily: "Orbitron, monospace",
             fontSize: 10,
             fontWeight: 800,
             color: licColor,
@@ -163,7 +163,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
         {/* Name */}
         <span
           style={{
-            fontFamily: "Syne, sans-serif",
+            fontFamily: "Rajdhani, sans-serif",
             fontWeight: 700,
             fontSize: 13,
             color: "#22C55E",
@@ -175,7 +175,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
         {/* Primary iRating */}
         <span
           style={{
-            fontFamily: "DM Mono, monospace",
+            fontFamily: "Orbitron, monospace",
             fontSize: 12,
             fontWeight: 600,
             color: "#3B9EFF",
@@ -186,7 +186,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
 
         <ChevronDown
           size={13}
-          color="#475569"
+          color="#555566"
           style={{
             transform: open ? "rotate(180deg)" : "rotate(0)",
             transition: "transform 0.2s",
@@ -215,9 +215,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
             style={{
               padding: "14px 16px 12px",
               borderBottom: `1px solid ${T.divider}`,
-              background: isDark
-                ? "rgba(255,255,255,0.03)"
-                : "rgba(0,0,0,0.02)",
+              background: isDark ? "#0F0F14" : "rgba(0,0,0,0.02)",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -238,7 +236,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
               <div>
                 <p
                   style={{
-                    fontFamily: "Syne, sans-serif",
+                    fontFamily: "Rajdhani, sans-serif",
                     fontWeight: 800,
                     fontSize: 15,
                     color: "var(--text-primary)",
@@ -250,7 +248,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
                 {memberSince && (
                   <p
                     style={{
-                      fontFamily: "DM Mono, monospace",
+                      fontFamily: "Orbitron, monospace",
                       fontSize: 10,
                       color: T.textMuted,
                       margin: "2px 0 0",
@@ -275,7 +273,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
           <div style={{ padding: "10px 12px" }}>
             <p
               style={{
-                fontFamily: "DM Mono, monospace",
+                fontFamily: "Orbitron, monospace",
                 fontSize: 9,
                 color: T.textMuted,
                 textTransform: "uppercase",
@@ -292,7 +290,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
                 const lc =
                   LICENSE_COLORS[s.license] ??
                   LICENSE_COLORS[s.license?.replace("Class ", "")] ??
-                  "#64748B";
+                  "#666677";
                 return (
                   <div
                     key={key}
@@ -317,7 +315,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
                         borderRadius: 6,
                         background: lc + "20",
                         border: `1px solid ${lc}40`,
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         fontSize: 10,
                         fontWeight: 800,
                         color: lc,
@@ -331,7 +329,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
                     {/* Category */}
                     <span
                       style={{
-                        fontFamily: "Syne, sans-serif",
+                        fontFamily: "Rajdhani, sans-serif",
                         fontWeight: 600,
                         fontSize: 12,
                         color: T.text,
@@ -352,7 +350,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
                         <TrendingUp size={10} color="#3B9EFF" />
                         <span
                           style={{
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             fontSize: 12,
                             fontWeight: 700,
                             color: "#3B9EFF",
@@ -372,7 +370,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
                         <Shield size={10} color={SR_COLOR(s.sr)} />
                         <span
                           style={{
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             fontSize: 11,
                             fontWeight: 600,
                             color: SR_COLOR(s.sr),
@@ -383,7 +381,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
                         {s.starts > 0 && (
                           <span
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontSize: 10,
                               color: T.textMuted,
                               marginLeft: 4,
@@ -410,7 +408,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
             {!licenses?.length && !(user as any).cust_id && (
               <p
                 style={{
-                  fontFamily: "DM Mono, monospace",
+                  fontFamily: "Orbitron, monospace",
                   fontSize: 10,
                   color: T.textMuted,
                   margin: "0 0 8px 2px",
@@ -432,7 +430,7 @@ export default function DriverStats({ user, memberSince, onLogout }: Props) {
                 border: `1px solid ${T.logoutBorder}`,
                 background: T.logoutBg,
                 cursor: "pointer",
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Rajdhani, sans-serif",
                 fontWeight: 700,
                 fontSize: 13,
                 color: "#EF4444",

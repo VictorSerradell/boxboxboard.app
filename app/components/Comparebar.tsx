@@ -22,7 +22,7 @@ const LICENSE_CONFIG = {
   1: { label: "D", color: "#F97316" },
   2: { label: "C", color: "#EAB308" },
   3: { label: "B", color: "#22C55E" },
-  4: { label: "A", color: "#3B9EFF" },
+  4: { label: "A", color: "#E8002D" },
   5: { label: "PRO", color: "#A855F7" },
 } as const;
 
@@ -41,22 +41,20 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
   if (series.length === 0) return null;
 
   const T = {
-    bg: isDark ? "#0A1221" : "#FFFFFF",
-    border: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)",
-    headerBg: isDark ? "#070D19" : "#F8FAFC",
-    colBg: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-    colBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
-    rowBg: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
-    rowBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)",
-    text: isDark ? "rgba(255,255,255,0.85)" : "#1E293B",
-    textMuted: isDark ? "#475569" : "#94A3B8",
-    textFaint: isDark ? "#334155" : "#CBD5E1",
+    bg: isDark ? "#111118" : "#FFFFFF",
+    border: isDark ? "rgba(255,255,255,0.10)" : "#E0E0E8",
+    headerBg: isDark ? "#0D0D12" : "#F8FAFC",
+    colBg: isDark ? "#0F0F14" : "rgba(0,0,0,0.02)",
+    colBorder: isDark ? "#161620" : "rgba(0,0,0,0.07)",
+    rowBg: isDark ? "#111118" : "rgba(0,0,0,0.03)",
+    rowBorder: isDark ? "#161620" : "rgba(0,0,0,0.07)",
+    text: isDark ? "rgba(255,255,255,0.85)" : "#222230",
+    textMuted: isDark ? "#555566" : "#999AAA",
+    textFaint: isDark ? "#444455" : "#CCCCDD",
     flagColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.18)",
-    closeBtn: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)",
-    closeBtnBorder: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.10)",
-    shadow: isDark
-      ? "0 -8px 40px rgba(0,0,0,0.6)"
-      : "0 -8px 32px rgba(0,0,0,0.10)",
+    closeBtn: isDark ? "#1A1A26" : "rgba(0,0,0,0.06)",
+    closeBtnBorder: isDark ? "rgba(255,255,255,0.12)" : "#E0E0E8",
+    shadow: isDark ? "0 -8px 40px rgba(0,0,0,0.6)" : "0 -8px 32px #E0E0E8",
   };
 
   // Max weeks across all selected series — guard against empty array
@@ -74,7 +72,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
         right: 0,
         zIndex: 1300,
         background: T.bg,
-        borderTop: `2px solid ${series[0] ? (CATEGORY_ACCENT[series[0].category ?? ""] ?? "#3B9EFF") + "60" : "rgba(59,158,255,0.4)"}`,
+        borderTop: `2px solid ${series[0] ? (CATEGORY_ACCENT[series[0].category ?? ""] ?? "#3B9EFF") + "60" : "rgba(232,0,45,0.1)"}`,
         boxShadow: T.shadow,
         transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
       }}
@@ -93,13 +91,13 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
         onClick={() => setExpanded(!expanded)}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <GitCompare size={15} color="#3B9EFF" />
+          <GitCompare size={15} color="#E8002D" />
           <span
             style={{
-              fontFamily: "Syne, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
               fontWeight: 800,
               fontSize: 14,
-              color: "#3B9EFF",
+              color: "#E8002D",
             }}
           >
             {t.comparing} {series.length}{" "}
@@ -119,7 +117,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                     borderRadius: 20,
                     background: accent + "18",
                     border: `1px solid ${accent}35`,
-                    fontFamily: "DM Mono, monospace",
+                    fontFamily: "Orbitron, monospace",
                     fontSize: 10,
                     fontWeight: 700,
                     color: accent,
@@ -166,7 +164,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
               border: `1px solid ${T.closeBtnBorder}`,
               color: T.textMuted,
               fontSize: 12,
-              fontFamily: "Syne, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
               fontWeight: 600,
             }}
           >
@@ -241,7 +239,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                     />
                     <span
                       style={{
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         fontSize: 9,
                         fontWeight: 700,
                         color: accent,
@@ -254,7 +252,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                   </div>
                   <p
                     style={{
-                      fontFamily: "Syne, sans-serif",
+                      fontFamily: "Rajdhani, sans-serif",
                       fontWeight: 800,
                       fontSize: 13,
                       color: T.text,
@@ -271,7 +269,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                         borderRadius: 20,
                         fontSize: 11,
                         fontWeight: 700,
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         background: lic.color + "22",
                         border: `1px solid ${lic.color}40`,
                         color: lic.color,
@@ -285,12 +283,12 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                         borderRadius: 20,
                         fontSize: 11,
                         fontWeight: 700,
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         background: s.fixed_setup
-                          ? "rgba(59,158,255,0.12)"
+                          ? "rgba(232,0,45,0.1)"
                           : "rgba(34,197,94,0.12)",
-                        border: `1px solid ${s.fixed_setup ? "rgba(59,158,255,0.3)" : "rgba(34,197,94,0.3)"}`,
-                        color: s.fixed_setup ? "#3B9EFF" : "#22C55E",
+                        border: `1px solid ${s.fixed_setup ? "rgba(232,0,45,0.1)" : "rgba(34,197,94,0.3)"}`,
+                        color: s.fixed_setup ? "#E8002D" : "#22C55E",
                       }}
                     >
                       {s.fixed_setup ? t.fixed : t.open}
@@ -301,7 +299,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                         borderRadius: 20,
                         fontSize: 11,
                         fontWeight: 700,
-                        fontFamily: "DM Mono, monospace",
+                        fontFamily: "Orbitron, monospace",
                         background: T.rowBg,
                         border: `1px solid ${T.rowBorder}`,
                         color: T.textMuted,
@@ -340,7 +338,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                       >
                         <span
                           style={{
-                            fontFamily: "DM Mono, monospace",
+                            fontFamily: "Orbitron, monospace",
                             fontSize: 10,
                             fontWeight: 700,
                             color: isActive ? accent : T.textMuted,
@@ -400,7 +398,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                         {isActive && (
                           <span
                             style={{
-                              fontFamily: "DM Mono, monospace",
+                              fontFamily: "Orbitron, monospace",
                               fontSize: 8,
                               fontWeight: 700,
                               color: "#22C55E",

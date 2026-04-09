@@ -170,6 +170,37 @@ export async function getSeriesSeasons(
           guideLookup[s.season_id]?.[w.race_week_num] ?? w.start_date ?? "",
       }));
 
+      // Normalize race_time_descriptors — iRacing API uses many different field names
+      const rawRtd = s.race_time_descriptors ?? s.time_trial_lowest_rank ?? [];
+      const race_time_descriptors = Array.isArray(rawRtd)
+        ? rawRtd.map((r: any) => {
+            // iRacing real API uses: race_time_limit, session_minutes, time_limit_minutes, repeating_units
+            const mins =
+              r.session_minutes ??
+              r.race_time_limit_minutes ??
+              r.race_time_limit ??
+              r.time_limit_minutes ??
+              r.time_limit ??
+              (r.repeating_units === "minutes" ? r.repeating_value : 0) ??
+              0;
+            return {
+              repeating: r.repeating ?? false,
+              session_minutes: Number(mins) || 0,
+              start_time: r.start_time ?? "",
+              day_offset: r.day_offset ?? r.day_offset_list ?? [],
+            };
+          })
+        : [];
+      const sessionMins = race_time_descriptors[0]?.session_minutes ?? 0;
+      console.log(
+        "[series] rtd sample:",
+        s.series_name,
+        "→",
+        sessionMins,
+        "min",
+        rawRtd?.[0],
+      );
+
       return {
         season_id: s.season_id,
         season_name: s.season_name ?? "",
@@ -187,15 +218,14 @@ export async function getSeriesSeasons(
         allowed_licenses: s.allowed_licenses ?? [],
         multiclass: (s.car_class_ids?.length ?? 0) > 1,
         schedules,
-        race_time_descriptors:
-          s.race_time_descriptors ?? s.time_trial_lowest_rank ?? [],
+        race_time_descriptors,
         // Computed UI fields
         category: mapCategory(
           s.license_group,
           s.category,
           s.series_name,
           s.driver_changes,
-          s.race_time_descriptors?.[0]?.session_minutes,
+          sessionMins,
         ),
         minLicenseLevel: mapLicenseLevel(s.allowed_licenses, s.license_group),
         status: mapStatus(s.fixed_setup, s.official),
@@ -320,7 +350,7 @@ function mapCategory(
   const name = (seriesName ?? "").toLowerCase();
   const mins = sessionMinutes ?? 0;
 
-  // Endurance: explicit name keywords OR driver_changes + long race (≥2h)
+  // Endurance first
   if (
     name.includes("endurance") ||
     name.includes("endur") ||
@@ -329,7 +359,7 @@ function mapCategory(
     name.includes("12h") ||
     name.includes("6h ") ||
     name.includes("ires") ||
-    name.includes("imsa") || // IMSA races are endurance-style
+    name.includes("imsa") ||
     name.includes("le mans") ||
     name.includes("daytona 24") ||
     name.includes("sebring") ||
@@ -337,14 +367,39 @@ function mapCategory(
   )
     return "Endurance";
 
+  // Formula detection from name (iRacing returns category:'road' for formula series)
+  if (
+    name.includes("formula") ||
+    name.includes(" f1 ") ||
+    name.includes(" f1-") ||
+    name.includes("dallara") ||
+    name.includes("indycar") ||
+    name.includes("indy car") ||
+    name.includes("super formula") ||
+    name.includes("f3") ||
+    name.includes("f4") ||
+    name.includes("ff1600") ||
+    name.includes("lotus 79") ||
+    name.includes("ir-04") ||
+    name.includes("ir04") ||
+    name.includes("radical") ||
+    name.includes("skip barber") ||
+    name.includes("pro mazda") ||
+    name.includes("star mazda")
+  )
+    return "Formula Car";
+
   if (rawCategory) {
     const c = rawCategory.toLowerCase();
+    // iRacing uses 'formula_car' as category value
     if (c.includes("formula")) return "Formula Car";
     if (c.includes("oval") && c.includes("dirt")) return "Dirt Oval";
     if (c.includes("dirt")) return "Dirt Road";
     if (c.includes("oval")) return "Oval";
     if (c.includes("road") || c.includes("sports")) return "Sports Car";
   }
+
+  // license_group fallback (iRacing: 1=Oval, 2=Road, 3=DirtOval, 4=DirtRoad, 5=Road/SportsCar)
   const map: Record<number, CarCategory> = {
     1: "Oval",
     2: "Sports Car",

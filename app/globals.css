@@ -62,7 +62,10 @@
 }
 
 /* ── Base ────────────────────────────────────────────────── */
-html { color-scheme: dark; }
+html {
+  color-scheme: dark;
+  height: 100%;
+}
 [data-theme="light"] { color-scheme: light; }
 
 body {
@@ -71,6 +74,7 @@ body {
   transition: background 0.25s ease, color 0.25s ease;
   margin: 0;
   font-family: 'Rajdhani', system-ui, sans-serif;
+  min-height: 100%;
 }
 
 /* ── Carbon fiber texture — dark mode only ───────────────── */
@@ -92,6 +96,7 @@ body {
       transparent 50%
     );
   background-size: 6px 6px;
+  background-attachment: fixed;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────── */

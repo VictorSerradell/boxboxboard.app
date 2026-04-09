@@ -19,7 +19,7 @@ import DriverProfile from '../components/DriverProfile';
 import { useBreakpoint } from '../lib/useBreakpoint';
 import { useT } from '../lib/i18n';
 import type { SeriesSeason, FilterState, SeasonInfo, AppUser } from '../types/iracing';
-import { getSeasonList, getSeriesSeasons, getFavoriteSeriesIds, getMemberInfo } from '../lib/iracing-client';
+import { getSeasonList, getSeriesSeasons, getFavoriteSeriesIds, getMemberInfo, getSeriesAssets } from '../lib/iracing-client';
 import { useTheme } from '../lib/theme';
 import CompareBar from '../components/Comparebar';
 
@@ -67,11 +67,25 @@ export default function HomePage() {
   const [seasons, setSeasons]             = useState<SeasonInfo[]>([]);
   const [currentSeason, setCurrentSeason] = useState<SeasonInfo | null>(null);
   const [series, setSeries]               = useState<SeriesSeason[]>([]);
+  const [seriesAssets, setSeriesAssets]   = useState<Record<number, string>>({});
   const [loading, setLoading]             = useState(true);
   const [favorites, setFavorites]         = useState<number[]>([]);
   const [user, setUser]                   = useState<AppUser | null>(null);
   const [showLogin, setShowLogin]         = useState(false);
   const [selectedSeries, setSelectedSeries] = useState<SeriesSeason | null>(null);
+
+  // Lock body scroll when detail panel is open
+  useEffect(() => {
+    if (selectedSeries) {
+      const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${scrollbarW}px`;
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [selectedSeries]);
   const [comparingSeries, setComparingSeries] = useState<SeriesSeason[]>([]);
   const [scheduledIds, setScheduledIds] = useState<number[]>(() => {
     try { return JSON.parse(localStorage.getItem('boxboxboard_schedule') ?? '[]'); } catch { return []; }
@@ -245,7 +259,18 @@ export default function HomePage() {
     if (!currentSeason) return;
     setLoading(true);
     getSeriesSeasons(currentSeason.season_year, currentSeason.season_quarter)
-      .then(data => setSeries(data))
+      .then(data => {
+        setSeries(data);
+        // Fetch series logos in background
+        getSeriesAssets().then((assets: any) => {
+          const logoMap: Record<number, string> = {};
+          Object.entries(assets ?? {}).forEach(([id, a]: [string, any]) => {
+            const path = a?.logo_path ?? a?.series_logo ?? a?.small_image;
+            if (path) logoMap[Number(id)] = `https://images-static.iracing.com${path}`;
+          });
+          setSeriesAssets(logoMap);
+        }).catch(() => {});
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [currentSeason]);
@@ -567,6 +592,7 @@ export default function HomePage() {
               <SeriesCard
                 key={s.season_id}
                 series={s}
+                logoUrl={seriesAssets[s.series_id]}
                 isFavorite={favorites.includes(s.series_id)}
                 isComparing={comparingSeries.some(x => x.series_id === s.series_id)}
                 isScheduled={scheduledIds.includes(s.series_id)}

@@ -708,7 +708,7 @@ video {
   --bg-surface:     #161616;
   --bg-card:        #1C1C1C;
   --bg-card-solid:  #1C1C1C;
-  --bg-header:      rgba(15,15,15,0.97);
+  --bg-header:      rgba(12,12,12,0.94);
   --bg-footer:      rgba(0,0,0,0.4);
   --bg-input:       #232323;
 
@@ -760,7 +760,10 @@ video {
 }
 
 /* ── Base ────────────────────────────────────────────────── */
-html { color-scheme: dark; }
+html {
+  color-scheme: dark;
+  height: 100%;
+}
 [data-theme="light"] { color-scheme: light; }
 
 body {
@@ -769,6 +772,29 @@ body {
   transition: background 0.25s ease, color 0.25s ease;
   margin: 0;
   font-family: 'Rajdhani', system-ui, sans-serif;
+  min-height: 100%;
+}
+
+/* ── Carbon fiber texture — dark mode only ───────────────── */
+[data-theme="dark"] body {
+  background-color: #0F0F0F;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.018) 0px,
+      rgba(255,255,255,0.018) 1px,
+      transparent 0px,
+      transparent 50%
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255,255,255,0.018) 0px,
+      rgba(255,255,255,0.018) 1px,
+      transparent 0px,
+      transparent 50%
+    );
+  background-size: 6px 6px;
+  background-attachment: fixed;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────── */
@@ -786,7 +812,12 @@ body {
   --font-family-mono:    'Orbitron', monospace;
 }
 
-/* ── Input focus ─────────────────────────────────────────── */
+/* ── Card glass effect over carbon — dark mode ───────────── */
+[data-theme="dark"] .carbon-card {
+  background: rgba(28,28,28,0.92);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--accent) !important;

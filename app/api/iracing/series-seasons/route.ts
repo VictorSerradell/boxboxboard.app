@@ -57,6 +57,21 @@ export async function GET(request: NextRequest) {
       `[rtd] ${noRtd}/${series.length} series have empty race_time_descriptors`,
     );
 
+    // Debug: driver_changes series
+    const dcSeries = series.filter((s: any) => s.driver_changes === true);
+    console.log(
+      `[driver_changes] ${dcSeries.length} series with driver_changes=true:`,
+      dcSeries
+        .map((s: any) => s.series_name ?? s.season_name)
+        .slice(0, 10)
+        .join(", "),
+    );
+
+    // Debug: log sample series fields
+    if (series.length > 0) {
+      console.log("[series-fields] keys:", Object.keys(series[0]).join(", "));
+    }
+
     // Debug: log series that look like endurance by name
     const enduranceLike = series.filter((s: any) => {
       const n = (s.series_name ?? s.season_name ?? "").toLowerCase();

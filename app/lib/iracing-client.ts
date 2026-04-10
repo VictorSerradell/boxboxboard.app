@@ -106,11 +106,12 @@ export async function getSeriesSeasons(
     // Step 2: get race guide for exact week start dates
     let raceGuide: any[] = [];
     try {
-      const guideRaw = await apiFetch<any>("season/race_guide", {
+      const guideRaw = await apiFetch<any>("race-guide", {
         season_year: String(seasonYear),
         season_quarter: String(seasonQuarter),
       });
       raceGuide = guideRaw?.sessions ?? guideRaw ?? [];
+      console.log("[getSeriesSeasons] race guide entries:", raceGuide.length);
     } catch {
       // Race guide is optional — proceed without dates
     }
@@ -171,10 +172,9 @@ export async function getSeriesSeasons(
       }));
 
       // Normalize race_time_descriptors — iRacing API uses many different field names
-      const rawRtd = s.race_time_descriptors ?? s.time_trial_lowest_rank ?? [];
+      const rawRtd = s.race_time_descriptors ?? [];
       const race_time_descriptors = Array.isArray(rawRtd)
         ? rawRtd.map((r: any) => {
-            // iRacing real API uses: race_time_limit, session_minutes, time_limit_minutes, repeating_units
             const mins =
               r.session_minutes ??
               r.race_time_limit_minutes ??
@@ -191,15 +191,31 @@ export async function getSeriesSeasons(
             };
           })
         : [];
-      const sessionMins = race_time_descriptors[0]?.session_minutes ?? 0;
-      console.log(
-        "[series] rtd sample:",
-        s.series_name,
-        "→",
-        sessionMins,
-        "min",
-        rawRtd?.[0],
-      );
+
+      // If RTDs empty, try extracting duration from first schedule entry
+      let sessionMins = race_time_descriptors[0]?.session_minutes ?? 0;
+      if (sessionMins === 0 && s.schedules?.length > 0) {
+        const firstSchedule = s.schedules[0];
+        sessionMins =
+          firstSchedule.race_time_limit_minutes ??
+          firstSchedule.race_time_limit ??
+          firstSchedule.session_minutes ??
+          firstSchedule.time_limit_minutes ??
+          0;
+        if (sessionMins > 0) {
+          console.log(
+            `[duration] "${s.series_name}" from schedule:`,
+            sessionMins,
+            "min",
+          );
+        }
+      }
+
+      // Also log raw schedule keys once for debugging
+      if (s.schedules?.length > 0 && !s._logged) {
+        console.log("[schedule-keys]", Object.keys(s.schedules[0]).join(", "));
+        s._logged = true;
+      }
 
       return {
         season_id: s.season_id,
@@ -352,7 +368,7 @@ function mapCategory(
   const name = ((seriesName ?? "") + " " + (seasonName ?? "")).toLowerCase();
   const mins = sessionMinutes ?? 0;
 
-  // Endurance: name keywords OR driver_changes + long race
+  // Endurance: name keywords OR driver_changes (any series allowing driver swaps is endurance-style)
   if (
     name.includes("endurance") ||
     name.includes("endur") ||
@@ -365,7 +381,11 @@ function mapCategory(
     name.includes("le mans") ||
     name.includes("daytona 24") ||
     name.includes("sebring") ||
-    (driverChanges === true && mins >= 120)
+    name.includes("bathurst") ||
+    name.includes("spa 24") ||
+    name.includes("nurburgring 24") ||
+    driverChanges === true ||
+    (mins >= 60 && mins !== 0)
   )
     return "Endurance";
 

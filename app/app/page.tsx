@@ -387,16 +387,18 @@ export default function HomePage() {
           .then((assets: any) => {
             const logoMap: Record<number, string> = {};
             Object.entries(assets ?? {}).forEach(([id, a]: [string, any]) => {
-              // iRacing assets API returns: logo_path, series_logo, small_image, large_image
-              const path =
+              // iRacing returns: logo: "seriesid_32.png", large_image: null
+              const file =
+                a?.logo ??
                 a?.logo_path ??
                 a?.series_logo ??
                 a?.small_image ??
                 a?.large_image;
-              if (path) {
-                const url = path.startsWith("http")
-                  ? path
-                  : `https://images-static.iracing.com${path}`;
+              if (file) {
+                // Full URL or relative path
+                const url = file.startsWith("http")
+                  ? file
+                  : `https://images-static.iracing.com/img/series/${file}`;
                 logoMap[Number(id)] = url;
               }
             });

@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     });
     console.log(
       `[endurance] ${enduranceLike.length} endurance-like series by name:`,
-      enduranceLike.map((s: any) => s.series_name).join(", "),
+      enduranceLike.map((s: any) => s.series_name ?? s.season_name).join(", "),
     );
 
     return NextResponse.json(series, {

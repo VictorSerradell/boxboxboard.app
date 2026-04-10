@@ -52,11 +52,19 @@ export async function GET(request: NextRequest) {
     // Log first entry to see structure
     const firstKey = Object.keys(data)[0];
     if (firstKey) {
+      const sample = data[firstKey];
+      console.log("[series-assets] sample key:", firstKey);
       console.log(
-        "[series-assets] sample key:",
-        firstKey,
-        "value:",
-        JSON.stringify(data[firstKey]).slice(0, 200),
+        "[series-assets] sample fields:",
+        Object.keys(sample ?? {}).join(", "),
+      );
+      console.log(
+        "[series-assets] sample logo:",
+        sample?.logo,
+        "| logo_path:",
+        sample?.logo_path,
+        "| small_image:",
+        sample?.small_image,
       );
     }
     console.log("[series-assets] total entries:", Object.keys(data).length);

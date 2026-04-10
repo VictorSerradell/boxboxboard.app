@@ -171,50 +171,62 @@ export async function getSeriesSeasons(
           guideLookup[s.season_id]?.[w.race_week_num] ?? w.start_date ?? "",
       }));
 
-      // Normalize race_time_descriptors — iRacing API uses many different field names
+      // Normalize race_time_descriptors — RTDs are empty in real API
+      // Duration comes from op_duration (minutes) or schedule_description
       const rawRtd = s.race_time_descriptors ?? [];
-      const race_time_descriptors = Array.isArray(rawRtd)
-        ? rawRtd.map((r: any) => {
-            const mins =
-              r.session_minutes ??
-              r.race_time_limit_minutes ??
-              r.race_time_limit ??
-              r.time_limit_minutes ??
-              r.time_limit ??
-              (r.repeating_units === "minutes" ? r.repeating_value : 0) ??
-              0;
-            return {
-              repeating: r.repeating ?? false,
-              session_minutes: Number(mins) || 0,
-              start_time: r.start_time ?? "",
-              day_offset: r.day_offset ?? r.day_offset_list ?? [],
-            };
-          })
-        : [];
+      const race_time_descriptors =
+        Array.isArray(rawRtd) && rawRtd.length > 0
+          ? rawRtd.map((r: any) => {
+              const mins =
+                r.session_minutes ??
+                r.race_time_limit_minutes ??
+                r.race_time_limit ??
+                r.time_limit_minutes ??
+                r.time_limit ??
+                (r.repeating_units === "minutes" ? r.repeating_value : 0) ??
+                0;
+              return {
+                repeating: r.repeating ?? false,
+                session_minutes: Number(mins) || 0,
+                start_time: r.start_time ?? "",
+                day_offset: r.day_offset ?? r.day_offset_list ?? [],
+              };
+            })
+          : [];
 
-      // If RTDs empty, try extracting duration from first schedule entry
+      // Real iRacing API: duration lives in op_duration (minutes) or schedules[0]
       let sessionMins = race_time_descriptors[0]?.session_minutes ?? 0;
-      if (sessionMins === 0 && s.schedules?.length > 0) {
-        const firstSchedule = s.schedules[0];
-        sessionMins =
-          firstSchedule.race_time_limit_minutes ??
-          firstSchedule.race_time_limit ??
-          firstSchedule.session_minutes ??
-          firstSchedule.time_limit_minutes ??
-          0;
-        if (sessionMins > 0) {
-          console.log(
-            `[duration] "${s.series_name}" from schedule:`,
-            sessionMins,
-            "min",
-          );
-        }
+
+      // Fallback 1: op_duration field (observed in series-fields log)
+      if (sessionMins === 0 && s.op_duration) {
+        sessionMins = Number(s.op_duration) || 0;
       }
 
-      // Also log raw schedule keys once for debugging
-      if (s.schedules?.length > 0 && !s._logged) {
-        console.log("[schedule-keys]", Object.keys(s.schedules[0]).join(", "));
-        s._logged = true;
+      // Fallback 2: schedule_description text e.g. "Every 2h repeating"
+      if (sessionMins === 0 && s.schedule_description) {
+        const desc = (s.schedule_description as string).toLowerCase();
+        const hourMatch = desc.match(/(\d+)\s*h/);
+        const minMatch = desc.match(/(\d+)\s*m(?:in)?/);
+        if (hourMatch)
+          sessionMins =
+            parseInt(hourMatch[1]) * 60 +
+            (minMatch ? parseInt(minMatch[1]) : 0);
+        else if (minMatch) sessionMins = parseInt(minMatch[1]);
+      }
+
+      // Fallback 3: look inside schedules for race_time fields
+      if (
+        sessionMins === 0 &&
+        Array.isArray(s.schedules) &&
+        s.schedules.length > 0
+      ) {
+        const sch = s.schedules[0];
+        sessionMins =
+          sch.race_time_limit_minutes ??
+          sch.race_time_limit ??
+          sch.session_minutes ??
+          sch.time_limit_minutes ??
+          0;
       }
 
       return {
@@ -235,6 +247,9 @@ export async function getSeriesSeasons(
         multiclass: (s.car_class_ids?.length ?? 0) > 1,
         schedules,
         race_time_descriptors,
+        next_race_session: s.next_race_session,
+        op_duration: s.op_duration,
+        schedule_description: s.schedule_description,
         // Computed UI fields
         category: mapCategory(
           s.license_group,

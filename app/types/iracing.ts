@@ -121,7 +121,9 @@ export interface SeriesSeason {
   complete?: boolean;
   rookie_season_name?: string;
 
-  // Computed/UI fields
+  next_race_session?: string; // ISO datetime of next race from iRacing API
+  op_duration?: number; // Open practice duration (minutes) - used as race duration proxy
+  schedule_description?: string; // e.g. "Every 2h repeating"
   status?: SessionType;
   category?: CarCategory;
   minLicenseLevel?: LicenseLevel;

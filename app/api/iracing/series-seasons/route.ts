@@ -57,6 +57,35 @@ export async function GET(request: NextRequest) {
       `[rtd] ${noRtd}/${series.length} series have empty race_time_descriptors`,
     );
 
+    // Debug: op_duration field (real duration source)
+    const withOpDur = series.filter((s: any) => s.op_duration > 0).slice(0, 5);
+    console.log(
+      "[op_duration] sample:",
+      withOpDur.map((s: any) => `${s.season_name}=${s.op_duration}`).join(", "),
+    );
+
+    // Debug: schedule_description
+    const withSchedDesc = series
+      .filter((s: any) => s.schedule_description)
+      .slice(0, 3);
+    console.log(
+      "[schedule_description] sample:",
+      withSchedDesc.map((s: any) => `"${s.schedule_description}"`).join(", "),
+    );
+
+    // Debug: schedules[0] keys
+    const withSchedules = series.find((s: any) => s.schedules?.length > 0);
+    if (withSchedules) {
+      console.log(
+        "[schedule-keys]:",
+        Object.keys(withSchedules.schedules[0]).join(", "),
+      );
+      console.log(
+        "[schedule-sample]:",
+        JSON.stringify(withSchedules.schedules[0]).slice(0, 300),
+      );
+    }
+
     // Debug: driver_changes series
     const dcSeries = series.filter((s: any) => s.driver_changes === true);
     console.log(

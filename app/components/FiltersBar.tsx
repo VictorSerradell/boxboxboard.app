@@ -47,7 +47,7 @@ const STATUSES: { label: string; value: SessionType; color: string }[] = [
   { label: "Fixed", value: "FIXED", color: "#E8002D" },
   { label: "Open", value: "OPEN", color: "#22C55E" },
   { label: "Ranked", value: "RANKED", color: "#A855F7" },
-  { label: "Unranked", value: "UNRANKED", color: "#666677" },
+  { label: "Unranked", value: "UNRANKED", color: "#777777" },
 ];
 
 export default function FiltersBar({
@@ -78,20 +78,20 @@ export default function FiltersBar({
 
   const T = {
     barBg: isDark ? "rgba(8,8,8,0.97)" : "rgba(255,255,255,0.97)",
-    barBorder: isDark ? "#1E1E2A" : "#E0E0E8",
-    divider: isDark ? "#1E1E2A" : "#E0E0E8",
-    groupLabel: isDark ? "#444455" : "#999AAA",
+    barBorder: isDark ? "#2A2A2A" : "#E0E0E8",
+    divider: isDark ? "#2A2A2A" : "#E0E0E8",
+    groupLabel: isDark ? "#555555" : "#999AAA",
     chipDefault: isDark
-      ? { color: "#555566", border: "#2A2A3A", bg: "transparent" }
+      ? { color: "#666666", border: "#2A2A3A", bg: "transparent" }
       : { color: "#888899", border: "#D8D8E8", bg: "transparent" },
     chipHover: isDark
-      ? { color: "#AAAABC", border: "#3E3E4E", bg: "#111118" }
+      ? { color: "#AAAABC", border: "#3E3E4E", bg: "#1C1C1C" }
       : { color: "#333344", border: "#B8B8C8", bg: "rgba(0,0,0,0.03)" },
-    searchBg: isDark ? "#111118" : "#FFFFFF",
+    searchBg: isDark ? "#1C1C1C" : "#FFFFFF",
     searchBorder: isDark ? "#2A2A3A" : "#D8D8E8",
     searchText: isDark ? "#FFFFFF" : "#0A0A0F",
-    searchPlaceholder: isDark ? "#444455" : "#CCCCDD",
-    resetColor: isDark ? "#555566" : "#888899",
+    searchPlaceholder: isDark ? "#555555" : "#CCCCDD",
+    resetColor: isDark ? "#666666" : "#888899",
   };
 
   function toggleCategory(cat: CarCategory) {
@@ -555,9 +555,8 @@ export default function FiltersBar({
         {/* Compact mobile bar: search + filter button */}
         <div
           style={{
-            position: "sticky",
-            top: 60,
-            zIndex: 990,
+            position: "relative",
+            zIndex: 1,
             background: T.barBg,
             backdropFilter: "blur(20px)",
             borderBottom: `1px solid ${T.barBorder}`,
@@ -718,9 +717,8 @@ export default function FiltersBar({
   return (
     <div
       style={{
-        position: "sticky",
-        top: 60,
-        zIndex: 990,
+        position: "relative",
+        zIndex: 1,
         background: T.barBg,
         backdropFilter: "blur(20px)",
         borderBottom: `1px solid ${T.barBorder}`,

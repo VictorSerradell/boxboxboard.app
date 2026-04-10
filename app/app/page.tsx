@@ -170,13 +170,9 @@ export default function HomePage() {
   // Lock body scroll when detail panel is open
   useEffect(() => {
     if (selectedSeries) {
-      const scrollbarW =
-        window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = "hidden";
-      document.body.style.paddingRight = `${scrollbarW}px`;
     } else {
       document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
     }
     return () => {
       document.body.style.overflow = "";
@@ -937,7 +933,6 @@ export default function HomePage() {
       {!user && (
         <div
           style={{
-            marginTop: 64,
             background: "rgba(232,0,45,0.05)",
             borderBottom: "1px solid rgba(232,0,45,0.10)",
             padding: "10px 24px",
@@ -971,13 +966,24 @@ export default function HomePage() {
       )}
 
       {/* ── FILTERS ─────────────────────────────────────────── */}
-      <div style={{ marginTop: user ? 64 : 0 }}>
+      <div
+        style={{
+          position: "fixed",
+          top: 64,
+          left: 0,
+          right: 0,
+          zIndex: 900,
+        }}
+      >
         <FiltersBar
           filters={filters}
           onChange={setFilters}
           autoLicense={autoLicense as any}
         />
       </div>
+
+      {/* Spacer to push content below fixed filters bar */}
+      <div style={{ height: user ? 108 : 44 }} />
 
       {/* ════════════════════════════════════════════════════════
           MAIN CONTENT

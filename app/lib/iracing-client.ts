@@ -194,15 +194,10 @@ export async function getSeriesSeasons(
             })
           : [];
 
-      // Real iRacing API: duration lives in op_duration (minutes) or schedules[0]
+      // Real iRacing API: RTDs are empty. Duration comes from schedule_description text
       let sessionMins = race_time_descriptors[0]?.session_minutes ?? 0;
 
-      // Fallback 1: op_duration field (observed in series-fields log)
-      if (sessionMins === 0 && s.op_duration) {
-        sessionMins = Number(s.op_duration) || 0;
-      }
-
-      // Fallback 2: schedule_description text e.g. "Every 2h repeating"
+      // Fallback: schedule_description e.g. "Every 2h repeating", "30 minute races"
       if (sessionMins === 0 && s.schedule_description) {
         const desc = (s.schedule_description as string).toLowerCase();
         const hourMatch = desc.match(/(\d+)\s*h/);
@@ -214,20 +209,7 @@ export async function getSeriesSeasons(
         else if (minMatch) sessionMins = parseInt(minMatch[1]);
       }
 
-      // Fallback 3: look inside schedules for race_time fields
-      if (
-        sessionMins === 0 &&
-        Array.isArray(s.schedules) &&
-        s.schedules.length > 0
-      ) {
-        const sch = s.schedules[0];
-        sessionMins =
-          sch.race_time_limit_minutes ??
-          sch.race_time_limit ??
-          sch.session_minutes ??
-          sch.time_limit_minutes ??
-          0;
-      }
+      // NOTE: op_duration = open PRACTICE duration, not race — do NOT use for sessionMins
 
       return {
         season_id: s.season_id,
@@ -383,7 +365,8 @@ function mapCategory(
   const name = ((seriesName ?? "") + " " + (seasonName ?? "")).toLowerCase();
   const mins = sessionMinutes ?? 0;
 
-  // Endurance: name keywords OR driver_changes (any series allowing driver swaps is endurance-style)
+  // Endurance: ONLY name keywords OR driver_changes flag
+  // NOTE: op_duration is open practice duration, NOT race duration — never use for category
   if (
     name.includes("endurance") ||
     name.includes("endur") ||
@@ -399,8 +382,7 @@ function mapCategory(
     name.includes("bathurst") ||
     name.includes("spa 24") ||
     name.includes("nurburgring 24") ||
-    driverChanges === true ||
-    (mins >= 60 && mins !== 0)
+    driverChanges === true
   )
     return "Endurance";
 

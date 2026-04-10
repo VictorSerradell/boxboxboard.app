@@ -279,24 +279,25 @@ export default function SeriesCard({
           }}
         />
 
-        {/* Series logo — right side, visible but not intrusive */}
+        {/* Series logo — right side */}
         {logoUrl && (
-          <div
+          <img
+            src={logoUrl}
+            alt=""
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }}
             style={{
               position: "absolute",
               right: 14,
               top: "50%",
               transform: "translateY(-50%)",
-              width: 56,
-              height: 56,
-              zIndex: 0,
-              borderRadius: 8,
-              backgroundImage: `url(${logoUrl})`,
-              backgroundSize: "contain",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center",
-              opacity: isDark ? 0.22 : 0.18,
+              width: 52,
+              height: 52,
+              objectFit: "contain",
+              opacity: isDark ? 0.25 : 0.2,
               pointerEvents: "none",
+              zIndex: 0,
             }}
           />
         )}

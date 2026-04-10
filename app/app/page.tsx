@@ -43,7 +43,6 @@ import {
   getSeriesSeasons,
   getFavoriteSeriesIds,
   getMemberInfo,
-  getSeriesAssets,
 } from "../lib/iracing-client";
 import { useTheme } from "../lib/theme";
 import CompareBar from "../components/Comparebar";
@@ -154,11 +153,15 @@ function SkeletonCard() {
   );
 }
 
+// iRacing series logo URL — pattern confirmed from assets API: seriesid_NNN.png
+function getSeriesLogoUrl(seriesId: number): string {
+  return `https://images-static.iracing.com/img/series/seriesid_${seriesId}.png`;
+}
+
 export default function HomePage() {
   const [seasons, setSeasons] = useState<SeasonInfo[]>([]);
   const [currentSeason, setCurrentSeason] = useState<SeasonInfo | null>(null);
   const [series, setSeries] = useState<SeriesSeason[]>([]);
-  const [seriesAssets, setSeriesAssets] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [user, setUser] = useState<AppUser | null>(null);
@@ -382,34 +385,6 @@ export default function HomePage() {
     getSeriesSeasons(currentSeason.season_year, currentSeason.season_quarter)
       .then((data) => {
         setSeries(data);
-        // Fetch series logos in background
-        getSeriesAssets()
-          .then((assets: any) => {
-            const logoMap: Record<number, string> = {};
-            Object.entries(assets ?? {}).forEach(([id, a]: [string, any]) => {
-              // iRacing returns: logo: "seriesid_32.png", large_image: null
-              const file =
-                a?.logo ??
-                a?.logo_path ??
-                a?.series_logo ??
-                a?.small_image ??
-                a?.large_image;
-              if (file) {
-                // Full URL or relative path
-                const url = file.startsWith("http")
-                  ? file
-                  : `https://images-static.iracing.com/img/series/${file}`;
-                logoMap[Number(id)] = url;
-              }
-            });
-            console.log(
-              "[assets] loaded",
-              Object.keys(logoMap).length,
-              "logos",
-            );
-            setSeriesAssets(logoMap);
-          })
-          .catch(() => {});
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -1265,7 +1240,7 @@ export default function HomePage() {
                 <SeriesCard
                   key={s.season_id}
                   series={s}
-                  logoUrl={seriesAssets[s.series_id]}
+                  logoUrl={getSeriesLogoUrl(s.series_id)}
                   isFavorite={favorites.includes(s.series_id)}
                   isComparing={comparingSeries.some(
                     (x) => x.series_id === s.series_id,
@@ -1517,7 +1492,9 @@ export default function HomePage() {
       <SeriesDetailPanel
         series={selectedSeries}
         logoUrl={
-          selectedSeries ? seriesAssets[selectedSeries.series_id] : undefined
+          selectedSeries
+            ? getSeriesLogoUrl(selectedSeries.series_id)
+            : undefined
         }
         isFavorite={
           selectedSeries ? favorites.includes(selectedSeries.series_id) : false

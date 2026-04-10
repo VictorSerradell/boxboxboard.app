@@ -389,20 +389,23 @@ export default function SeriesDetailPanel({
             >
               {/* Series logo */}
               {logoUrl && (
-                <div
+                <img
+                  src={logoUrl}
+                  alt=""
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
                   style={{
                     width: 52,
                     height: 52,
                     flexShrink: 0,
+                    objectFit: "contain",
                     borderRadius: 8,
                     background: isDark
                       ? "rgba(255,255,255,0.06)"
                       : "rgba(0,0,0,0.04)",
                     border: `1px solid ${accent}25`,
-                    backgroundImage: `url(${logoUrl})`,
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
+                    padding: 6,
                     marginTop: 2,
                   }}
                 />

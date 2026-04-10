@@ -42,6 +42,36 @@ export async function GET(request: NextRequest) {
     const series: any[] = Array.isArray(data) ? data : (data?.seasons ?? []);
     console.log(`[series-seasons] fetched ${series.length} series`);
 
+    // Debug: log RTD structure from a few series
+    const withRtd = series
+      .filter((x) => x.race_time_descriptors?.length > 0)
+      .slice(0, 3);
+    withRtd.forEach((s) => {
+      console.log(
+        `[rtd] "${s.series_name}" rtd[0]:`,
+        JSON.stringify(s.race_time_descriptors[0]),
+      );
+    });
+    const noRtd = series.filter((x) => !x.race_time_descriptors?.length).length;
+    console.log(
+      `[rtd] ${noRtd}/${series.length} series have empty race_time_descriptors`,
+    );
+
+    // Debug: log series that look like endurance by name
+    const enduranceLike = series.filter((s: any) => {
+      const n = (s.series_name ?? s.season_name ?? "").toLowerCase();
+      return (
+        n.includes("endurance") ||
+        n.includes("imsa") ||
+        n.includes("24h") ||
+        n.includes("ires")
+      );
+    });
+    console.log(
+      `[endurance] ${enduranceLike.length} endurance-like series by name:`,
+      enduranceLike.map((s: any) => s.series_name).join(", "),
+    );
+
     return NextResponse.json(series, {
       headers: { "Cache-Control": "public, max-age=1800" },
     });

@@ -224,6 +224,7 @@ export async function getSeriesSeasons(
           s.license_group,
           s.category,
           s.series_name,
+          s.season_name,
           s.driver_changes,
           sessionMins,
         ),
@@ -313,7 +314,7 @@ export async function getCarClasses(): Promise<CarClass[]> {
   return apiFetch("carclass/list");
 }
 export async function getSeriesAssets() {
-  return apiFetch<Record<string, unknown>>("series/assets");
+  return apiFetch<Record<string, unknown>>("series-assets");
 }
 
 // ─── Favorites (localStorage) ────────────────────────────────────────────────
@@ -344,13 +345,14 @@ function mapCategory(
   licenseGroup: number,
   rawCategory?: string,
   seriesName?: string,
+  seasonName?: string,
   driverChanges?: boolean,
   sessionMinutes?: number,
 ): CarCategory {
-  const name = (seriesName ?? "").toLowerCase();
+  const name = ((seriesName ?? "") + " " + (seasonName ?? "")).toLowerCase();
   const mins = sessionMinutes ?? 0;
 
-  // Endurance first
+  // Endurance: name keywords OR driver_changes + long race
   if (
     name.includes("endurance") ||
     name.includes("endur") ||
@@ -367,7 +369,7 @@ function mapCategory(
   )
     return "Endurance";
 
-  // Formula detection from name (iRacing returns category:'road' for formula series)
+  // Formula: iRacing returns category 'road' for formula series, detect by name
   if (
     name.includes("formula") ||
     name.includes(" f1 ") ||
@@ -376,13 +378,10 @@ function mapCategory(
     name.includes("indycar") ||
     name.includes("indy car") ||
     name.includes("super formula") ||
-    name.includes("f3") ||
-    name.includes("f4") ||
     name.includes("ff1600") ||
     name.includes("lotus 79") ||
     name.includes("ir-04") ||
     name.includes("ir04") ||
-    name.includes("radical") ||
     name.includes("skip barber") ||
     name.includes("pro mazda") ||
     name.includes("star mazda")
@@ -391,7 +390,6 @@ function mapCategory(
 
   if (rawCategory) {
     const c = rawCategory.toLowerCase();
-    // iRacing uses 'formula_car' as category value
     if (c.includes("formula")) return "Formula Car";
     if (c.includes("oval") && c.includes("dirt")) return "Dirt Oval";
     if (c.includes("dirt")) return "Dirt Road";
@@ -399,7 +397,6 @@ function mapCategory(
     if (c.includes("road") || c.includes("sports")) return "Sports Car";
   }
 
-  // license_group fallback (iRacing: 1=Oval, 2=Road, 3=DirtOval, 4=DirtRoad, 5=Road/SportsCar)
   const map: Record<number, CarCategory> = {
     1: "Oval",
     2: "Sports Car",

@@ -102,13 +102,7 @@ function getSessionDuration(series: SeriesSeason): string {
   return "—";
 }
 
-// iRacing track images CDN — correct path format
-function getTrackImageUrl(trackId: number): string | null {
-  if (!trackId || trackId <= 0) return null;
-  // iRacing uses: https://images-static.iracing.com/img/tracks/track_NNN_landscape.jpg
-  // BUT many tracks don't have landscape images. Use a more reliable smaller image:
-  return `https://images-static.iracing.com/img/tracks/track_${trackId}_landscape.jpg`;
-}
+// Series logo URL is passed as prop from page — no track images needed
 
 // Next race countdown — uses next_race_session (real API), start_date, or start_time
 function getNextRaceCountdown(series: SeriesSeason): string | null {
@@ -200,9 +194,6 @@ export default function SeriesCard({
   );
   const accent = catStyle.accent;
   const activeTrack = currentWeek !== null ? tracks[currentWeek] : null;
-  const trackImgUrl = activeTrack?.track?.track_id
-    ? getTrackImageUrl(activeTrack.track.track_id)
-    : null;
 
   const T = {
     cardBg: isDark ? "#1C1C1C" : "#FFFFFF",
@@ -275,53 +266,6 @@ export default function SeriesCard({
           overflow: "hidden",
         }}
       >
-        {/* Track image background */}
-        {trackImgUrl && (
-          <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-            <img
-              src={trackImgUrl}
-              alt=""
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                opacity: isDark ? 0.08 : 0.05,
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background: isDark
-                  ? "linear-gradient(90deg, rgba(28,28,28,0.95) 40%, rgba(28,28,28,0.7) 100%)"
-                  : "linear-gradient(90deg, rgba(255,255,255,0.97) 40%, rgba(255,255,255,0.85) 100%)",
-              }}
-            />
-          </div>
-        )}
-        {/* Series logo watermark */}
-        {logoUrl && (
-          <div
-            style={{
-              position: "absolute",
-              right: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: 72,
-              height: 72,
-              zIndex: 0,
-              backgroundImage: `url(${logoUrl})`,
-              backgroundSize: "contain",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center right",
-              opacity: isDark ? 0.12 : 0.1,
-              pointerEvents: "none",
-            }}
-          />
-        )}
         {/* Top accent line */}
         <div
           style={{
@@ -334,6 +278,28 @@ export default function SeriesCard({
             zIndex: 1,
           }}
         />
+
+        {/* Series logo — right side, visible but not intrusive */}
+        {logoUrl && (
+          <div
+            style={{
+              position: "absolute",
+              right: 14,
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 56,
+              height: 56,
+              zIndex: 0,
+              borderRadius: 8,
+              backgroundImage: `url(${logoUrl})`,
+              backgroundSize: "contain",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+              opacity: isDark ? 0.22 : 0.18,
+              pointerEvents: "none",
+            }}
+          />
+        )}
 
         {/* Categoría + live badge + acciones */}
         <div

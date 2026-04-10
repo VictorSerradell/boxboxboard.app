@@ -1516,6 +1516,9 @@ export default function HomePage() {
 
       <SeriesDetailPanel
         series={selectedSeries}
+        logoUrl={
+          selectedSeries ? seriesAssets[selectedSeries.series_id] : undefined
+        }
         isFavorite={
           selectedSeries ? favorites.includes(selectedSeries.series_id) : false
         }

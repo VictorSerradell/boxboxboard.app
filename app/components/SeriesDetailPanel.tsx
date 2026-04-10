@@ -27,6 +27,7 @@ import { useTheme } from "../lib/theme";
 
 interface Props {
   series: SeriesSeason | null;
+  logoUrl?: string;
   isFavorite: boolean;
   onClose: () => void;
   onFavoriteToggle: (seriesId: number, newFavs: number[]) => void;
@@ -112,6 +113,7 @@ function getSessionDuration(series: SeriesSeason): string {
 
 export default function SeriesDetailPanel({
   series,
+  logoUrl,
   isFavorite,
   onClose,
   onFavoriteToggle,
@@ -200,29 +202,29 @@ export default function SeriesDetailPanel({
 
   // Theme-aware local tokens
   const T = {
-    panelBg: isDark ? "#0D0D12" : "#FFFFFF",
+    panelBg: isDark ? "#161616" : "#FFFFFF",
     headerBg: isDark
       ? `linear-gradient(160deg, ${accent}18 0%, #0D0D12 100%)`
       : `linear-gradient(160deg, ${accent}10 0%, #FAFAFA 100%)`,
-    sectionBorder: isDark ? "#1E1E2A" : "#E8E8F0",
-    rowBg: isDark ? "#141418" : "#F8F8FC",
+    sectionBorder: isDark ? "#2A2A2A" : "#E8E8F0",
+    rowBg: isDark ? "#1E1E1E" : "#F8F8FC",
     rowBgAlt: isDark ? "#111116" : "#F5F5FA",
-    rowBorder: isDark ? "#1E1E2A" : "#E8E8F0",
-    labelColor: isDark ? "#444455" : "#888899",
+    rowBorder: isDark ? "#2A2A2A" : "#E8E8F0",
+    labelColor: isDark ? "#555555" : "#888899",
     textPrimary: isDark ? "#FFFFFF" : "#0A0A0F",
     textSecondary: isDark ? "#CCCCDC" : "#222230",
-    textMuted: isDark ? "#888898" : "#666677",
-    textFaint: isDark ? "#444455" : "#AAAABC",
+    textMuted: isDark ? "#888898" : "#777777",
+    textFaint: isDark ? "#555555" : "#AAAABC",
     statValue: isDark ? "#FFFFFF" : "#0A0A0F",
-    iconBtnBg: isDark ? "#1A1A22" : "#F0F0F8",
-    iconBtnBorder: isDark ? "#2A2A38" : "#D8D8E8",
-    iconBtnColor: isDark ? "#555566" : "#888899",
+    iconBtnBg: isDark ? "#252525" : "#F0F0F8",
+    iconBtnBorder: isDark ? "#333333" : "#D8D8E8",
+    iconBtnColor: isDark ? "#666666" : "#888899",
     flagColor: isDark ? "#2E2E3E" : "#CCCCDD",
-    carIconBg: isDark ? "#141418" : "#F0F0F8",
-    carIconBorder: isDark ? "#2A2A38" : "#D8D8E8",
-    dateColor: isDark ? "#444455" : "#888899",
-    infoGridBg: isDark ? "#141418" : "#F8F8FC",
-    infoGridBorder: isDark ? "#1E1E2A" : "#E8E8F0",
+    carIconBg: isDark ? "#1E1E1E" : "#F0F0F8",
+    carIconBorder: isDark ? "#333333" : "#D8D8E8",
+    dateColor: isDark ? "#555555" : "#888899",
+    infoGridBg: isDark ? "#1E1E1E" : "#F8F8FC",
+    infoGridBorder: isDark ? "#2A2A2A" : "#E8E8F0",
   };
 
   function handleFav() {
@@ -376,90 +378,99 @@ export default function SeriesDetailPanel({
               gap: 12,
             }}
           >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              {/* Categoría */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 7,
-                  marginBottom: 10,
-                }}
-              >
+            <div
+              style={{
+                flex: 1,
+                minWidth: 0,
+                display: "flex",
+                gap: 14,
+                alignItems: "flex-start",
+              }}
+            >
+              {/* Series logo */}
+              {logoUrl && (
                 <div
                   style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: "50%",
-                    background: accent,
-                    boxShadow: `0 0 8px ${accent}`,
+                    width: 52,
+                    height: 52,
+                    flexShrink: 0,
+                    borderRadius: 8,
+                    background: isDark
+                      ? "rgba(255,255,255,0.06)"
+                      : "rgba(0,0,0,0.04)",
+                    border: `1px solid ${accent}25`,
+                    backgroundImage: `url(${logoUrl})`,
+                    backgroundSize: "contain",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
+                    marginTop: 2,
                   }}
                 />
-                <span
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {/* Categoría */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 7,
+                    marginBottom: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: "50%",
+                      background: accent,
+                      boxShadow: `0 0 8px ${accent}`,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontFamily: "Rajdhani, sans-serif",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: accent,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {series.category ?? t.catRoad}
+                  </span>
+                </div>
+
+                {/* Nombre */}
+                <h2
                   style={{
                     fontFamily: "Rajdhani, sans-serif",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: accent,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
+                    fontSize: 22,
+                    fontWeight: 900,
+                    color: isDark ? "#FFFFFF" : "#0F172A",
+                    margin: "0 0 12px",
+                    letterSpacing: "-0.4px",
+                    lineHeight: 1.2,
                   }}
                 >
-                  {series.category ?? t.catRoad}
-                </span>
-              </div>
+                  {series.series_name ?? series.season_name ?? "—"}
+                </h2>
 
-              {/* Nombre */}
-              <h2
-                style={{
-                  fontFamily: "Rajdhani, sans-serif",
-                  fontSize: 22,
-                  fontWeight: 900,
-                  color: isDark ? "#FFFFFF" : "#0F172A",
-                  margin: "0 0 12px",
-                  letterSpacing: "-0.4px",
-                  lineHeight: 1.2,
-                }}
-              >
-                {series.series_name ?? series.season_name ?? "—"}
-              </h2>
-
-              {/* Badges */}
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                <span
-                  style={{
-                    padding: "4px 11px",
-                    borderRadius: 20,
-                    fontSize: 12,
-                    fontWeight: 700,
-                    fontFamily: "Orbitron, monospace",
-                    background: licConfig.color + "22",
-                    border: `1px solid ${licConfig.color}50`,
-                    color: licConfig.color,
-                  }}
-                >
-                  {licConfig.label}
-                </span>
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 5,
-                    padding: "4px 11px",
-                    borderRadius: 20,
-                    fontSize: 12,
-                    fontWeight: 700,
-                    fontFamily: "Orbitron, monospace",
-                    background: series.fixed_setup
-                      ? "rgba(232,0,45,0.10)"
-                      : "rgba(34,197,94,0.14)",
-                    border: `1px solid ${series.fixed_setup ? "rgba(232,0,45,0.35)" : "rgba(34,197,94,0.35)"}`,
-                    color: series.fixed_setup ? "#E8002D" : "#22C55E",
-                  }}
-                >
-                  <Wrench size={10} /> {series.fixed_setup ? t.fixed : t.open}
-                </span>
-                {series.driver_changes && (
+                {/* Badges */}
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  <span
+                    style={{
+                      padding: "4px 11px",
+                      borderRadius: 20,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      fontFamily: "Orbitron, monospace",
+                      background: licConfig.color + "22",
+                      border: `1px solid ${licConfig.color}50`,
+                      color: licConfig.color,
+                    }}
+                  >
+                    {licConfig.label}
+                  </span>
                   <span
                     style={{
                       display: "inline-flex",
@@ -470,33 +481,54 @@ export default function SeriesDetailPanel({
                       fontSize: 12,
                       fontWeight: 700,
                       fontFamily: "Orbitron, monospace",
-                      background: "rgba(232,121,249,0.14)",
-                      border: "1px solid rgba(232,121,249,0.38)",
-                      color: "#E879F9",
+                      background: series.fixed_setup
+                        ? "rgba(232,0,45,0.10)"
+                        : "rgba(34,197,94,0.14)",
+                      border: `1px solid ${series.fixed_setup ? "rgba(232,0,45,0.35)" : "rgba(34,197,94,0.35)"}`,
+                      color: series.fixed_setup ? "#E8002D" : "#22C55E",
                     }}
                   >
-                    👥 {t.teamDriving}
+                    <Wrench size={10} /> {series.fixed_setup ? t.fixed : t.open}
                   </span>
-                )}
-                {series.official && (
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 5,
-                      padding: "4px 11px",
-                      borderRadius: 20,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      fontFamily: "Orbitron, monospace",
-                      background: "rgba(234,179,8,0.14)",
-                      border: "1px solid rgba(234,179,8,0.38)",
-                      color: "#EAB308",
-                    }}
-                  >
-                    <Trophy size={10} /> {t.official}
-                  </span>
-                )}
+                  {series.driver_changes && (
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 5,
+                        padding: "4px 11px",
+                        borderRadius: 20,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        fontFamily: "Orbitron, monospace",
+                        background: "rgba(232,121,249,0.14)",
+                        border: "1px solid rgba(232,121,249,0.38)",
+                        color: "#E879F9",
+                      }}
+                    >
+                      👥 {t.teamDriving}
+                    </span>
+                  )}
+                  {series.official && (
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 5,
+                        padding: "4px 11px",
+                        borderRadius: 20,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        fontFamily: "Orbitron, monospace",
+                        background: "rgba(234,179,8,0.14)",
+                        border: "1px solid rgba(234,179,8,0.38)",
+                        color: "#EAB308",
+                      }}
+                    >
+                      <Trophy size={10} /> {t.official}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -661,7 +693,7 @@ export default function SeriesDetailPanel({
                   fontFamily: "Rajdhani, sans-serif",
                   fontWeight: 700,
                   fontSize: 13,
-                  color: activeTab === tab.id ? accent : "#666677",
+                  color: activeTab === tab.id ? accent : "#777777",
                   borderBottom: `2px solid ${activeTab === tab.id ? accent : "transparent"}`,
                   marginBottom: -1,
                   transition: "all 0.15s",
@@ -698,7 +730,7 @@ export default function SeriesDetailPanel({
                         style={{
                           fontSize: 10,
                           fontFamily: "Orbitron, monospace",
-                          color: "#666677",
+                          color: "#777777",
                         }}
                       >
                         loading...
@@ -724,7 +756,7 @@ export default function SeriesDetailPanel({
                         style={{
                           fontSize: 10,
                           fontFamily: "Orbitron, monospace",
-                          color: "#666677",
+                          color: "#777777",
                           background: "rgba(100,116,139,0.1)",
                           border: "1px solid rgba(100,116,139,0.2)",
                           borderRadius: 4,
@@ -1107,7 +1139,7 @@ export default function SeriesDetailPanel({
                       alignItems: "center",
                       gap: 10,
                       padding: "14px 0",
-                      color: "#666677",
+                      color: "#777777",
                       fontFamily: "Orbitron, monospace",
                       fontSize: 12,
                     }}
@@ -1131,7 +1163,7 @@ export default function SeriesDetailPanel({
                       style={{
                         height: 52,
                         borderRadius: 10,
-                        background: isDark ? "#111118" : "rgba(0,0,0,0.04)",
+                        background: isDark ? "#1C1C1C" : "rgba(0,0,0,0.04)",
                         animation: "pulse 1.5s ease infinite",
                       }}
                     />
@@ -1146,7 +1178,7 @@ export default function SeriesDetailPanel({
                   style={{
                     textAlign: "center",
                     padding: "40px 0",
-                    color: "#666677",
+                    color: "#777777",
                     fontFamily: "Orbitron, monospace",
                     fontSize: 12,
                   }}
@@ -1224,7 +1256,7 @@ export default function SeriesDetailPanel({
                               fontFamily: "Orbitron, monospace",
                               fontSize: 11,
                               fontWeight: 700,
-                              color: isTop ? "#fff" : "#666677",
+                              color: isTop ? "#fff" : "#777777",
                             }}
                           >
                             {i + 1}
@@ -1251,7 +1283,7 @@ export default function SeriesDetailPanel({
                               height: 4,
                               borderRadius: 2,
                               background: isDark
-                                ? "#161620"
+                                ? "#232323"
                                 : "rgba(0,0,0,0.06)",
                               overflow: "hidden",
                             }}
@@ -1283,7 +1315,7 @@ export default function SeriesDetailPanel({
                             style={{
                               fontFamily: "Orbitron, monospace",
                               fontSize: 10,
-                              color: "#666677",
+                              color: "#777777",
                               marginTop: 1,
                             }}
                           >

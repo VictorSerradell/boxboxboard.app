@@ -3,7 +3,7 @@
   "/page": "app/page.js",
   "/api/auth/me/route": "app/api/auth/me/route.js",
   "/api/iracing/current-season/route": "app/api/iracing/current-season/route.js",
-  "/api/iracing/series-seasons/route": "app/api/iracing/series-seasons/route.js",
   "/api/iracing/series-assets/route": "app/api/iracing/series-assets/route.js",
+  "/api/iracing/series-seasons/route": "app/api/iracing/series-seasons/route.js",
   "/app/page": "app/app/page.js"
 }

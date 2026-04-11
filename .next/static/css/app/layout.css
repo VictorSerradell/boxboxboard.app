@@ -636,6 +636,9 @@ video {
 .sticky {
   position: sticky;
 }
+.block {
+  display: block;
+}
 .inline-block {
   display: inline-block;
 }

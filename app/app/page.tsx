@@ -155,11 +155,11 @@ function SkeletonCard() {
 
 // iRacing series logo — only for series confirmed to have logos via assets API
 function buildLogoUrl(logoFile: string): string {
-  // logo field can be "seriesid_32.png" or "img/series/seriesid_32.png"
   if (logoFile.startsWith("http")) return logoFile;
   if (logoFile.startsWith("img/"))
     return `https://images-static.iracing.com/${logoFile}`;
-  return `https://images-static.iracing.com/img/series/${logoFile}`;
+  // Correct path: /img/logos/series/seriesid_NNN.png
+  return `https://images-static.iracing.com/img/logos/series/${logoFile}`;
 }
 
 export default function HomePage() {

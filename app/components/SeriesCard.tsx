@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Heart, Lock, Check, Clock, Wrench, Trophy, GitCompare, CalendarClock } from 'lucide-react';
+import { Heart, Lock, Check, Clock, Wrench, Trophy, GitCompare, CalendarClock, Calendar, Flag } from 'lucide-react';
 import type { SeriesSeason } from '../types/iracing';
 import { toggleFavoriteSeries } from '../lib/iracing-client';
 import { getCurrentRaceWeek } from '../lib/season-week';

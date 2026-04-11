@@ -256,16 +256,28 @@ export default function SeriesCard({
         flexDirection: "column",
       }}
     >
-      {/* ── HEADER ──────────────────────────────────────────── */}
+      {/* ── LOGO BANNER ─────────────────────────────────────── */}
       <div
         style={{
-          background: T.headerGrad,
-          padding: "14px 16px 12px",
+          height: logoUrl ? 88 : 0,
+          background: isDark ? "#0A0A0A" : "#F0F0F4",
+          display: logoUrl ? "flex" : "none",
+          alignItems: "center",
+          justifyContent: "center",
           position: "relative",
-          borderBottom: `1px solid ${T.sectionBorder}`,
           overflow: "hidden",
+          borderBottom: `1px solid ${T.sectionBorder}`,
         }}
       >
+        {/* Accent color glow behind logo */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: `radial-gradient(ellipse at center, ${accent}18 0%, transparent 70%)`,
+            pointerEvents: "none",
+          }}
+        />
         {/* Top accent line */}
         <div
           style={{
@@ -275,32 +287,212 @@ export default function SeriesCard({
             right: 0,
             height: 2,
             background: accent,
-            zIndex: 1,
           }}
         />
-
-        {/* Series logo — right side */}
         {logoUrl && (
           <img
             src={logoUrl}
             alt=""
             onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
+              (e.target as HTMLImageElement).parentElement!.style.display =
+                "none";
             }}
             style={{
-              position: "absolute",
-              right: 14,
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: 52,
-              height: 52,
+              height: 60,
+              maxWidth: "80%",
               objectFit: "contain",
-              opacity: isDark ? 0.25 : 0.2,
-              pointerEvents: "none",
-              zIndex: 0,
+              position: "relative",
+              zIndex: 1,
+              filter: isDark ? "brightness(1)" : "brightness(0.9)",
             }}
           />
         )}
+        {/* Action buttons — top right over logo */}
+        <div
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            display: "flex",
+            gap: 4,
+            zIndex: 2,
+          }}
+        >
+          <div
+            title={series.isOwned ? t.allContentOwned : t.missingContent}
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: series.isOwned
+                ? "rgba(34,197,94,0.2)"
+                : "rgba(0,0,0,0.4)",
+              border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.1)"}`,
+              color: series.isOwned ? "#22C55E" : "rgba(255,255,255,0.4)",
+            }}
+          >
+            {series.isOwned ? (
+              <Check size={12} strokeWidth={2.5} />
+            ) : (
+              <Lock size={11} strokeWidth={2} />
+            )}
+          </div>
+          {onCompare && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onCompare();
+              }}
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: isComparing
+                  ? "rgba(232,0,45,0.3)"
+                  : "rgba(0,0,0,0.4)",
+                border: `1px solid ${isComparing ? "rgba(232,0,45,0.5)" : "rgba(255,255,255,0.1)"}`,
+                color: isComparing ? "#E8002D" : "rgba(255,255,255,0.4)",
+              }}
+            >
+              <GitCompare size={11} strokeWidth={2} />
+            </button>
+          )}
+          {onSchedule && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSchedule();
+              }}
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: isScheduled
+                  ? "rgba(168,85,247,0.3)"
+                  : "rgba(0,0,0,0.4)",
+                border: `1px solid ${isScheduled ? "rgba(168,85,247,0.5)" : "rgba(255,255,255,0.1)"}`,
+                color: isScheduled ? "#A855F7" : "rgba(255,255,255,0.4)",
+              }}
+            >
+              <CalendarClock size={11} strokeWidth={2} />
+            </button>
+          )}
+          <button
+            onClick={handleFavClick}
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: 6,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: localFav ? "rgba(239,68,68,0.3)" : "rgba(0,0,0,0.4)",
+              border: `1px solid ${localFav ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
+              color: localFav ? "#EF4444" : "rgba(255,255,255,0.4)",
+              transform: favAnimating ? "scale(1.35)" : "scale(1)",
+              transition: "transform 0.15s ease",
+            }}
+          >
+            <Heart
+              size={12}
+              fill={localFav ? "currentColor" : "none"}
+              strokeWidth={2}
+            />
+          </button>
+        </div>
+        {/* Live / eligible badges — bottom left */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 6,
+            left: 8,
+            display: "flex",
+            gap: 4,
+          }}
+        >
+          {currentWeek !== null && currentWeek < tracks.length && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                padding: "2px 7px",
+                borderRadius: 20,
+                background: "rgba(34,197,94,0.9)",
+                fontFamily: "Orbitron, monospace",
+                fontSize: 9,
+                fontWeight: 700,
+                color: "#fff",
+                letterSpacing: "0.06em",
+              }}
+            >
+              <span
+                style={{
+                  width: 4,
+                  height: 4,
+                  borderRadius: "50%",
+                  background: "#fff",
+                  display: "inline-block",
+                }}
+              />
+              WK {currentWeek + 1} LIVE
+            </span>
+          )}
+          {isEligible && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                padding: "2px 7px",
+                borderRadius: 20,
+                background: "rgba(168,85,247,0.85)",
+                fontFamily: "Orbitron, monospace",
+                fontSize: 9,
+                fontWeight: 700,
+                color: "#fff",
+                letterSpacing: "0.06em",
+              }}
+            >
+              ✓ ELIGIBLE
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── HEADER (no logo) ────────────────────────────────── */}
+      <div
+        style={{
+          background: T.headerGrad,
+          padding: "12px 16px 10px",
+          position: "relative",
+          borderBottom: `1px solid ${T.sectionBorder}`,
+          overflow: "hidden",
+          display: logoUrl ? "none" : "block",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 2,
+            background: accent,
+          }}
+        />
 
         {/* Categoría + live badge + acciones */}
         <div
@@ -335,7 +527,6 @@ export default function SeriesCard({
             >
               {catStyle.label}
             </span>
-            {/* Endurance duration badge */}
             {series.category === "Endurance" && duration !== "—" && (
               <span
                 style={{
@@ -350,159 +541,140 @@ export default function SeriesCard({
                   fontSize: 10,
                   fontWeight: 700,
                   color: "#E879F9",
-                  letterSpacing: "0.06em",
                 }}
               >
                 ⏱ {duration}
               </span>
             )}
-            {currentWeek !== null && currentWeek < tracks.length && (
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  padding: "2px 8px",
-                  borderRadius: 20,
-                  background: "rgba(34,197,94,0.15)",
-                  border: "1px solid rgba(34,197,94,0.35)",
-                  fontFamily: "Orbitron, monospace",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: "#22C55E",
-                  letterSpacing: "0.06em",
-                }}
-              >
+            {!logoUrl &&
+              currentWeek !== null &&
+              currentWeek < tracks.length && (
                 <span
                   style={{
-                    width: 5,
-                    height: 5,
-                    borderRadius: "50%",
-                    background: "#22C55E",
-                    display: "inline-block",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 3,
+                    padding: "2px 7px",
+                    borderRadius: 20,
+                    background: "rgba(34,197,94,0.15)",
+                    border: "1px solid rgba(34,197,94,0.35)",
+                    fontFamily: "Orbitron, monospace",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: "#22C55E",
                   }}
-                />
-                {t.wkLive(currentWeek + 1)}
-              </span>
-            )}
-            {isEligible && (
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  padding: "2px 8px",
-                  borderRadius: 20,
-                  background: "rgba(168,85,247,0.15)",
-                  border: "1px solid rgba(168,85,247,0.35)",
-                  fontFamily: "Orbitron, monospace",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: "#A855F7",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                ✓ {t.eligible}
-              </span>
-            )}
-          </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            <div
-              title={series.isOwned ? t.allContentOwned : t.missingContent}
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 8,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: series.isOwned
-                  ? "rgba(34,197,94,0.18)"
-                  : T.iconBtnBg,
-                border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.4)" : T.iconBtnBorder}`,
-                color: series.isOwned ? "#22C55E" : T.iconBtnColor,
-              }}
-            >
-              {series.isOwned ? (
-                <Check size={14} strokeWidth={2.5} />
-              ) : (
-                <Lock size={13} strokeWidth={2} />
+                >
+                  <span
+                    style={{
+                      width: 5,
+                      height: 5,
+                      borderRadius: "50%",
+                      background: "#22C55E",
+                      display: "inline-block",
+                    }}
+                  />
+                  {t.wkLive(currentWeek + 1)}
+                </span>
               )}
-            </div>
-            {onCompare && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCompare();
-                }}
-                title={isComparing ? t.removeFromCompare : t.addToCompare}
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: isComparing ? "rgba(232,0,45,0.12)" : T.iconBtnBg,
-                  border: `1px solid ${isComparing ? "rgba(232,0,45,0.5)" : T.iconBtnBorder}`,
-                  color: isComparing ? "#3B9EFF" : T.iconBtnColor,
-                  transition: "all 0.15s ease",
-                }}
-              >
-                <GitCompare size={13} strokeWidth={2} />
-              </button>
-            )}
-            {onSchedule && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSchedule();
-                }}
-                title={isScheduled ? t.removeFromSchedule : t.addToSchedule}
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: isScheduled
-                    ? "rgba(168,85,247,0.2)"
-                    : T.iconBtnBg,
-                  border: `1px solid ${isScheduled ? "rgba(168,85,247,0.5)" : T.iconBtnBorder}`,
-                  color: isScheduled ? "#A855F7" : T.iconBtnColor,
-                  transition: "all 0.15s ease",
-                }}
-              >
-                <CalendarClock size={13} strokeWidth={2} />
-              </button>
-            )}
-            <button
-              onClick={handleFavClick}
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 8,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: localFav ? "rgba(239,68,68,0.2)" : T.iconBtnBg,
-                border: `1px solid ${localFav ? "rgba(239,68,68,0.5)" : T.iconBtnBorder}`,
-                color: localFav ? "#EF4444" : T.iconBtnColor,
-                transform: favAnimating ? "scale(1.35)" : "scale(1)",
-                transition: "transform 0.15s ease",
-              }}
-            >
-              <Heart
-                size={14}
-                fill={localFav ? "currentColor" : "none"}
-                strokeWidth={2}
-              />
-            </button>
           </div>
+          {/* Action buttons — only shown when no logo banner */}
+          {!logoUrl && (
+            <div style={{ display: "flex", gap: 5 }}>
+              <div
+                title={series.isOwned ? t.allContentOwned : t.missingContent}
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 7,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: series.isOwned
+                    ? "rgba(34,197,94,0.18)"
+                    : T.iconBtnBg,
+                  border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.4)" : T.iconBtnBorder}`,
+                  color: series.isOwned ? "#22C55E" : T.iconBtnColor,
+                }}
+              >
+                {series.isOwned ? (
+                  <Check size={13} strokeWidth={2.5} />
+                ) : (
+                  <Lock size={12} strokeWidth={2} />
+                )}
+              </div>
+              {onCompare && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCompare();
+                  }}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 7,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: isComparing
+                      ? "rgba(232,0,45,0.12)"
+                      : T.iconBtnBg,
+                    border: `1px solid ${isComparing ? "rgba(232,0,45,0.5)" : T.iconBtnBorder}`,
+                    color: isComparing ? "#E8002D" : T.iconBtnColor,
+                  }}
+                >
+                  <GitCompare size={12} strokeWidth={2} />
+                </button>
+              )}
+              {onSchedule && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSchedule();
+                  }}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 7,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: isScheduled
+                      ? "rgba(168,85,247,0.2)"
+                      : T.iconBtnBg,
+                    border: `1px solid ${isScheduled ? "rgba(168,85,247,0.5)" : T.iconBtnBorder}`,
+                    color: isScheduled ? "#A855F7" : T.iconBtnColor,
+                  }}
+                >
+                  <CalendarClock size={12} strokeWidth={2} />
+                </button>
+              )}
+              <button
+                onClick={handleFavClick}
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 7,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: localFav ? "rgba(239,68,68,0.2)" : T.iconBtnBg,
+                  border: `1px solid ${localFav ? "rgba(239,68,68,0.5)" : T.iconBtnBorder}`,
+                  color: localFav ? "#EF4444" : T.iconBtnColor,
+                  transform: favAnimating ? "scale(1.35)" : "scale(1)",
+                  transition: "transform 0.15s ease",
+                }}
+              >
+                <Heart
+                  size={13}
+                  fill={localFav ? "currentColor" : "none"}
+                  strokeWidth={2}
+                />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Nombre */}
@@ -524,20 +696,12 @@ export default function SeriesCard({
         </h3>
 
         {/* Badges */}
-        <div
-          style={{
-            display: "flex",
-            gap: 6,
-            flexWrap: "wrap",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
+        <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
           <span
             style={{
-              padding: "4px 11px",
+              padding: "3px 9px",
               borderRadius: 20,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: 700,
               fontFamily: "Orbitron, monospace",
               background: licConfig.color + "22",
@@ -551,10 +715,10 @@ export default function SeriesCard({
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: 5,
-              padding: "4px 11px",
+              gap: 4,
+              padding: "3px 9px",
               borderRadius: 20,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: 700,
               fontFamily: "Orbitron, monospace",
               background: series.fixed_setup
@@ -564,7 +728,7 @@ export default function SeriesCard({
               color: series.fixed_setup ? "#E8002D" : "#22C55E",
             }}
           >
-            <Wrench size={10} strokeWidth={2.5} />{" "}
+            <Wrench size={9} strokeWidth={2.5} />{" "}
             {series.fixed_setup ? t.fixed : t.open}
           </span>
           {series.official && (
@@ -572,10 +736,10 @@ export default function SeriesCard({
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 5,
-                padding: "4px 11px",
+                gap: 4,
+                padding: "3px 9px",
                 borderRadius: 20,
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 700,
                 fontFamily: "Orbitron, monospace",
                 background: "rgba(234,179,8,0.14)",
@@ -583,11 +747,12 @@ export default function SeriesCard({
                 color: "#EAB308",
               }}
             >
-              <Trophy size={10} strokeWidth={2.5} /> {t.official}
+              <Trophy size={9} strokeWidth={2.5} /> {t.official}
             </span>
           )}
         </div>
       </div>
+      {/* Close no-logo header */}
 
       {/* ── TRACK ROTATION ──────────────────────────────────── */}
       <div

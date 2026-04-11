@@ -153,15 +153,20 @@ function SkeletonCard() {
   );
 }
 
-// iRacing series logo URL — pattern confirmed from assets API: seriesid_NNN.png
-function getSeriesLogoUrl(seriesId: number): string {
-  return `https://images-static.iracing.com/img/series/seriesid_${seriesId}.png`;
+// iRacing series logo — only for series confirmed to have logos via assets API
+function buildLogoUrl(logoFile: string): string {
+  // logo field can be "seriesid_32.png" or "img/series/seriesid_32.png"
+  if (logoFile.startsWith("http")) return logoFile;
+  if (logoFile.startsWith("img/"))
+    return `https://images-static.iracing.com/${logoFile}`;
+  return `https://images-static.iracing.com/img/series/${logoFile}`;
 }
 
 export default function HomePage() {
   const [seasons, setSeasons] = useState<SeasonInfo[]>([]);
   const [currentSeason, setCurrentSeason] = useState<SeasonInfo | null>(null);
   const [series, setSeries] = useState<SeriesSeason[]>([]);
+  const [seriesLogos, setSeriesLogos] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [user, setUser] = useState<AppUser | null>(null);
@@ -385,6 +390,17 @@ export default function HomePage() {
     getSeriesSeasons(currentSeason.season_year, currentSeason.season_quarter)
       .then((data) => {
         setSeries(data);
+        // Fetch logo map from assets API — only series with actual logos
+        fetch("/api/iracing/series-assets", { credentials: "include" })
+          .then((r) => (r.ok ? r.json() : {}))
+          .then((assets: Record<string, any>) => {
+            const logos: Record<number, string> = {};
+            Object.entries(assets).forEach(([id, a]) => {
+              if (a?.logo) logos[Number(id)] = buildLogoUrl(a.logo);
+            });
+            setSeriesLogos(logos);
+          })
+          .catch(() => {});
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -1240,7 +1256,7 @@ export default function HomePage() {
                 <SeriesCard
                   key={s.season_id}
                   series={s}
-                  logoUrl={getSeriesLogoUrl(s.series_id)}
+                  logoUrl={seriesLogos[s.series_id]}
                   isFavorite={favorites.includes(s.series_id)}
                   isComparing={comparingSeries.some(
                     (x) => x.series_id === s.series_id,
@@ -1492,9 +1508,7 @@ export default function HomePage() {
       <SeriesDetailPanel
         series={selectedSeries}
         logoUrl={
-          selectedSeries
-            ? getSeriesLogoUrl(selectedSeries.series_id)
-            : undefined
+          selectedSeries ? seriesLogos[selectedSeries.series_id] : undefined
         }
         isFavorite={
           selectedSeries ? favorites.includes(selectedSeries.series_id) : false

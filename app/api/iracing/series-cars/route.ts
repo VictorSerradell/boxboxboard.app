@@ -52,6 +52,16 @@ export async function GET(request: NextRequest) {
       token,
     );
     const allSubs: any[] = searchData?.results ?? searchData ?? [];
+    console.log(
+      "[series-cars] series_id:",
+      seriesId,
+      "week:",
+      weekNum,
+      "results:",
+      allSubs.length,
+      "raw keys:",
+      Object.keys(searchData ?? {}).join(","),
+    );
 
     if (!allSubs.length) {
       return NextResponse.json({

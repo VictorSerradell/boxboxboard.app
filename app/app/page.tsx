@@ -153,13 +153,27 @@ function SkeletonCard() {
   );
 }
 
-// iRacing series logo — only for series confirmed to have logos via assets API
+// iRacing series logo — from assets map or direct URL fallback
 function buildLogoUrl(logoFile: string): string {
   if (logoFile.startsWith("http")) return logoFile;
   if (logoFile.startsWith("img/"))
     return `https://images-static.iracing.com/${logoFile}`;
-  // Correct path: /img/logos/series/seriesid_NNN.png
   return `https://images-static.iracing.com/img/logos/series/${logoFile}`;
+}
+
+// Get logo URL for a series — uses assets map when available, direct URL as fallback
+function getLogoUrl(
+  seriesId: number,
+  logos: Record<number, string>,
+): string | undefined {
+  // If assets loaded with real data
+  if (logos[seriesId]) return logos[seriesId];
+  // If assets failed (-1 = fallback mode), try direct URL for all series
+  // onError in <img> will hide silently if file doesn't exist
+  if (logos[-1] === "fallback") {
+    return `https://images-static.iracing.com/img/logos/series/seriesid_${seriesId}.png`;
+  }
+  return undefined;
 }
 
 export default function HomePage() {
@@ -384,24 +398,33 @@ export default function HomePage() {
     init();
   }, []);
 
+  // Load series logos — assets API with fallback to direct URL for known series
+  useEffect(() => {
+    fetch("/api/iracing/series-assets")
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((assets: Record<string, any>) => {
+        const logos: Record<number, string> = {};
+        Object.entries(assets).forEach(([id, a]) => {
+          if (a?.logo) logos[Number(id)] = buildLogoUrl(a.logo);
+        });
+        // If API returned nothing, fall back to direct URL pattern for all series
+        // (onError in <img> will hide ones that don't exist)
+        if (Object.keys(logos).length === 0) {
+          // Mark that we should try direct URLs — handled in getLogoUrl below
+          logos[-1] = "fallback";
+        }
+        setSeriesLogos(logos);
+      })
+      .catch(() => {
+        setSeriesLogos({ [-1]: "fallback" });
+      });
+  }, []);
+
   useEffect(() => {
     if (!currentSeason) return;
     setLoading(true);
     getSeriesSeasons(currentSeason.season_year, currentSeason.season_quarter)
-      .then((data) => {
-        setSeries(data);
-        // Fetch logo map from assets API — only series with actual logos
-        fetch("/api/iracing/series-assets", { credentials: "include" })
-          .then((r) => (r.ok ? r.json() : {}))
-          .then((assets: Record<string, any>) => {
-            const logos: Record<number, string> = {};
-            Object.entries(assets).forEach(([id, a]) => {
-              if (a?.logo) logos[Number(id)] = buildLogoUrl(a.logo);
-            });
-            setSeriesLogos(logos);
-          })
-          .catch(() => {});
-      })
+      .then((data) => setSeries(data))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [currentSeason]);
@@ -1256,7 +1279,7 @@ export default function HomePage() {
                 <SeriesCard
                   key={s.season_id}
                   series={s}
-                  logoUrl={seriesLogos[s.series_id]}
+                  logoUrl={getLogoUrl(s.series_id, seriesLogos)}
                   isFavorite={favorites.includes(s.series_id)}
                   isComparing={comparingSeries.some(
                     (x) => x.series_id === s.series_id,
@@ -1508,7 +1531,9 @@ export default function HomePage() {
       <SeriesDetailPanel
         series={selectedSeries}
         logoUrl={
-          selectedSeries ? seriesLogos[selectedSeries.series_id] : undefined
+          selectedSeries
+            ? getLogoUrl(selectedSeries.series_id, seriesLogos)
+            : undefined
         }
         isFavorite={
           selectedSeries ? favorites.includes(selectedSeries.series_id) : false

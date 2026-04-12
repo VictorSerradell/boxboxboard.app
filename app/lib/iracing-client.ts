@@ -511,7 +511,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
   return [
     {
       season_id: 4501,
-      series_id: 301,
+      series_id: 139,
       season_name: `iRacing Endurance Series ${year} S${quarter}`,
       series_name: "iRacing Endurance Series",
       series_short_name: "iRES",
@@ -532,7 +532,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
     },
     {
       season_id: 4502,
-      series_id: 302,
+      series_id: 356,
       season_name: `Porsche TAG Heuer Esports Supercup ${year} S${quarter}`,
       series_name: "Porsche TAG Heuer Esports Supercup",
       series_short_name: "PESC",
@@ -553,7 +553,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
     },
     {
       season_id: 4503,
-      series_id: 303,
+      series_id: 406,
       season_name: `Formula iRacing ${year} S${quarter}`,
       series_name: "Formula iRacing",
       series_short_name: "FiR",
@@ -574,7 +574,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
     },
     {
       season_id: 4504,
-      series_id: 304,
+      series_id: 23,
       season_name: `NASCAR Cup Series ${year} S${quarter}`,
       series_name: "NASCAR Cup Series",
       series_short_name: "NCS",
@@ -595,7 +595,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
     },
     {
       season_id: 4505,
-      series_id: 305,
+      series_id: 455,
       season_name: `IMSA Sportscar Championship ${year} S${quarter}`,
       series_name: "IMSA Sportscar Championship",
       series_short_name: "IMSA",
@@ -645,7 +645,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
     },
     {
       season_id: 4507,
-      series_id: 307,
+      series_id: 231,
       season_name: `GT3 Challenge Series ${year} S${quarter}`,
       series_name: "GT3 Challenge Series",
       series_short_name: "GT3C",
@@ -666,7 +666,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
     },
     {
       season_id: 4508,
-      series_id: 308,
+      series_id: 131,
       season_name: `IndyCar Series ${year} S${quarter}`,
       series_name: "IndyCar Series",
       series_short_name: "ICS",
@@ -708,7 +708,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
     },
     {
       season_id: 4510,
-      series_id: 310,
+      series_id: 430,
       season_name: `Super Formula ${year} S${quarter}`,
       series_name: "Super Formula",
       series_short_name: "SF",
@@ -758,7 +758,7 @@ function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
     },
     {
       season_id: 4512,
-      series_id: 312,
+      series_id: 171,
       season_name: `LMP2 Endurance Challenge ${year} S${quarter}`,
       series_name: "LMP2 Endurance Challenge",
       series_short_name: "LMP2",

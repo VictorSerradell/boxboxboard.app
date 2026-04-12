@@ -78,7 +78,6 @@ const LICENSE_CONFIG = {
 } as const;
 
 function getSessionDuration(series: SeriesSeason): string {
-  // Demo data: race_time_descriptors has session_minutes
   const td = series.race_time_descriptors;
   if (td?.[0]?.session_minutes) {
     const mins = td[0].session_minutes;
@@ -86,8 +85,6 @@ function getSessionDuration(series: SeriesSeason): string {
       return `${Math.floor(mins / 60)}h${mins % 60 > 0 ? ` ${mins % 60}m` : ""}`;
     return `${mins}m`;
   }
-  // Real iRacing: parse schedule_description e.g. "Every 2h repeating", "30 minute races"
-  // NOTE: op_duration is open PRACTICE duration, not race duration — do not use here
   if (series.schedule_description) {
     const desc = series.schedule_description.toLowerCase();
     const hMatch = desc.match(/(\d+)\s*h(?:our)?/);
@@ -102,17 +99,12 @@ function getSessionDuration(series: SeriesSeason): string {
   return "—";
 }
 
-// Series logo URL is passed as prop from page — no track images needed
-
-// Next race countdown — uses next_race_session (real API), start_date, or start_time
 function getNextRaceCountdown(series: SeriesSeason): string | null {
-  // Real iRacing API provides next_race_session as ISO datetime
   if (series.next_race_session) {
     const diff = new Date(series.next_race_session).getTime() - Date.now();
     if (diff > 0) return formatCountdown(diff);
   }
 
-  // Fallback: start_date from current week schedule
   const currentWeek = getCurrentRaceWeek(
     series.season_year,
     series.season_quarter,
@@ -125,7 +117,6 @@ function getNextRaceCountdown(series: SeriesSeason): string | null {
     }
   }
 
-  // Fallback: start_time from race_time_descriptors
   const rtd = series.race_time_descriptors?.[0];
   if (rtd?.start_time) {
     const [hStr, mStr] = rtd.start_time.split(":");
@@ -172,7 +163,6 @@ export default function SeriesCard({
   const isDark = theme === "dark";
   const { t } = useT();
 
-  // Update countdown every minute
   useEffect(() => {
     const update = () => setCountdown(getNextRaceCountdown(series));
     update();
@@ -258,15 +248,17 @@ export default function SeriesCard({
     >
       {/* ── LOGO BANNER ─────────────────────────────────────── */}
       <div
+        ref={(el) => {
+          if (el) el.dataset.banner = "1";
+        }}
         style={{
-          height: logoUrl ? 100 : 0,
+          height: logoUrl && !logoError ? 100 : 0,
           background: isDark ? "#0D0D0D" : "#F0F0F4",
-          display: logoUrl ? "block" : "none",
+          display: logoUrl && !logoError ? "block" : "none",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Top accent line */}
         <div
           style={{
             position: "absolute",
@@ -278,8 +270,6 @@ export default function SeriesCard({
             zIndex: 3,
           }}
         />
-
-        {/* Category glow */}
         <div
           style={{
             position: "absolute",
@@ -289,18 +279,17 @@ export default function SeriesCard({
           }}
         />
 
-        {/* Logo */}
         {logoUrl && (
           <img
             src={logoUrl}
             alt=""
             onError={(e) => {
-              const el = e.target as HTMLImageElement;
-              el.style.display = "none";
-              const parent = el.parentElement;
-              if (parent) {
-                parent.style.height = "0";
-                parent.style.display = "none";
+              setLogoError(true);
+              let el: HTMLElement | null = e.target as HTMLElement;
+              while (el && !el.dataset.banner) el = el.parentElement;
+              if (el) {
+                el.style.height = "0";
+                el.style.display = "none";
               }
             }}
             style={{
@@ -315,7 +304,6 @@ export default function SeriesCard({
           />
         )}
 
-        {/* Action buttons — top right */}
         <div
           style={{
             position: "absolute",
@@ -421,7 +409,6 @@ export default function SeriesCard({
           </button>
         </div>
 
-        {/* Category + live — bottom left */}
         <div
           style={{
             position: "absolute",
@@ -493,7 +480,8 @@ export default function SeriesCard({
           borderBottom: `1px solid ${T.sectionBorder}`,
         }}
       >
-        {!logoUrl && (
+        {/* Línea de acento superior SOLO cuando NO hay logo */}
+        {(!logoUrl || logoError) && (
           <div
             style={{
               position: "absolute",
@@ -506,8 +494,8 @@ export default function SeriesCard({
           />
         )}
 
-        {/* Category + live + actions row — only without logo */}
-        {!logoUrl && (
+        {/* Fila de categoría + botones SOLO cuando NO hay logo */}
+        {(!logoUrl || logoError) && (
           <div
             style={{
               display: "flex",
@@ -586,6 +574,7 @@ export default function SeriesCard({
                 </span>
               )}
             </div>
+
             <div style={{ display: "flex", gap: 4 }}>
               <div
                 title={series.isOwned ? t.allContentOwned : t.missingContent}

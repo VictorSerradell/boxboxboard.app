@@ -153,7 +153,7 @@ function SkeletonCard() {
   );
 }
 
-// iRacing series logo — from assets map or direct URL fallback
+// iRacing series logo — from assets map only (confirmed logos)
 function buildLogoUrl(logoFile: string): string {
   if (logoFile.startsWith("http")) return logoFile;
   if (logoFile.startsWith("img/"))
@@ -161,19 +161,11 @@ function buildLogoUrl(logoFile: string): string {
   return `https://images-static.iracing.com/img/logos/series/${logoFile}`;
 }
 
-// Get logo URL for a series — uses assets map when available, direct URL as fallback
 function getLogoUrl(
   seriesId: number,
   logos: Record<number, string>,
 ): string | undefined {
-  // If assets loaded with real data
-  if (logos[seriesId]) return logos[seriesId];
-  // If assets failed (-1 = fallback mode), try direct URL for all series
-  // onError in <img> will hide silently if file doesn't exist
-  if (logos[-1] === "fallback") {
-    return `https://images-static.iracing.com/img/logos/series/seriesid_${seriesId}.png`;
-  }
-  return undefined;
+  return logos[seriesId];
 }
 
 export default function HomePage() {
@@ -398,7 +390,7 @@ export default function HomePage() {
     init();
   }, []);
 
-  // Load series logos — assets API with fallback to direct URL for known series
+  // Load series logos — only from assets API (confirmed logos)
   useEffect(() => {
     fetch("/api/iracing/series-assets")
       .then((r) => (r.ok ? r.json() : {}))
@@ -407,17 +399,9 @@ export default function HomePage() {
         Object.entries(assets).forEach(([id, a]) => {
           if (a?.logo) logos[Number(id)] = buildLogoUrl(a.logo);
         });
-        // If API returned nothing, fall back to direct URL pattern for all series
-        // (onError in <img> will hide ones that don't exist)
-        if (Object.keys(logos).length === 0) {
-          // Mark that we should try direct URLs — handled in getLogoUrl below
-          logos[-1] = "fallback";
-        }
         setSeriesLogos(logos);
       })
-      .catch(() => {
-        setSeriesLogos({ [-1]: "fallback" });
-      });
+      .catch(() => {});
   }, []);
 
   useEffect(() => {

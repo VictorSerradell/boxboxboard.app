@@ -100,7 +100,7 @@ export default function WeekChangeBanner({
     <div
       style={{
         position: "fixed",
-        top: 76,
+        top: 114,
         right: 16,
         zIndex: 400,
         width: "min(420px, calc(100vw - 32px))",

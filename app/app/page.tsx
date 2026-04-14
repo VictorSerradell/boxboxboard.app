@@ -20,6 +20,7 @@ import { useBreakpoint } from '../lib/useBreakpoint';
 import { useT } from '../lib/i18n';
 import type { SeriesSeason, FilterState, SeasonInfo, AppUser } from '../types/iracing';
 import { getSeasonList, getSeriesSeasons, getFavoriteSeriesIds, getMemberInfo } from '../lib/iracing-client';
+import { getCurrentRaceWeek } from '../lib/season-week';
 import { useTheme } from '../lib/theme';
 import CompareBar from '../components/Comparebar';
 
@@ -486,19 +487,39 @@ export default function HomePage() {
 
         {/* Título de temporada + toggle de vista */}
         <div style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
-          <h1 style={{
-            fontFamily: 'Orbitron, monospace', fontSize: isMobile ? 16 : 22, fontWeight: 900,
-            color: 'var(--text-primary)', letterSpacing: '0.04em', margin: 0, textTransform: 'uppercase',
-          }}>
-            {currentSeason
-              ? `${t.season} ${currentSeason.season_quarter} · ${currentSeason.season_year}`
-              : t.loading}
-          </h1>
-          <span style={{ fontFamily: 'Orbitron, monospace', fontSize: 13, color: T.textFaint }}>
+          {/* Season title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h1 style={{
+              fontFamily: 'Orbitron, monospace', fontSize: isMobile ? 15 : 20, fontWeight: 900,
+              color: 'var(--text-primary)', letterSpacing: '0.04em', margin: 0, textTransform: 'uppercase',
+            }}>
+              {currentSeason
+                ? `${t.season} ${currentSeason.season_quarter} · ${currentSeason.season_year}`
+                : t.loading}
+            </h1>
+            {/* Current week badge — like iRacing */}
+            {currentSeason && (() => {
+              const week = getCurrentRaceWeek(currentSeason.season_year, currentSeason.season_quarter);
+              if (week === null) return null;
+              const maxWeeks = series.length > 0 ? Math.max(...series.map(s => s.schedules?.length ?? 0)) : 12;
+              return (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  fontFamily: 'Orbitron, monospace', fontSize: isMobile ? 11 : 13,
+                  fontWeight: 700, color: isDark ? '#AAAAAA' : '#666666',
+                  letterSpacing: '0.06em',
+                }}>
+                  Week {week + 1} of {maxWeeks || 12}
+                </span>
+              );
+            })()}
+          </div>
+          <span style={{ fontFamily: 'Orbitron, monospace', fontSize: 12, color: T.textFaint }}>
             {loading ? '' : `${displayed.length} series`}
           </span>
           {!loading && (
-            <span style={{ fontFamily: 'Orbitron, monospace', fontSize: 11, fontWeight: 600, color: '#22C55E', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 6, padding: '2px 8px', letterSpacing: '0.1em' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'Orbitron, monospace', fontSize: 10, fontWeight: 600, color: '#22C55E', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 6, padding: '2px 8px', letterSpacing: '0.1em' }}>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block' }} />
               {t.live}
             </span>
           )}

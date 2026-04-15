@@ -1,6 +1,8 @@
 // /app/api/iracing/series-assets/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic"; // uses cookies, can't be static
+
 const BASE = "https://members-ng.iracing.com/data";
 
 async function fetchAssets(token?: string) {

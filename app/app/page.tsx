@@ -947,12 +947,57 @@ export default function HomePage() {
         />
       </div>
 
-      {/* Spacer to push content below fixed filters bar (header 64 + filters ~44) */}
-      <div style={{ height: 108 }} />
+      {/* Spacer: header(64) + filters(~44) = 108, plus banner(40) if no user */}
+      <div style={{ height: user ? 108 : 148 }} />
 
-      {/* ════════════════════════════════════════════════════════
-          MAIN CONTENT
-      ════════════════════════════════════════════════════════ */}
+      {/* ── CONNECT BANNER — full width, below filters ─────────── */}
+      {!user && (
+        <div
+          style={{
+            position: "fixed",
+            top: 108,
+            left: 0,
+            right: 0,
+            zIndex: 850,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background: isDark ? "#161616" : "#FFFFFF",
+            borderBottom: "1px solid rgba(232,0,45,0.2)",
+            padding: "8px 24px",
+          }}
+        >
+          <Info size={13} color="#E8002D" style={{ flexShrink: 0 }} />
+          <span
+            style={{
+              fontFamily: "Rajdhani, sans-serif",
+              fontSize: 13,
+              color: isDark ? "#888888" : "#666666",
+              flex: 1,
+            }}
+          >
+            {t.demoBannerText}
+          </span>
+          <button
+            onClick={() => setShowLogin(true)}
+            style={{
+              fontFamily: "Rajdhani, sans-serif",
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#E8002D",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              letterSpacing: "0.03em",
+            }}
+          >
+            {t.connectIRacing} →
+          </button>
+        </div>
+      )}
+
+      {/* MAIN CONTENT */}
       <main
         style={{
           flex: 1,
@@ -968,53 +1013,6 @@ export default function HomePage() {
                 : "48px",
         }}
       >
-        {/* ── CONNECT BANNER ─────────────────────────────────── */}
-        {!user && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              background: isDark
-                ? "rgba(232,0,45,0.06)"
-                : "rgba(232,0,45,0.04)",
-              border: "1px solid rgba(232,0,45,0.15)",
-              borderRadius: 10,
-              padding: "10px 16px",
-              marginBottom: 20,
-            }}
-          >
-            <Info size={14} color="#E8002D" style={{ flexShrink: 0 }} />
-            <span
-              style={{
-                fontFamily: "Rajdhani, sans-serif",
-                fontSize: 14,
-                color: isDark ? "#AAAAAA" : "#666666",
-                flex: 1,
-              }}
-            >
-              {t.demoBannerText}
-            </span>
-            <button
-              onClick={() => setShowLogin(true)}
-              style={{
-                fontFamily: "Rajdhani, sans-serif",
-                fontSize: 13,
-                fontWeight: 700,
-                color: "#E8002D",
-                background: "none",
-                border: "1px solid rgba(232,0,45,0.35)",
-                borderRadius: 6,
-                padding: "4px 12px",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {t.connectIRacing} →
-            </button>
-          </div>
-        )}
-
         {/* Título de temporada + toggle de vista */}
         <div
           style={{

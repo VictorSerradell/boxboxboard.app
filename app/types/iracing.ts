@@ -222,4 +222,5 @@ export interface SeasonInfo {
   season_quarter: number;
   label: string;
   active: boolean;
+  max_weeks?: number;
 }

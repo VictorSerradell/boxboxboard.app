@@ -63,6 +63,7 @@ export async function getSeasonList(): Promise<SeasonInfo[]> {
           season_quarter: data.season_quarter,
           label: `Season ${data.season_quarter} ${data.season_year}`,
           active: true,
+          max_weeks: data.max_weeks ?? 13,
         },
       ];
     }

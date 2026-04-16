@@ -945,57 +945,50 @@ export default function HomePage() {
           onChange={setFilters}
           autoLicense={autoLicense as any}
         />
+        {/* Connect banner — stacks directly below filters */}
+        {!user && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              background: isDark ? "#161616" : "#FAFAFA",
+              borderBottom: "1px solid rgba(232,0,45,0.2)",
+              padding: "7px 24px",
+            }}
+          >
+            <Info size={13} color="#E8002D" style={{ flexShrink: 0 }} />
+            <span
+              style={{
+                fontFamily: "Rajdhani, sans-serif",
+                fontSize: 13,
+                color: isDark ? "#888888" : "#666666",
+                flex: 1,
+              }}
+            >
+              {t.demoBannerText}
+            </span>
+            <button
+              onClick={() => setShowLogin(true)}
+              style={{
+                fontFamily: "Rajdhani, sans-serif",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#E8002D",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.connectIRacing} →
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Spacer: header(64) + filters(~44) = 108, plus banner(40) if no user */}
-      <div style={{ height: user ? 108 : 148 }} />
-
-      {/* ── CONNECT BANNER — full width, below filters ─────────── */}
-      {!user && (
-        <div
-          style={{
-            position: "fixed",
-            top: 108,
-            left: 0,
-            right: 0,
-            zIndex: 850,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            background: isDark ? "#161616" : "#FFFFFF",
-            borderBottom: "1px solid rgba(232,0,45,0.2)",
-            padding: "8px 24px",
-          }}
-        >
-          <Info size={13} color="#E8002D" style={{ flexShrink: 0 }} />
-          <span
-            style={{
-              fontFamily: "Rajdhani, sans-serif",
-              fontSize: 13,
-              color: isDark ? "#888888" : "#666666",
-              flex: 1,
-            }}
-          >
-            {t.demoBannerText}
-          </span>
-          <button
-            onClick={() => setShowLogin(true)}
-            style={{
-              fontFamily: "Rajdhani, sans-serif",
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#E8002D",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-              letterSpacing: "0.03em",
-            }}
-          >
-            {t.connectIRacing} →
-          </button>
-        </div>
-      )}
+      {/* Spacer: header(64) + filters(~44) + optional banner(~34) */}
+      <div style={{ height: user ? 108 : 142 }} />
 
       {/* MAIN CONTENT */}
       <main

@@ -4,6 +4,7 @@ import { Orbitron, Rajdhani } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./lib/theme";
 import { I18nProvider } from "./lib/i18n";
+import { Analytics } from "@vercel/analytics/next";
 
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -196,6 +197,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <Analytics />
         <ThemeProvider>
           <I18nProvider>{children}</I18nProvider>
         </ThemeProvider>

@@ -311,33 +311,112 @@ export default function HomePage() {
   }, [series, filters, favorites, activeSection])();
 
   return (
-    <div style={{ minHeight: '100vh', background: 'transparent', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column' }}>
-
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "transparent",
+        color: "var(--text-primary)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {/* ════════════════════════════════════════════════════════
           HEADER
       ════════════════════════════════════════════════════════ */}
-      <header style={{
-        position: 'fixed', top: 0, left: 0, right: 0, height: 64, zIndex: 1000,
-        background: 'var(--bg-header)',
-        borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center',
-        padding: '0 16px', gap: 0,
-      }}>
+      <header
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 64,
+          zIndex: 1000,
+          background: "var(--bg-header)",
+          borderBottom: "1px solid var(--border)",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 16px",
+          gap: 0,
+        }}
+      >
         {/* Logo */}
-        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
-          <img src="/icon.png" alt="BoxBoxBoard" style={{ width: 28, height: 28, borderRadius: 4 }} />
-          {!isMobile && <span style={{ fontFamily: 'Orbitron, monospace', fontWeight: 900, fontSize: 14, color: 'var(--text-primary)', letterSpacing: '0.04em' }}>BoxBoxBoard</span>}
+        <a
+          href="/"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            textDecoration: "none",
+            flexShrink: 0,
+          }}
+        >
+          <img
+            src="/icon.png"
+            alt="BoxBoxBoard"
+            style={{ width: 28, height: 28, borderRadius: 4 }}
+          />
+          {!isMobile && (
+            <span
+              style={{
+                fontFamily: "Orbitron, monospace",
+                fontWeight: 900,
+                fontSize: 14,
+                color: "var(--text-primary)",
+                letterSpacing: "0.04em",
+              }}
+            >
+              BoxBoxBoard
+            </span>
+          )}
         </a>
 
         {/* Season selector — hidden on mobile or when only one season */}
         {!isMobile && seasons.length > 1 && (
           <>
-            <div style={{ width: 1, height: 28, background: 'var(--border)', margin: '0 20px', flexShrink: 0 }} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 4 }}>
-              {seasons.map(s => {
-                const active = currentSeason?.season_year === s.season_year && currentSeason?.season_quarter === s.season_quarter;
+            <div
+              style={{
+                width: 1,
+                height: 28,
+                background: "var(--border)",
+                margin: "0 20px",
+                flexShrink: 0,
+              }}
+            />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                background: "var(--bg-card)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                padding: 4,
+              }}
+            >
+              {seasons.map((s) => {
+                const active =
+                  currentSeason?.season_year === s.season_year &&
+                  currentSeason?.season_quarter === s.season_quarter;
                 return (
-                  <button key={`${s.season_year}-${s.season_quarter}`} onClick={() => setCurrentSeason(s)} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13, background: active ? 'rgba(232,0,45,0.14)' : 'transparent', color: active ? '#E8002D' : '#64748B', transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
+                  <button
+                    key={`${s.season_year}-${s.season_quarter}`}
+                    onClick={() => setCurrentSeason(s)}
+                    style={{
+                      padding: "6px 14px",
+                      borderRadius: 8,
+                      border: "none",
+                      cursor: "pointer",
+                      fontFamily: "Rajdhani, sans-serif",
+                      fontWeight: 700,
+                      fontSize: 13,
+                      background: active
+                        ? "rgba(232,0,45,0.14)"
+                        : "transparent",
+                      color: active ? "#E8002D" : "#64748B",
+                      transition: "all 0.15s",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
                     {s.label}
                   </button>
                 );
@@ -350,23 +429,79 @@ export default function HomePage() {
 
         {/* Desktop nav */}
         {!isMobile && !isTablet && (
-          <nav style={{ display: 'flex', gap: 4, marginRight: 12 }}>
-            {([
-              { id: 'favorites', label: t.favorites,  icon: <Heart size={14} /> },
-              { id: 'myContent', label: t.myContent,  icon: <LayoutGrid size={14} /> },
-            ] as const).map(item => {
+          <nav style={{ display: "flex", gap: 4, marginRight: 12 }}>
+            {(
+              [
+                {
+                  id: "favorites",
+                  label: t.favorites,
+                  icon: <Heart size={14} />,
+                },
+                {
+                  id: "myContent",
+                  label: t.myContent,
+                  icon: <LayoutGrid size={14} />,
+                },
+              ] as const
+            ).map((item) => {
               const active = activeSection === item.id;
               return (
-                <button key={item.id} onClick={() => setActiveSection(activeSection === item.id ? 'all' : item.id)} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600, fontSize: 13, background: active ? 'rgba(232,0,45,0.10)' : 'transparent', color: active ? '#E8002D' : '#64748B', transition: 'all 0.15s' }}>
+                <button
+                  key={item.id}
+                  onClick={() =>
+                    setActiveSection(
+                      activeSection === item.id ? "all" : item.id,
+                    )
+                  }
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 7,
+                    padding: "8px 14px",
+                    borderRadius: 10,
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "Rajdhani, sans-serif",
+                    fontWeight: 600,
+                    fontSize: 13,
+                    background: active ? "rgba(232,0,45,0.10)" : "transparent",
+                    color: active ? "#E8002D" : "#64748B",
+                    transition: "all 0.15s",
+                  }}
+                >
                   {item.icon} {item.label}
                 </button>
               );
             })}
             {/* Driver search button — only when logged in */}
             {user && (
-              <button onClick={() => setDriverProfileOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600, fontSize: 13, background: 'transparent', color: '#64748B', transition: 'all 0.15s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#E8002D'; (e.currentTarget as HTMLElement).style.background = 'rgba(232,0,45,0.07)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#64748B'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+              <button
+                onClick={() => setDriverProfileOpen(true)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 7,
+                  padding: "8px 14px",
+                  borderRadius: 10,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "Rajdhani, sans-serif",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  background: "transparent",
+                  color: "#64748B",
+                  transition: "all 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "#E8002D";
+                  (e.currentTarget as HTMLElement).style.background =
+                    "rgba(232,0,45,0.07)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "#64748B";
+                  (e.currentTarget as HTMLElement).style.background =
+                    "transparent";
+                }}
               >
                 <Users size={14} /> {t.driverSearch}
               </button>
@@ -378,9 +513,35 @@ export default function HomePage() {
         {!isMobile && (
           <>
             {!isTablet && (
-              <button onClick={() => window.open('https://ko-fi.com', '_blank')} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-card)', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600, fontSize: 13, color: 'var(--text-muted)', marginRight: 10, transition: 'all 0.15s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#FB923C'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(251,146,60,0.3)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; }}
+              <button
+                onClick={() => window.open("https://ko-fi.com", "_blank")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 7,
+                  padding: "8px 14px",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                  background: "var(--bg-card)",
+                  cursor: "pointer",
+                  fontFamily: "Rajdhani, sans-serif",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  color: "var(--text-muted)",
+                  marginRight: 10,
+                  transition: "all 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "#FB923C";
+                  (e.currentTarget as HTMLElement).style.borderColor =
+                    "rgba(251,146,60,0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color =
+                    "var(--text-muted)";
+                  (e.currentTarget as HTMLElement).style.borderColor =
+                    "var(--border)";
+                }}
               >
                 <Coffee size={14} /> {t.support}
               </button>
@@ -390,9 +551,30 @@ export default function HomePage() {
             <ThemeToggle />
             <div style={{ width: 6 }} />
             {user ? (
-              <DriverStats user={user} memberSince={(user as any).member_since} onLogout={() => window.location.href = '/api/auth/logout'} />
+              <DriverStats
+                user={user}
+                memberSince={(user as any).member_since}
+                onLogout={() => (window.location.href = "/api/auth/logout")}
+              />
             ) : (
-              <button onClick={() => setShowLogin(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13, background: '#E8002D', color: 'white', boxShadow: '0 0 20px rgba(232,0,45,0.2)' }}>
+              <button
+                onClick={() => setShowLogin(true)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 18px",
+                  borderRadius: 10,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "Rajdhani, sans-serif",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  background: "#E8002D",
+                  color: "white",
+                  boxShadow: "0 0 20px rgba(232,0,45,0.2)",
+                }}
+              >
                 <User size={14} /> {t.connectIRacing}
               </button>
             )}
@@ -401,10 +583,24 @@ export default function HomePage() {
 
         {/* Mobile: toggles + hamburger */}
         {isMobile && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <LangToggle />
             <ThemeToggle />
-            <button onClick={() => setMenuOpen(o => !o)} style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-card)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+            <button
+              onClick={() => setMenuOpen((o) => !o)}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                border: "1px solid var(--border)",
+                background: "var(--bg-card)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--text-muted)",
+              }}
+            >
               {menuOpen ? <XIcon size={16} /> : <Menu size={16} />}
             </button>
           </div>
@@ -413,16 +609,63 @@ export default function HomePage() {
 
       {/* Mobile menu drawer */}
       {isMobile && menuOpen && (
-        <div style={{ position: 'fixed', top: 64, left: 0, right: 0, bottom: 0, zIndex: 999, background: 'var(--bg-base)', overflowY: 'auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 64,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 999,
+            background: "var(--bg-base)",
+            overflowY: "auto",
+            padding: "20px 16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+          }}
+        >
           {/* Season selector — only show if multiple seasons */}
           {seasons.length > 1 && (
             <div>
-              <p style={{ fontFamily: 'Orbitron, monospace', fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 8px' }}>{t.season}</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {seasons.map(s => {
-                  const active = currentSeason?.season_year === s.season_year && currentSeason?.season_quarter === s.season_quarter;
+              <p
+                style={{
+                  fontFamily: "Orbitron, monospace",
+                  fontSize: 10,
+                  color: "var(--text-muted)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.12em",
+                  margin: "0 0 8px",
+                }}
+              >
+                {t.season}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {seasons.map((s) => {
+                  const active =
+                    currentSeason?.season_year === s.season_year &&
+                    currentSeason?.season_quarter === s.season_quarter;
                   return (
-                    <button key={`${s.season_year}-${s.season_quarter}`} onClick={() => { setCurrentSeason(s); setMenuOpen(false); }} style={{ padding: '8px 16px', borderRadius: 10, border: `1px solid ${active ? 'rgba(232,0,45,0.4)' : 'var(--border)'}`, background: active ? 'rgba(232,0,45,0.10)' : 'var(--bg-card)', color: active ? '#E8002D' : 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                    <button
+                      key={`${s.season_year}-${s.season_quarter}`}
+                      onClick={() => {
+                        setCurrentSeason(s);
+                        setMenuOpen(false);
+                      }}
+                      style={{
+                        padding: "8px 16px",
+                        borderRadius: 10,
+                        border: `1px solid ${active ? "rgba(232,0,45,0.4)" : "var(--border)"}`,
+                        background: active
+                          ? "rgba(232,0,45,0.10)"
+                          : "var(--bg-card)",
+                        color: active ? "#E8002D" : "var(--text-muted)",
+                        fontFamily: "Rajdhani, sans-serif",
+                        fontWeight: 700,
+                        fontSize: 14,
+                        cursor: "pointer",
+                      }}
+                    >
                       {s.label}
                     </button>
                   );
@@ -431,34 +674,116 @@ export default function HomePage() {
             </div>
           )}
 
-          <div style={{ height: 1, background: 'var(--border)' }} />
+          <div style={{ height: 1, background: "var(--border)" }} />
 
           {/* Nav sections */}
-          {([
-            { id: 'all',        label: t.cards,      icon: <LayoutGrid size={16} /> },
-            { id: 'favorites',  label: t.favorites,  icon: <Heart size={16} /> },
-            { id: 'myContent',  label: t.myContent,  icon: <LayoutGrid size={16} /> },
-          ] as const).map(item => (
-            <button key={item.id} onClick={() => { setActiveSection(item.id === 'all' ? 'all' : item.id as any); setMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12, border: `1px solid ${activeSection === item.id ? 'rgba(232,0,45,0.3)' : 'var(--border)'}`, background: activeSection === item.id ? 'rgba(232,0,45,0.07)' : 'var(--bg-card)', color: activeSection === item.id ? '#E8002D' : 'var(--text-primary)', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600, fontSize: 15, cursor: 'pointer', textAlign: 'left' }}>
+          {(
+            [
+              { id: "all", label: t.cards, icon: <LayoutGrid size={16} /> },
+              {
+                id: "favorites",
+                label: t.favorites,
+                icon: <Heart size={16} />,
+              },
+              {
+                id: "myContent",
+                label: t.myContent,
+                icon: <LayoutGrid size={16} />,
+              },
+            ] as const
+          ).map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setActiveSection(item.id === "all" ? "all" : (item.id as any));
+                setMenuOpen(false);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "14px 16px",
+                borderRadius: 12,
+                border: `1px solid ${activeSection === item.id ? "rgba(232,0,45,0.3)" : "var(--border)"}`,
+                background:
+                  activeSection === item.id
+                    ? "rgba(232,0,45,0.07)"
+                    : "var(--bg-card)",
+                color:
+                  activeSection === item.id ? "#E8002D" : "var(--text-primary)",
+                fontFamily: "Rajdhani, sans-serif",
+                fontWeight: 600,
+                fontSize: 15,
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
               {item.icon} {item.label}
             </button>
           ))}
 
-          <div style={{ height: 1, background: 'var(--border)' }} />
+          <div style={{ height: 1, background: "var(--border)" }} />
 
           {/* Language toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontFamily: 'Orbitron, monospace', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.languageLabel}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span
+              style={{
+                fontFamily: "Orbitron, monospace",
+                fontSize: 11,
+                color: "var(--text-muted)",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+              }}
+            >
+              {t.languageLabel}
+            </span>
             <LangToggle />
           </div>
 
           {/* Login button */}
           {user ? (
-            <button onClick={() => window.location.href = '/api/auth/logout'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px', borderRadius: 12, border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+            <button
+              onClick={() => (window.location.href = "/api/auth/logout")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "14px",
+                borderRadius: 12,
+                border: "1px solid rgba(239,68,68,0.3)",
+                background: "rgba(239,68,68,0.08)",
+                color: "#EF4444",
+                fontFamily: "Rajdhani, sans-serif",
+                fontWeight: 700,
+                fontSize: 15,
+                cursor: "pointer",
+              }}
+            >
               {t.logout}
             </button>
           ) : (
-            <button onClick={() => { setShowLogin(true); setMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px', borderRadius: 12, background: '#E8002D', color: 'white', fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}>
+            <button
+              onClick={() => {
+                setShowLogin(true);
+                setMenuOpen(false);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "14px",
+                borderRadius: 12,
+                background: "#E8002D",
+                color: "white",
+                fontFamily: "Rajdhani, sans-serif",
+                fontWeight: 700,
+                fontSize: 15,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
               <User size={16} /> {t.connectIRacing}
             </button>
           )}
@@ -467,22 +792,51 @@ export default function HomePage() {
 
       {/* ── FILTERS ─────────────────────────────────────────── */}
       <div
-        ref={el => { if (el) setHeaderHeight(el.offsetHeight); }}
-        style={{ position: 'fixed', top: 64, left: 0, right: 0, zIndex: 900 }}
+        ref={(el) => {
+          if (el) setHeaderHeight(el.offsetHeight);
+        }}
+        style={{ position: "fixed", top: 64, left: 0, right: 0, zIndex: 900 }}
       >
-        <FiltersBar filters={filters} onChange={setFilters} autoLicense={autoLicense as any} />
+        <FiltersBar
+          filters={filters}
+          onChange={setFilters}
+          autoLicense={autoLicense as any}
+        />
         {!user && (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            background: isDark ? '#161616' : '#FAFAFA',
-            borderBottom: '1px solid rgba(232,0,45,0.2)',
-            padding: '7px 24px',
-          }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              background: isDark ? "#161616" : "#FAFAFA",
+              borderBottom: "1px solid rgba(232,0,45,0.2)",
+              padding: "7px 24px",
+            }}
+          >
             <Info size={13} color="#E8002D" style={{ flexShrink: 0 }} />
-            <span style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 13, color: isDark ? '#888888' : '#666666', flex: 1 }}>
+            <span
+              style={{
+                fontFamily: "Rajdhani, sans-serif",
+                fontSize: 13,
+                color: isDark ? "#888888" : "#666666",
+                flex: 1,
+              }}
+            >
               {t.demoBannerText}
             </span>
-            <button onClick={() => setShowLogin(true)} style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 12, fontWeight: 700, color: '#E8002D', background: 'none', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <button
+              onClick={() => setShowLogin(true)}
+              style={{
+                fontFamily: "Rajdhani, sans-serif",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#E8002D",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
               {t.connectIRacing} →
             </button>
           </div>
@@ -493,66 +847,190 @@ export default function HomePage() {
       <div style={{ height: headerHeight }} />
 
       {/* MAIN CONTENT */}
-      <main style={{ flex: 1, padding: isMobile ? '16px 12px 48px' : '28px 24px 48px', maxWidth: 1680, margin: '0 auto', width: '100%', paddingBottom: comparingSeries.length > 0 ? 'calc(48px + 60vh)' : isMobile ? '80px' : '48px' }}>
-
-
+      <main
+        style={{
+          flex: 1,
+          padding: isMobile ? "16px 12px 48px" : "80px 24px 48px",
+          maxWidth: 1680,
+          margin: "0 auto",
+          width: "100%",
+          paddingBottom:
+            comparingSeries.length > 0
+              ? "calc(48px + 60vh)"
+              : isMobile
+                ? "80px"
+                : "48px",
+        }}
+      >
         {/* Título de temporada + toggle de vista */}
-        <div style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: isMobile ? "flex-start" : "center",
+            flexDirection: isMobile ? "column" : "row",
+            gap: isMobile ? 10 : 14,
+            marginBottom: 24,
+          }}
+        >
           {/* Season title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <h1 style={{
-              fontFamily: 'Orbitron, monospace', fontSize: isMobile ? 15 : 20, fontWeight: 900,
-              color: 'var(--text-primary)', letterSpacing: '0.04em', margin: 0, textTransform: 'uppercase',
-            }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <h1
+              style={{
+                fontFamily: "Orbitron, monospace",
+                fontSize: isMobile ? 15 : 20,
+                fontWeight: 900,
+                color: "var(--text-primary)",
+                letterSpacing: "0.04em",
+                margin: 0,
+                textTransform: "uppercase",
+              }}
+            >
               {currentSeason
                 ? `${t.season} ${currentSeason.season_quarter} · ${currentSeason.season_year}`
                 : t.loading}
             </h1>
             {/* Current week badge — like iRacing */}
-            {currentSeason && (() => {
-              const week = getCurrentRaceWeek(currentSeason.season_year, currentSeason.season_quarter);
-              if (week === null) return null;
-              const maxWeeks = currentSeason.max_weeks ?? 13;
-              return (
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
-                  fontFamily: 'Orbitron, monospace', fontSize: isMobile ? 11 : 13,
-                  fontWeight: 700, color: isDark ? '#888888' : '#888888',
-                  letterSpacing: '0.06em',
-                }}>
-                  Week {week + 1} of {maxWeeks}
-                </span>
-              );
-            })()}
+            {currentSeason &&
+              (() => {
+                const week = getCurrentRaceWeek(
+                  currentSeason.season_year,
+                  currentSeason.season_quarter,
+                );
+                if (week === null) return null;
+                const maxWeeks = currentSeason.max_weeks ?? 13;
+                return (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      fontFamily: "Orbitron, monospace",
+                      fontSize: isMobile ? 11 : 13,
+                      fontWeight: 700,
+                      color: isDark ? "#888888" : "#888888",
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    Week {week + 1} of {maxWeeks}
+                  </span>
+                );
+              })()}
           </div>
-          <span style={{ fontFamily: 'Orbitron, monospace', fontSize: 12, color: T.textFaint }}>
-            {loading ? '' : `${displayed.length} series`}
+          <span
+            style={{
+              fontFamily: "Orbitron, monospace",
+              fontSize: 12,
+              color: T.textFaint,
+            }}
+          >
+            {loading ? "" : `${displayed.length} series`}
           </span>
           {!loading && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'Orbitron, monospace', fontSize: 10, fontWeight: 600, color: '#22C55E', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 6, padding: '2px 8px', letterSpacing: '0.1em' }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block' }} />
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                fontFamily: "Orbitron, monospace",
+                fontSize: 10,
+                fontWeight: 600,
+                color: "#22C55E",
+                background: "rgba(34,197,94,0.1)",
+                border: "1px solid rgba(34,197,94,0.25)",
+                borderRadius: 6,
+                padding: "2px 8px",
+                letterSpacing: "0.1em",
+              }}
+            >
+              <span
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: "50%",
+                  background: "#22C55E",
+                  display: "inline-block",
+                }}
+              />
               {t.live}
             </span>
           )}
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: 2, background: T.cardBg, border: `1px solid ${T.cardBorder}`, borderRadius: 10, padding: 3 }}>
-            {([
-              { mode: 'grid',     icon: <LayoutGrid size={15} />,    label: t.cards    },
-              { mode: 'calendar', icon: <LayoutList size={15} />,    label: t.calendar },
-              { mode: 'map',      icon: <MapPin size={15} />,        label: t.map      },
-              { mode: 'schedule', icon: <CalendarClock size={15} />, label: t.schedule, badge: scheduledIds.length || undefined },
-            ] as const).map(v => (
-              <button key={v.mode} onClick={() => setViewMode(v.mode)} title={v.label} style={{
-                display: 'flex', alignItems: 'center', gap: isMobile ? 0 : 6,
-                padding: isMobile ? '6px 10px' : '6px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                background: viewMode === v.mode ? (isDark ? 'rgba(232,0,45,0.12)' : 'rgba(232,0,45,0.08)') : 'transparent',
-                color: viewMode === v.mode ? 'var(--text-primary)' : T.textFaint,
-                fontFamily: 'Rajdhani, sans-serif', fontWeight: 600, fontSize: 13,
-                transition: 'all 0.15s', position: 'relative',
-              }}>
+          <div
+            style={{
+              marginLeft: "auto",
+              display: "flex",
+              gap: 2,
+              background: T.cardBg,
+              border: `1px solid ${T.cardBorder}`,
+              borderRadius: 10,
+              padding: 3,
+            }}
+          >
+            {(
+              [
+                {
+                  mode: "grid",
+                  icon: <LayoutGrid size={15} />,
+                  label: t.cards,
+                },
+                {
+                  mode: "calendar",
+                  icon: <LayoutList size={15} />,
+                  label: t.calendar,
+                },
+                { mode: "map", icon: <MapPin size={15} />, label: t.map },
+                {
+                  mode: "schedule",
+                  icon: <CalendarClock size={15} />,
+                  label: t.schedule,
+                  badge: scheduledIds.length || undefined,
+                },
+              ] as const
+            ).map((v) => (
+              <button
+                key={v.mode}
+                onClick={() => setViewMode(v.mode)}
+                title={v.label}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: isMobile ? 0 : 6,
+                  padding: isMobile ? "6px 10px" : "6px 12px",
+                  borderRadius: 8,
+                  border: "none",
+                  cursor: "pointer",
+                  background:
+                    viewMode === v.mode
+                      ? isDark
+                        ? "rgba(232,0,45,0.12)"
+                        : "rgba(232,0,45,0.08)"
+                      : "transparent",
+                  color:
+                    viewMode === v.mode ? "var(--text-primary)" : T.textFaint,
+                  fontFamily: "Rajdhani, sans-serif",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  transition: "all 0.15s",
+                  position: "relative",
+                }}
+              >
                 {v.icon}
                 {!isMobile && v.label}
-                {'badge' in v && v.badge ? (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '50%', background: '#A855F7', color: 'white', fontSize: 9, fontWeight: 800, fontFamily: 'Orbitron, monospace' }}>
+                {"badge" in v && v.badge ? (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 16,
+                      height: 16,
+                      borderRadius: "50%",
+                      background: "#A855F7",
+                      color: "white",
+                      fontSize: 9,
+                      fontWeight: 800,
+                      fontFamily: "Orbitron, monospace",
+                    }}
+                  >
                     {v.badge}
                   </span>
                 ) : null}
@@ -562,7 +1040,7 @@ export default function HomePage() {
         </div>
 
         {/* Map view */}
-        {viewMode === 'map' && !loading && (
+        {viewMode === "map" && !loading && (
           <TrackMap
             series={series}
             ownedTrackIds={[]}
@@ -571,121 +1049,259 @@ export default function HomePage() {
         )}
 
         {/* Schedule view */}
-        {viewMode === 'schedule' && !loading && (
+        {viewMode === "schedule" && !loading && (
           <ScheduleView
             series={series}
             scheduledIds={scheduledIds}
-            onRemove={id => toggleSchedule(id)}
-            onSeriesClick={s => openSeries(s)}
+            onRemove={(id) => toggleSchedule(id)}
+            onSeriesClick={(s) => openSeries(s)}
           />
         )}
 
         {/* Calendar view */}
-        {viewMode === 'calendar' && !loading && (
-          <CalendarView series={series} onSeriesClick={s => openSeries(s)} />
+        {viewMode === "calendar" && !loading && (
+          <CalendarView series={series} onSeriesClick={(s) => openSeries(s)} />
         )}
 
         {/* Grid view */}
-        {viewMode === 'grid' && <div style={{ display: 'grid', gap: isMobile ? 12 : 16, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(400px, 1fr))' }}>
-          {loading
-            ? Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)
-            : displayed.length === 0
-            ? (
-              <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '96px 0', gap: 16, textAlign: 'center' }}>
-                <div style={{
-                  width: 72, height: 72, borderRadius: 20,
-                  background: T.cardBg, border: `1px solid ${T.cardBorder}`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.emptyIcon,
-                }}>
-                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        {viewMode === "grid" && (
+          <div
+            style={{
+              display: "grid",
+              gap: isMobile ? 12 : 16,
+              gridTemplateColumns: isMobile
+                ? "1fr"
+                : "repeat(auto-fill, minmax(400px, 1fr))",
+            }}
+          >
+            {loading ? (
+              Array(6)
+                .fill(0)
+                .map((_, i) => <SkeletonCard key={i} />)
+            ) : displayed.length === 0 ? (
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "96px 0",
+                  gap: 16,
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: 20,
+                    background: T.cardBg,
+                    border: `1px solid ${T.cardBorder}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: T.emptyIcon,
+                  }}
+                >
+                  <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
                   </svg>
                 </div>
-                <p style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 20, fontWeight: 800, color: T.emptyTitle, margin: 0 }}>
+                <p
+                  style={{
+                    fontFamily: "Rajdhani, sans-serif",
+                    fontSize: 20,
+                    fontWeight: 800,
+                    color: T.emptyTitle,
+                    margin: 0,
+                  }}
+                >
                   No series found
                 </p>
                 <p style={{ fontSize: 14, color: T.emptyText, margin: 0 }}>
                   Try adjusting or resetting your filters.
                 </p>
                 <button
-                  onClick={() => setFilters({ categories: [], licenses: [], statuses: [], favoritesOnly: false, ownedOnly: false, searchQuery: '', myLicense: null })}
+                  onClick={() =>
+                    setFilters({
+                      categories: [],
+                      licenses: [],
+                      statuses: [],
+                      favoritesOnly: false,
+                      ownedOnly: false,
+                      searchQuery: "",
+                      myLicense: null,
+                    })
+                  }
                   style={{
-                    marginTop: 8, padding: '10px 20px', borderRadius: 10,
-                    border: `1px solid ${T.btnBorder}`, background: 'transparent',
-                    color: T.btnColor, cursor: 'pointer', fontSize: 14,
-                    fontFamily: 'Rajdhani, sans-serif', fontWeight: 600,
+                    marginTop: 8,
+                    padding: "10px 20px",
+                    borderRadius: 10,
+                    border: `1px solid ${T.btnBorder}`,
+                    background: "transparent",
+                    color: T.btnColor,
+                    cursor: "pointer",
+                    fontSize: 14,
+                    fontFamily: "Rajdhani, sans-serif",
+                    fontWeight: 600,
                   }}
                 >
                   Reset Filters
                 </button>
               </div>
-            )
-            : displayed.map(s => (
-              <SeriesCard
-                key={s.season_id}
-                series={s}
-                logoUrl={getLogoUrl(s.series_id, seriesLogos)}
-                isFavorite={favorites.includes(s.series_id)}
-                isComparing={comparingSeries.some(x => x.series_id === s.series_id)}
-                isScheduled={scheduledIds.includes(s.series_id)}
-                isEligible={effectiveLicense !== null && (s.minLicenseLevel ?? 0) <= effectiveLicense}
-                onFavoriteToggle={(_, newFavs) => { setFavorites(newFavs); if ((user as any)?.cust_id) { fetch('/api/user/favorites', { method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({favorites: newFavs}) }).catch(()=>{}); } }}
-                onClick={() => openSeries(s)}
-                onCompare={() => toggleCompare(s)}
-                onSchedule={() => toggleSchedule(s.series_id)}
-              />
-            ))
-          }
-        </div>}
+            ) : (
+              displayed.map((s) => (
+                <SeriesCard
+                  key={s.season_id}
+                  series={s}
+                  logoUrl={getLogoUrl(s.series_id, seriesLogos)}
+                  isFavorite={favorites.includes(s.series_id)}
+                  isComparing={comparingSeries.some(
+                    (x) => x.series_id === s.series_id,
+                  )}
+                  isScheduled={scheduledIds.includes(s.series_id)}
+                  isEligible={
+                    effectiveLicense !== null &&
+                    (s.minLicenseLevel ?? 0) <= effectiveLicense
+                  }
+                  onFavoriteToggle={(_, newFavs) => {
+                    setFavorites(newFavs);
+                    if ((user as any)?.cust_id) {
+                      fetch("/api/user/favorites", {
+                        method: "POST",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ favorites: newFavs }),
+                      }).catch(() => {});
+                    }
+                  }}
+                  onClick={() => openSeries(s)}
+                  onCompare={() => toggleCompare(s)}
+                  onSchedule={() => toggleSchedule(s.series_id)}
+                />
+              ))
+            )}
+          </div>
+        )}
       </main>
 
       {/* ════════════════════════════════════════════════════════
           FOOTER
       ════════════════════════════════════════════════════════ */}
-      <footer style={{
-        borderTop: `1px solid ${T.border}`,
-        background: T.footerBg,
-        padding: '32px 24px',
-      }}>
-        <div style={{ maxWidth: 1680, margin: '0 auto' }}>
-
+      <footer
+        style={{
+          borderTop: `1px solid ${T.border}`,
+          background: T.footerBg,
+          padding: "32px 24px",
+        }}
+      >
+        <div style={{ maxWidth: 1680, margin: "0 auto" }}>
           {/* Fila principal */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 32, flexWrap: 'wrap', marginBottom: 28 }}>
-
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: 32,
+              flexWrap: "wrap",
+              marginBottom: 28,
+            }}
+          >
             {/* Logo + descripción */}
             <div style={{ maxWidth: 280 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <div style={{
-                  width: 30, height: 30, borderRadius: 8,
-                }}>
-                  <img src="/icon.png" alt="BoxBoxBoard" style={{ width: 30, height: 30, borderRadius: 8 }} />
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  marginBottom: 12,
+                }}
+              >
+                <div
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 8,
+                  }}
+                >
+                  <img
+                    src="/icon.png"
+                    alt="BoxBoxBoard"
+                    style={{ width: 30, height: 30, borderRadius: 8 }}
+                  />
                 </div>
-                <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 17, color: 'var(--text-primary)' }}>
+                <span
+                  style={{
+                    fontFamily: "Rajdhani, sans-serif",
+                    fontWeight: 900,
+                    fontSize: 17,
+                    color: "var(--text-primary)",
+                  }}
+                >
                   BoxBoxBoard
                 </span>
               </div>
-              <p style={{ fontSize: 13, color: T.textFaint, lineHeight: 1.6, margin: 0 }}>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: T.textFaint,
+                  lineHeight: 1.6,
+                  margin: 0,
+                }}
+              >
                 {t.footerDesc}
               </p>
             </div>
 
             {/* Links */}
-            <div style={{ display: 'flex', gap: 48, flexWrap: 'wrap' }}>
+            <div style={{ display: "flex", gap: 48, flexWrap: "wrap" }}>
               <div>
-                <p style={{
-                  fontFamily: 'Orbitron, monospace', fontSize: 10, fontWeight: 600,
-                  color: T.textDimmed, textTransform: 'uppercase', letterSpacing: '0.14em',
-                  margin: '0 0 12px',
-                }}>
+                <p
+                  style={{
+                    fontFamily: "Orbitron, monospace",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: T.textDimmed,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.14em",
+                    margin: "0 0 12px",
+                  }}
+                >
                   {t.project}
                 </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <a href="https://ko-fi.com" target="_blank" rel="noopener noreferrer" style={{
-                    display: 'flex', alignItems: 'center', gap: 7,
-                    fontSize: 13, color: T.textMuted, textDecoration: 'none', transition: 'color 0.15s',
-                  }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = T.textMuted}
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                >
+                  <a
+                    href="https://ko-fi.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 7,
+                      fontSize: 13,
+                      color: T.textMuted,
+                      textDecoration: "none",
+                      transition: "color 0.15s",
+                    }}
+                    onMouseEnter={(e) =>
+                      ((e.currentTarget as HTMLElement).style.color =
+                        "var(--text-secondary)")
+                    }
+                    onMouseLeave={(e) =>
+                      ((e.currentTarget as HTMLElement).style.color =
+                        T.textMuted)
+                    }
                   >
                     <Coffee size={13} /> Ko-fi
                   </a>
@@ -693,26 +1309,55 @@ export default function HomePage() {
               </div>
 
               <div>
-                <p style={{
-                  fontFamily: 'Orbitron, monospace', fontSize: 10, fontWeight: 600,
-                  color: T.textDimmed, textTransform: 'uppercase', letterSpacing: '0.14em',
-                  margin: '0 0 12px',
-                }}>
+                <p
+                  style={{
+                    fontFamily: "Orbitron, monospace",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: T.textDimmed,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.14em",
+                    margin: "0 0 12px",
+                  }}
+                >
                   iRacing
                 </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                >
                   {[
-                    { label: 'iRacing.com', href: 'https://www.iracing.com' },
-                    { label: 'Members Site', href: 'https://members.iracing.com' },
-                    { label: 'API Docs', href: 'https://members-ng.iracing.com/data/doc' },
-                  ].map(link => (
-                    <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" style={{
-                      display: 'flex', alignItems: 'center', gap: 6,
-                      fontSize: 13, color: T.textMuted, textDecoration: 'none',
-                      transition: 'color 0.15s',
-                    }}
-                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'}
-                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = T.textMuted}
+                    { label: "iRacing.com", href: "https://www.iracing.com" },
+                    {
+                      label: "Members Site",
+                      href: "https://members.iracing.com",
+                    },
+                    {
+                      label: "API Docs",
+                      href: "https://members-ng.iracing.com/data/doc",
+                    },
+                  ].map((link) => (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        fontSize: 13,
+                        color: T.textMuted,
+                        textDecoration: "none",
+                        transition: "color 0.15s",
+                      }}
+                      onMouseEnter={(e) =>
+                        ((e.currentTarget as HTMLElement).style.color =
+                          "var(--text-secondary)")
+                      }
+                      onMouseLeave={(e) =>
+                        ((e.currentTarget as HTMLElement).style.color =
+                          T.textMuted)
+                      }
                     >
                       <ExternalLink size={11} /> {link.label}
                     </a>
@@ -726,11 +1371,33 @@ export default function HomePage() {
           <div style={{ height: 1, background: T.divider, marginBottom: 20 }} />
 
           {/* Legal disclaimer */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-            <p style={{ fontSize: 12, color: T.textDimmed, margin: 0, lineHeight: 1.5 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <p
+              style={{
+                fontSize: 12,
+                color: T.textDimmed,
+                margin: 0,
+                lineHeight: 1.5,
+              }}
+            >
               {t.notAffiliated}
             </p>
-            <p style={{ fontSize: 12, color: T.textDimmed, margin: 0, whiteSpace: 'nowrap' }}>
+            <p
+              style={{
+                fontSize: 12,
+                color: T.textDimmed,
+                margin: 0,
+                whiteSpace: "nowrap",
+              }}
+            >
               {t.madeBy}
             </p>
           </div>
@@ -747,10 +1414,26 @@ export default function HomePage() {
 
       <SeriesDetailPanel
         series={selectedSeries}
-        logoUrl={selectedSeries ? getLogoUrl(selectedSeries.series_id, seriesLogos) : undefined}
-        isFavorite={selectedSeries ? favorites.includes(selectedSeries.series_id) : false}
+        logoUrl={
+          selectedSeries
+            ? getLogoUrl(selectedSeries.series_id, seriesLogos)
+            : undefined
+        }
+        isFavorite={
+          selectedSeries ? favorites.includes(selectedSeries.series_id) : false
+        }
         onClose={() => closeSeries()}
-        onFavoriteToggle={(_, newFavs) => { setFavorites(newFavs); if ((user as any)?.cust_id) { fetch('/api/user/favorites', { method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({favorites: newFavs}) }).catch(()=>{}); } }}
+        onFavoriteToggle={(_, newFavs) => {
+          setFavorites(newFavs);
+          if ((user as any)?.cust_id) {
+            fetch("/api/user/favorites", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ favorites: newFavs }),
+            }).catch(() => {});
+          }
+        }}
       />
 
       <WeekChangeBanner
@@ -762,18 +1445,29 @@ export default function HomePage() {
 
       <CompareBar
         series={comparingSeries}
-        onRemove={id => setComparingSeries(prev => prev.filter(x => x.series_id !== id))}
+        onRemove={(id) =>
+          setComparingSeries((prev) => prev.filter((x) => x.series_id !== id))
+        }
         onClear={() => setComparingSeries([])}
       />
 
       <InstallBanner />
 
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #0F1623; border-radius: 3px; }
+        @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap");
+        * {
+          box-sizing: border-box;
+        }
+        ::-webkit-scrollbar {
+          width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #0f1623;
+          border-radius: 3px;
+        }
       `}</style>
     </div>
   );

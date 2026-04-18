@@ -2,6 +2,7 @@
 // Returns all series for the current season — works with or without auth
 
 import { NextRequest, NextResponse } from "next/server";
+import { getValidToken } from "../../../lib/iracing-token";
 
 const BASE = "https://members-ng.iracing.com/data";
 
@@ -22,11 +23,10 @@ async function iracingFetch(path: string, token: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("iracing_access_token")?.value;
-
-  if (!token) {
+  const tokenResult = await getValidToken();
+  if (!tokenResult)
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { token } = tokenResult;
 
   try {
     const data = await iracingFetch(

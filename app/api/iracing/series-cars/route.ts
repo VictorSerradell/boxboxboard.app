@@ -3,6 +3,7 @@
 // All races in a week are on the same track so lap times are directly comparable
 
 import { NextRequest, NextResponse } from "next/server";
+import { getValidToken } from "../../../lib/iracing-token";
 
 const BASE = "https://members-ng.iracing.com/data";
 
@@ -32,9 +33,10 @@ function formatLapTime(ms: number): string {
 }
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("iracing_access_token")?.value;
-  if (!token)
+  const tokenResult = await getValidToken();
+  if (!tokenResult)
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const { token, headers: tokenHeaders } = tokenResult;
 
   const { searchParams } = request.nextUrl;
   const seriesId = searchParams.get("series_id");
@@ -153,15 +155,18 @@ export async function GET(request: NextRequest) {
           : `+${((c.avg_lap_ms - leaderTime) / 10000).toFixed(3)}s`,
     }));
 
-    return NextResponse.json({
-      cars: carsWithDelta,
-      total_drivers: Object.values(carData).reduce(
-        (s, d) => s + d.lap_times.length,
-        0,
-      ),
-      subsessions_sampled: topSubs.length,
-      total_subsessions: allSubs.length,
-    });
+    return NextResponse.json(
+      {
+        cars: carsWithDelta,
+        total_drivers: Object.values(carData).reduce(
+          (s, d) => s + d.lap_times.length,
+          0,
+        ),
+        subsessions_sampled: topSubs.length,
+        total_subsessions: allSubs.length,
+      },
+      { headers: tokenHeaders },
+    );
   } catch (e: any) {
     console.error("[series-cars]", e.message);
     return NextResponse.json({ error: e.message }, { status: 500 });

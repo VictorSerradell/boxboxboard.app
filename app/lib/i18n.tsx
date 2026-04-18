@@ -58,6 +58,8 @@ export interface Translations {
   fullCalendar: string;
   seriesInfo: string;
   topCars: string;
+  noRaceData: string;
+  lapTimesNote: (n: number) => string;
   seasonLabel: string;
   minLicense: string;
   teamDriving: string;
@@ -213,6 +215,8 @@ const translations: Record<Lang, Translations> = {
     fullCalendar: "Full Track Calendar",
     seriesInfo: "Series Info",
     topCars: "Top Cars",
+    noRaceData: "No race data for this week yet",
+    lapTimesNote: (n: number) => `Based on ${n}+ best laps from top splits`,
     seasonLabel: "Season",
     minLicense: "Min License",
     teamDriving: "Team Driving",
@@ -438,6 +442,9 @@ const translations: Record<Lang, Translations> = {
     fullCalendar: "Calendario Completo",
     seriesInfo: "Info de Serie",
     topCars: "Coches más usados",
+    noRaceData: "No hay datos de carreras para esta semana todavía",
+    lapTimesNote: (n: number) =>
+      `Basado en ${n}+ mejores vueltas de los splits más rápidos`,
     seasonLabel: "Temporada",
     minLicense: "Licencia Mín.",
     teamDriving: "Conducción en Equipo",

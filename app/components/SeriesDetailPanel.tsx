@@ -1193,7 +1193,7 @@ export default function SeriesDetailPanel({
                     fontSize: 12,
                   }}
                 >
-                  No hay datos de carreras para esta semana todavía
+                  {t.noRaceData}
                 </div>
               )}
 
@@ -1399,8 +1399,7 @@ export default function SeriesDetailPanel({
                       paddingLeft: 2,
                     }}
                   >
-                    Basado en los {carStats[0]?.sample_size ?? 0}+ mejores
-                    vueltas de los splits más rápidos
+                    {t.lapTimesNote(carStats[0]?.sample_size ?? 0)}
                   </div>
                 </div>
               )}

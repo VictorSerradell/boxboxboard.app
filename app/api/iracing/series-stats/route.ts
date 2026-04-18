@@ -44,17 +44,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   try {
-    // Build query params for results/search_series
+    // Build query params — note: search_series filters by cust_id automatically
+    // so results only reflect races the authenticated user participated in
     const params = new URLSearchParams({
       race_week_num: weekNum,
-      official_only: "true",
       event_types: "5", // Race only
+      season_year: seasonYear ?? String(new Date().getFullYear()),
+      season_quarter: seasonQ ?? "1",
     });
 
     if (seasonId) params.set("season_id", seasonId);
     if (seriesId) params.set("series_id", seriesId);
-    if (seasonYear) params.set("season_year", seasonYear);
-    if (seasonQ) params.set("season_quarter", seasonQ);
 
     const data = await iracingFetch(`results/search_series?${params}`, token);
 

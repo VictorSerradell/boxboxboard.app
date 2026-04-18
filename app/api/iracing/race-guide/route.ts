@@ -2,6 +2,7 @@
 // Race guide with exact session start times — follows S3 redirect
 
 import { NextRequest, NextResponse } from "next/server";
+import { getValidToken } from "../../../lib/iracing-token";
 
 const BASE = "https://members-ng.iracing.com/data";
 
@@ -22,8 +23,9 @@ async function iracingFetch(path: string, token: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("iracing_access_token")?.value;
-  if (!token) return NextResponse.json({ sessions: [] }, { status: 401 });
+  const token = await getValidToken(request);
+  if (!token)
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
   const year = searchParams.get("season_year") ?? "";

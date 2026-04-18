@@ -3,6 +3,7 @@
 // Uses results/search_series which returns aggregated data per subsession
 
 import { NextRequest, NextResponse } from "next/server";
+import { getValidToken } from "../../../lib/iracing-token";
 
 const IRACING_BASE = "https://members-ng.iracing.com";
 
@@ -38,10 +39,9 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const token = request.cookies.get("iracing_access_token")?.value;
-  if (!token) {
+  const token = await getValidToken(request);
+  if (!token)
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
 
   try {
     // Build query params for results/search_series
@@ -101,13 +101,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (e: any) {
     console.error("[series-stats]", e.message);
-    return NextResponse.json({
-      avg_sof: 0,
-      avg_drivers: 0,
-      splits: 0,
-      total_races: 0,
-      has_data: false,
-      error: e.message,
-    });
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }

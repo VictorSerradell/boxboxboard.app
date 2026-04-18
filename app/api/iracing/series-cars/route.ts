@@ -1,5 +1,6 @@
 // /app/api/iracing/series-cars/route.ts
-// Returns most used cars in top 100 finishers across high-SOF races this week
+// Ranks cars by average best lap time across top-SOF races this week
+// All races in a week are on the same track so lap times are directly comparable
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -11,7 +12,7 @@ async function iracingFetch(path: string, token: string) {
       Authorization: `Bearer ${token}`,
       "User-Agent": "BoxBoxBoard/1.0",
     },
-    next: { revalidate: 1800 }, // cache 30 min
+    next: { revalidate: 1800 },
   });
   if (!res.ok) throw new Error(`iRacing ${res.status}: ${path}`);
   const raw = await res.json();
@@ -20,6 +21,14 @@ async function iracingFetch(path: string, token: string) {
       r.json(),
     );
   return raw;
+}
+
+function formatLapTime(ms: number): string {
+  // iRacing stores lap times in ten-thousandths of a second
+  const totalSeconds = ms / 10000;
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = (totalSeconds % 60).toFixed(3).padStart(6, "0");
+  return mins > 0 ? `${mins}:${secs}` : `${secs}s`;
 }
 
 export async function GET(request: NextRequest) {
@@ -37,12 +46,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "series_id required" }, { status: 400 });
 
   try {
-    // Step 1 — get all subsessions for this series/week
+    // Step 1 — get subsessions for this series/week
     const params = new URLSearchParams({
       series_id: seriesId,
       race_week_num: weekNum,
       official_only: "true",
-      event_types: "5", // Race only
+      event_types: "5",
     });
     if (seasonYear) params.set("season_year", seasonYear);
     if (seasonQ) params.set("season_quarter", seasonQ);
@@ -57,10 +66,8 @@ export async function GET(request: NextRequest) {
       seriesId,
       "week:",
       weekNum,
-      "results:",
+      "subsessions:",
       allSubs.length,
-      "raw keys:",
-      Object.keys(searchData ?? {}).join(","),
     );
 
     if (!allSubs.length) {
@@ -71,20 +78,18 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Step 2 — sort by SOF descending, take top 25 (highest competition)
+    // Step 2 — take top 20 splits by SOF
     const topSubs = [...allSubs]
       .sort(
         (a, b) =>
           (b.event_strength_of_field ?? 0) - (a.event_strength_of_field ?? 0),
       )
-      .slice(0, 25);
+      .slice(0, 20);
 
-    // Step 3 — fetch results for each subsession in parallel (batches of 5)
-    const carCounts: Record<
-      string,
-      { car_name: string; car_id: number; count: number }
-    > = {};
-    let totalDrivers = 0;
+    // Step 3 — collect best lap times per car across all sessions
+    // car_id → { car_name, lap_times: number[] }
+    const carData: Record<number, { car_name: string; lap_times: number[] }> =
+      {};
 
     const BATCH = 5;
     for (let i = 0; i < topSubs.length; i += BATCH) {
@@ -99,49 +104,61 @@ export async function GET(request: NextRequest) {
         if (result.status !== "fulfilled") continue;
         const data = result.value;
 
-        // Find the race session (simsession_type 6 = Race)
         const raceSessions = (data?.session_results ?? []).filter(
           (s: any) => s.simsession_type === 6 || s.simsession_name === "RACE",
         );
 
         for (const session of raceSessions) {
-          const results: any[] = session.results ?? [];
-          // Take top 100 finishers
-          const top100 = results
-            .filter((r: any) => r.finish_position !== undefined)
-            .sort((a: any, b: any) => a.finish_position - b.finish_position)
-            .slice(0, 100);
-
-          for (const driver of top100) {
+          for (const driver of session.results ?? []) {
             const carId = driver.car_id;
             const carName = driver.car_name ?? `Car ${carId}`;
-            if (!carId) continue;
-            if (!carCounts[carId]) {
-              carCounts[carId] = { car_name: carName, car_id: carId, count: 0 };
-            }
-            carCounts[carId].count++;
-            totalDrivers++;
+            const lapTime = driver.best_lap_time; // ten-thousandths of a second, -1 if no lap
+
+            if (!carId || !lapTime || lapTime <= 0) continue;
+
+            if (!carData[carId])
+              carData[carId] = { car_name: carName, lap_times: [] };
+            carData[carId].lap_times.push(lapTime);
           }
         }
       }
     }
 
-    // Step 4 — sort and calculate percentages
-    const cars = Object.values(carCounts)
-      .sort((a, b) => b.count - a.count)
-      .map((car) => ({
-        car_id: car.car_id,
-        car_name: car.car_name,
-        count: car.count,
-        pct:
-          totalDrivers > 0
-            ? ((car.count / totalDrivers) * 100).toFixed(1)
-            : "0",
-      }));
+    // Step 4 — compute average best lap per car, sort ascending (faster = lower)
+    const cars = Object.entries(carData)
+      .filter(([, d]) => d.lap_times.length >= 3) // need enough samples
+      .map(([carId, d]) => {
+        const sorted = [...d.lap_times].sort((a, b) => a - b);
+        // Use median of top 20% fastest laps to represent car pace
+        const topN = Math.max(1, Math.ceil(sorted.length * 0.2));
+        const topLaps = sorted.slice(0, topN);
+        const avgBest = topLaps.reduce((s, v) => s + v, 0) / topLaps.length;
+        return {
+          car_id: Number(carId),
+          car_name: d.car_name,
+          avg_lap_ms: avgBest,
+          lap_time: formatLapTime(avgBest),
+          sample_size: d.lap_times.length,
+        };
+      })
+      .sort((a, b) => a.avg_lap_ms - b.avg_lap_ms);
+
+    // Add delta to leader
+    const leaderTime = cars[0]?.avg_lap_ms ?? 0;
+    const carsWithDelta = cars.map((c, i) => ({
+      ...c,
+      delta:
+        i === 0
+          ? null
+          : `+${((c.avg_lap_ms - leaderTime) / 10000).toFixed(3)}s`,
+    }));
 
     return NextResponse.json({
-      cars,
-      total_drivers: totalDrivers,
+      cars: carsWithDelta,
+      total_drivers: Object.values(carData).reduce(
+        (s, d) => s + d.lap_times.length,
+        0,
+      ),
       subsessions_sampled: topSubs.length,
       total_subsessions: allSubs.length,
     });

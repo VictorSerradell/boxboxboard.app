@@ -130,7 +130,14 @@ export default function SeriesDetailPanel({
   const [statsLoading, setStatsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"info" | "cars">("info");
   const [carStats, setCarStats] = useState<
-    { car_id: number; car_name: string; count: number; pct: string }[]
+    {
+      car_id: number;
+      car_name: string;
+      lap_time: string;
+      delta: string | null;
+      sample_size: number;
+      avg_lap_ms: number;
+    }[]
   >([]);
   const [carsLoading, setCarsLoading] = useState(false);
   const [carsLoaded, setCarsLoaded] = useState(false);
@@ -1224,29 +1231,81 @@ export default function SeriesDetailPanel({
                       LIVE
                     </span>
                   </div>
+                  {/* Header */}
+                  <div
+                    style={{
+                      display: "flex",
+                      padding: "0 14px",
+                      marginBottom: 2,
+                    }}
+                  >
+                    <span
+                      style={{
+                        flex: 1,
+                        fontSize: 10,
+                        fontFamily: "Orbitron, monospace",
+                        color: "#555",
+                        letterSpacing: "0.1em",
+                      }}
+                    >
+                      CAR
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontFamily: "Orbitron, monospace",
+                        color: "#555",
+                        letterSpacing: "0.1em",
+                        marginRight: 8,
+                      }}
+                    >
+                      BEST LAP
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontFamily: "Orbitron, monospace",
+                        color: "#555",
+                        letterSpacing: "0.1em",
+                        width: 60,
+                        textAlign: "right",
+                      }}
+                    >
+                      GAP
+                    </span>
+                  </div>
                   {carStats.slice(0, 10).map((car, i) => {
-                    const pct = parseFloat(car.pct);
                     const isTop = i === 0;
+                    // Bar width relative to leader (max gap shown = 5s)
+                    const gapMs =
+                      car.avg_lap_ms - (carStats[0]?.avg_lap_ms ?? 0);
+                    const maxGap =
+                      (carStats[carStats.length - 1]?.avg_lap_ms ?? 0) -
+                      (carStats[0]?.avg_lap_ms ?? 1);
+                    const barWidth = isTop
+                      ? 100
+                      : maxGap > 0
+                        ? Math.min(100, 100 - (gapMs / maxGap) * 100)
+                        : 50;
                     return (
                       <div
                         key={car.car_id}
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: 12,
-                          padding: "12px 14px",
+                          gap: 10,
+                          padding: "10px 14px",
                           borderRadius: 10,
                           background: isTop ? `${accent}12` : T.rowBg,
                           border: `1px solid ${isTop ? accent + "35" : T.sectionBorder}`,
-                          transition: "all 0.15s",
                         }}
                       >
                         {/* Position */}
                         <div
                           style={{
-                            width: 24,
-                            height: 24,
-                            borderRadius: 8,
+                            width: 22,
+                            height: 22,
+                            borderRadius: 6,
                             background: isTop ? accent : T.rowBgAlt,
                             display: "flex",
                             alignItems: "center",
@@ -1257,15 +1316,15 @@ export default function SeriesDetailPanel({
                           <span
                             style={{
                               fontFamily: "Orbitron, monospace",
-                              fontSize: 11,
+                              fontSize: 10,
                               fontWeight: 700,
-                              color: isTop ? "#fff" : "#777777",
+                              color: isTop ? "#fff" : "#777",
                             }}
                           >
                             {i + 1}
                           </span>
                         </div>
-                        {/* Car name */}
+                        {/* Car name + bar */}
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div
                             style={{
@@ -1279,11 +1338,10 @@ export default function SeriesDetailPanel({
                           >
                             {car.car_name}
                           </div>
-                          {/* Bar */}
                           <div
                             style={{
-                              marginTop: 5,
-                              height: 4,
+                              marginTop: 4,
+                              height: 3,
                               borderRadius: 2,
                               background: isDark
                                 ? "#232323"
@@ -1295,39 +1353,55 @@ export default function SeriesDetailPanel({
                               style={{
                                 height: "100%",
                                 borderRadius: 2,
-                                width: `${Math.min(pct, 100)}%`,
-                                background: isTop ? accent : `${accent}70`,
+                                width: `${barWidth}%`,
+                                background: isTop ? accent : `${accent}60`,
                                 transition: "width 0.6s ease",
                               }}
                             />
                           </div>
                         </div>
-                        {/* Pct */}
-                        <div style={{ textAlign: "right", flexShrink: 0 }}>
-                          <div
-                            style={{
-                              fontFamily: "Orbitron, monospace",
-                              fontSize: 14,
-                              fontWeight: 700,
-                              color: isTop ? accent : T.textMuted,
-                            }}
-                          >
-                            {car.pct}%
-                          </div>
-                          <div
-                            style={{
-                              fontFamily: "Orbitron, monospace",
-                              fontSize: 10,
-                              color: "#777777",
-                              marginTop: 1,
-                            }}
-                          >
-                            {car.count} pilotos
-                          </div>
+                        {/* Lap time */}
+                        <div
+                          style={{
+                            fontFamily: "Orbitron, monospace",
+                            fontSize: 13,
+                            fontWeight: 700,
+                            color: isTop ? accent : T.textMuted,
+                            flexShrink: 0,
+                            textAlign: "right",
+                            minWidth: 72,
+                          }}
+                        >
+                          {car.lap_time}
+                        </div>
+                        {/* Delta */}
+                        <div
+                          style={{
+                            fontFamily: "Orbitron, monospace",
+                            fontSize: 11,
+                            color: isTop ? "#22C55E" : "#888",
+                            flexShrink: 0,
+                            textAlign: "right",
+                            minWidth: 60,
+                          }}
+                        >
+                          {car.delta ?? "LEADER"}
                         </div>
                       </div>
                     );
                   })}
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "#555",
+                      fontFamily: "Rajdhani, sans-serif",
+                      marginTop: 4,
+                      paddingLeft: 2,
+                    }}
+                  >
+                    Basado en los {carStats[0]?.sample_size ?? 0}+ mejores
+                    vueltas de los splits más rápidos
+                  </div>
                 </div>
               )}
             </section>

@@ -33,10 +33,9 @@ function formatLapTime(ms: number): string {
 }
 
 export async function GET(request: NextRequest) {
-  const tokenResult = await getValidToken();
-  if (!tokenResult)
+  const token = await getValidToken(request);
+  if (!token)
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  const { token, headers: tokenHeaders } = tokenResult;
 
   const { searchParams } = request.nextUrl;
   const seriesId = searchParams.get("series_id");
@@ -49,20 +48,27 @@ export async function GET(request: NextRequest) {
 
   try {
     // Step 1 — get subsessions for this series/week
+    // Note: official_only is NOT a valid iRacing API param (causes 400)
     const params = new URLSearchParams({
+      season_year: seasonYear ?? String(new Date().getFullYear()),
+      season_quarter: seasonQ ?? "1",
       series_id: seriesId,
       race_week_num: weekNum,
-      official_only: "true",
-      event_types: "5",
+      event_types: "5", // Race only
+      finish_range_begin: "1",
+      finish_range_end: "100",
     });
-    if (seasonYear) params.set("season_year", seasonYear);
-    if (seasonQ) params.set("season_quarter", seasonQ);
 
     const searchData = await iracingFetch(
       `results/search_series?${params}`,
       token,
     );
-    const allSubs: any[] = searchData?.results ?? searchData ?? [];
+    console.log(
+      "[series-cars] raw response keys:",
+      Object.keys(searchData ?? {}).join(","),
+    );
+    const allSubs: any[] =
+      searchData?.results ?? searchData?.data ?? searchData ?? [];
     console.log(
       "[series-cars] series_id:",
       seriesId,
@@ -155,18 +161,15 @@ export async function GET(request: NextRequest) {
           : `+${((c.avg_lap_ms - leaderTime) / 10000).toFixed(3)}s`,
     }));
 
-    return NextResponse.json(
-      {
-        cars: carsWithDelta,
-        total_drivers: Object.values(carData).reduce(
-          (s, d) => s + d.lap_times.length,
-          0,
-        ),
-        subsessions_sampled: topSubs.length,
-        total_subsessions: allSubs.length,
-      },
-      { headers: tokenHeaders },
-    );
+    return NextResponse.json({
+      cars: carsWithDelta,
+      total_drivers: Object.values(carData).reduce(
+        (s, d) => s + d.lap_times.length,
+        0,
+      ),
+      subsessions_sampled: topSubs.length,
+      total_subsessions: allSubs.length,
+    });
   } catch (e: any) {
     console.error("[series-cars]", e.message);
     return NextResponse.json({ error: e.message }, { status: 500 });

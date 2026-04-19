@@ -1,5 +1,5 @@
 // /app/api/iracing/series-stats/route.ts
-// Uses season/driver_standings — returns ALL drivers, not filtered by cust_id
+// Uses results/season_results — returns all sessions for a season week (all drivers)
 
 import { NextRequest, NextResponse } from "next/server";
 import { getValidToken } from "../../../lib/iracing-token";
@@ -19,7 +19,7 @@ async function iracingFetch(path: string, token: string) {
     const s3 = await fetch(raw.link);
     return s3.ok ? s3.json() : null;
   }
-  // Handle chunked response
+  // Chunked S3 format
   const chunkFiles: string[] = raw?.chunk_info?.chunk_file_names ?? [];
   const baseUrl = raw?.chunk_info?.base_download_url ?? "";
   if (chunkFiles.length > 0 && baseUrl) {
@@ -33,13 +33,13 @@ async function iracingFetch(path: string, token: string) {
       if (f.status === "fulfilled") {
         const chunk = Array.isArray(f.value)
           ? f.value
-          : (f.value?.drivers ?? f.value?.results ?? []);
+          : (f.value?.results ?? f.value?.sessions ?? []);
         all.push(...chunk);
       }
     }
-    return all;
+    return all.length > 0 ? all : (raw?.results ?? raw?.sessions ?? raw);
   }
-  return raw?.drivers ?? raw?.results ?? raw;
+  return raw?.results ?? raw?.sessions ?? raw;
 }
 
 export async function GET(request: NextRequest) {
@@ -55,25 +55,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   try {
-    // driver_standings returns ALL drivers for a season week — no cust_id filter
-    const params = new URLSearchParams({
-      season_id: seasonId,
-      race_week_num: weekNum,
-    });
+    // results/season_results returns all race sessions for a season/week
+    const data = await iracingFetch(
+      `results/season_results?season_id=${seasonId}&race_week_num=${weekNum}&event_type=5`,
+      token,
+    );
 
-    const data = await iracingFetch(`season/driver_standings?${params}`, token);
-    const drivers: any[] = Array.isArray(data) ? data : (data?.drivers ?? []);
-
+    const sessions: any[] = Array.isArray(data)
+      ? data
+      : (data?.results ?? data?.sessions ?? []);
     console.log(
       "[series-stats] season_id:",
       seasonId,
       "week:",
       weekNum,
-      "drivers:",
-      drivers.length,
+      "sessions:",
+      sessions.length,
     );
 
-    if (!drivers.length) {
+    if (!sessions.length) {
       return NextResponse.json({
         avg_sof: 0,
         avg_drivers: 0,
@@ -83,33 +83,31 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Aggregate from driver standings
-    const totalDrivers = drivers.length;
+    // Aggregate stats from sessions
+    const totalRaces = sessions.length;
+    const totalSof = sessions.reduce(
+      (s: number, r: any) => s + (r.event_strength_of_field ?? r.sof ?? 0),
+      0,
+    );
+    const totalDrivers = sessions.reduce(
+      (s: number, r: any) => s + (r.num_drivers ?? r.driver_count ?? 0),
+      0,
+    );
 
-    // SOF: average of all drivers' irating
-    const ratings = drivers
-      .map((d: any) => d.oldi_rating ?? d.irating ?? 0)
-      .filter((r: number) => r > 0);
-    const avgSof =
-      ratings.length > 0
-        ? Math.round(
-            ratings.reduce((s: number, r: number) => s + r, 0) / ratings.length,
-          )
-        : 0;
-
-    // Splits: max starts / avg starts gives approximate splits
-    const starts = drivers.map((d: any) => d.starts ?? d.week_starts ?? 1);
-    const maxStarts = Math.max(...starts);
-    const avgStarts =
-      starts.reduce((s: number, v: number) => s + v, 0) / starts.length;
-    const splits =
-      maxStarts > 0 ? Math.round(totalDrivers / Math.max(1, avgStarts)) : 1;
+    // Count splits by grouping sessions at the same start_time
+    const byTime = new Map<string, number>();
+    for (const s of sessions) {
+      const t = s.start_time ?? s.session_start_time ?? "";
+      byTime.set(t, (byTime.get(t) ?? 0) + 1);
+    }
+    const avgSplits =
+      byTime.size > 0 ? Math.round(totalRaces / byTime.size) : 1;
 
     return NextResponse.json({
-      avg_sof: avgSof,
-      avg_drivers: Math.round(totalDrivers / Math.max(splits, 1)),
-      splits,
-      total_races: maxStarts,
+      avg_sof: totalRaces > 0 ? Math.round(totalSof / totalRaces) : 0,
+      avg_drivers: totalRaces > 0 ? Math.round(totalDrivers / totalRaces) : 0,
+      splits: avgSplits,
+      total_races: totalRaces,
       has_data: true,
     });
   } catch (e: any) {

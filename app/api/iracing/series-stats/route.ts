@@ -10,7 +10,32 @@ async function resolveData(raw: any, token: string): Promise<any> {
   if (!raw) return [];
   if (raw?.link) {
     const s3 = await fetch(raw.link);
-    return s3.ok ? s3.json() : [];
+    if (!s3.ok) {
+      console.error("[series-stats] S3 fetch failed:", s3.status);
+      return [];
+    }
+    const data = await s3.json();
+    console.log(
+      "[series-stats] S3 type:",
+      typeof data,
+      "isArray:",
+      Array.isArray(data),
+    );
+    if (!Array.isArray(data) && typeof data === "object") {
+      console.log("[series-stats] S3 keys:", Object.keys(data).join(", "));
+      console.log(
+        "[series-stats] S3 sample:",
+        JSON.stringify(data).slice(0, 400),
+      );
+    } else if (Array.isArray(data)) {
+      console.log("[series-stats] S3 array length:", data.length);
+      if (data.length > 0)
+        console.log(
+          "[series-stats] S3[0] keys:",
+          Object.keys(data[0]).join(", "),
+        );
+    }
+    return data;
   }
   const chunkFiles: string[] = raw?.chunk_info?.chunk_file_names ?? [];
   const baseUrl = raw?.chunk_info?.base_download_url ?? "";

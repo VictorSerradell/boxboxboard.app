@@ -33,7 +33,8 @@ export type CarCategory =
   | "Oval"
   | "Dirt Oval"
   | "Dirt Road"
-  | "Road";
+  | "Road"
+  | "Endurance";
 
 export interface Car {
   car_id: number;
@@ -120,7 +121,10 @@ export interface SeriesSeason {
   complete?: boolean;
   rookie_season_name?: string;
 
-  // Computed/UI fields
+  next_race_session?: string; // ISO datetime of next race from iRacing API
+  op_duration?: number; // Open practice duration (minutes) - used as race duration proxy
+  schedule_description?: string; // e.g. "Every 2h repeating"
+  race_week?: number; // Current race week from API (0-indexed) — authoritative
   status?: SessionType;
   category?: CarCategory;
   minLicenseLevel?: LicenseLevel;
@@ -202,7 +206,7 @@ export interface FilterState {
   favoritesOnly: boolean;
   ownedOnly: boolean;
   searchQuery: string;
-  myLicense?: LicenseLevel | null;
+  myLicense: LicenseLevel | null;
 }
 
 export interface AppUser {
@@ -219,4 +223,5 @@ export interface SeasonInfo {
   season_quarter: number;
   label: string;
   active: boolean;
+  max_weeks?: number;
 }

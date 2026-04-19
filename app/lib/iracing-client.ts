@@ -160,7 +160,7 @@ export async function getSeriesSeasons(
       );
     }
 
-    return seasons.map((s: any): SeriesSeason => {
+    return seasons.map((s: any) => {
       const schedules = (s.schedules ?? s.race_weeks ?? []).map((w: any) => ({
         race_week_num: w.race_week_num ?? 0,
         track: {
@@ -233,6 +233,7 @@ export async function getSeriesSeasons(
         next_race_session: s.next_race_session,
         op_duration: s.op_duration,
         schedule_description: s.schedule_description,
+        race_week: s.race_week, // current week from API — 0-indexed, same as race_week_num
         // Computed UI fields
         category: mapCategory(
           s.license_group,

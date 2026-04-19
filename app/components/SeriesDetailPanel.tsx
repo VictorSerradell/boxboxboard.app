@@ -172,6 +172,7 @@ export default function SeriesDetailPanel({
       getCurrentRaceWeek(series.season_year, series.season_quarter) ?? 0;
     const params = new URLSearchParams({
       series_id: String(series.series_id),
+      season_id: String(series.season_id),
       race_week_num: String(currentWeek),
       season_year: String(series.season_year),
       season_quarter: String(series.season_quarter),
@@ -679,6 +680,7 @@ export default function SeriesDetailPanel({
                       ) ?? 0;
                     const params = new URLSearchParams({
                       series_id: String(series.series_id),
+                      season_id: String(series.season_id),
                       race_week_num: String(currentWeek),
                       season_year: String(series.season_year),
                       season_quarter: String(series.season_quarter),

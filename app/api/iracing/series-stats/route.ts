@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getValidToken } from "../../../lib/iracing-token";
+import { searchSeries } from "../../../lib/iracing-search";
 
 const IRACING_BASE = "https://members-ng.iracing.com";
 
@@ -16,7 +17,6 @@ async function iracingFetch(path: string, token: string) {
   });
   if (!res.ok) throw new Error(`iRacing API error: ${res.status}`);
   const raw = await res.json();
-  // Handle S3 redirect
   if (raw?.link) {
     const s3 = await fetch(raw.link);
     return s3.json();
@@ -56,10 +56,7 @@ export async function GET(request: NextRequest) {
     if (seasonId) params.set("season_id", seasonId);
     if (seriesId) params.set("series_id", seriesId);
 
-    const data = await iracingFetch(`results/search_series?${params}`, token);
-
-    // data.results is array of subsessions
-    const results: any[] = data?.results ?? data ?? [];
+    const results: any[] = await searchSeries(params, token);
 
     if (!results.length) {
       return NextResponse.json({

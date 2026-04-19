@@ -5,13 +5,12 @@
 // returns the current race week number (0-indexed, same as race_week_num).
 
 // Approximate season start dates per quarter
-// iRacing typically starts: Q1=early Jan, Q2=early Apr, Q3=early Jul, Q4=early Oct
-// These are approximate Tuesdays — real dates vary slightly each year.
+// iRacing S1=early Jan, S2=mid-March, S3=mid-June, S4=mid-September
 const APPROX_START_DATES: Record<number, string> = {
-  1: "-01-07", // ~first Tuesday of January
-  2: "-04-01", // ~first Tuesday of April
-  3: "-07-01", // ~first Tuesday of July
-  4: "-10-01", // ~first Tuesday of October
+  1: "-01-06", // ~first Tuesday of January
+  2: "-03-17", // ~third Tuesday of March
+  3: "-06-16", // ~third Tuesday of June
+  4: "-09-15", // ~third Tuesday of September
 };
 
 /**

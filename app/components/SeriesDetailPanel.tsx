@@ -168,8 +168,14 @@ export default function SeriesDetailPanel({
     if (!series) return;
     setRealStats(null);
     setStatsLoading(true);
+    // Use the first schedule's start_date for accurate week calculation
+    const firstScheduleDate = series.schedules?.[0]?.start_date;
     const currentWeek =
-      getCurrentRaceWeek(series.season_year, series.season_quarter) ?? 0;
+      getCurrentRaceWeek(
+        series.season_year,
+        series.season_quarter,
+        firstScheduleDate,
+      ) ?? 0;
     const params = new URLSearchParams({
       series_id: String(series.series_id),
       season_id: String(series.season_id),
@@ -673,10 +679,12 @@ export default function SeriesDetailPanel({
                   setActiveTab(tab.id);
                   if (tab.id === "cars" && !carsLoaded) {
                     setCarsLoading(true);
+                    const firstScheduleDate = series.schedules?.[0]?.start_date;
                     const currentWeek =
                       getCurrentRaceWeek(
                         series.season_year,
                         series.season_quarter,
+                        firstScheduleDate,
                       ) ?? 0;
                     const params = new URLSearchParams({
                       series_id: String(series.series_id),

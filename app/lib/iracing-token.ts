@@ -4,7 +4,7 @@
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 
-const OAUTH_TOKEN_URL = "https://oauth2.iracing.com/oauth2/token";
+const OAUTH_TOKEN_URL = "https://oauth.iracing.com/oauth2/token";
 
 export async function getValidToken(
   request: NextRequest,

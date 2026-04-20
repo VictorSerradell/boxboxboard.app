@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const seasonId = searchParams.get("season_id");
   const weekNum = searchParams.get("race_week_num") ?? "0";
+  const carClassId = searchParams.get("car_class_id");
 
   if (!seasonId)
     return NextResponse.json({ error: "season_id required" }, { status: 400 });
@@ -48,11 +49,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   try {
-    // stats/season_driver_standings — documented, returns all drivers for a season week
-    const data = await iracingGet(
-      `stats/season_driver_standings?season_id=${seasonId}&race_week_num=${weekNum}`,
-      token,
-    );
+    const qs = new URLSearchParams({
+      season_id: seasonId,
+      race_week_num: weekNum,
+    });
+    if (carClassId) qs.set("car_class_id", carClassId);
+
+    const data = await iracingGet(`stats/season_driver_standings?${qs}`, token);
 
     const drivers: any[] = Array.isArray(data)
       ? data

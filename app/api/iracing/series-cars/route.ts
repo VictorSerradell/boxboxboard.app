@@ -1,5 +1,5 @@
 // /app/api/iracing/series-cars/route.ts
-// Uses results/season_results to get subsession IDs, then fetches lap data
+// Uses results/season_results to get sessions, then fetches subsession details
 
 import { NextRequest, NextResponse } from "next/server";
 import { getValidToken } from "../../../lib/iracing-token";
@@ -7,40 +7,24 @@ import { getValidToken } from "../../../lib/iracing-token";
 export const dynamic = "force-dynamic";
 
 const BASE = "https://members-ng.iracing.com/data";
+const TIMEOUT = 10000;
 
-async function iracingFetch(path: string, token: string) {
+async function iracingGet(path: string, token: string) {
   const res = await fetch(`${BASE}/${path}`, {
     headers: {
       Authorization: `Bearer ${token}`,
       "User-Agent": "BoxBoxBoard/1.0",
     },
+    signal: AbortSignal.timeout(TIMEOUT),
   });
   if (!res.ok) throw new Error(`iRacing ${res.status}: ${path}`);
   const raw = await res.json();
   if (raw?.link) {
-    const s3 = await fetch(raw.link);
-    return s3.ok ? s3.json() : null;
+    const s3 = await fetch(raw.link, { signal: AbortSignal.timeout(TIMEOUT) });
+    if (!s3.ok) throw new Error(`S3 ${s3.status}`);
+    return s3.json();
   }
-  const chunkFiles: string[] = raw?.chunk_info?.chunk_file_names ?? [];
-  const baseUrl = raw?.chunk_info?.base_download_url ?? "";
-  if (chunkFiles.length > 0 && baseUrl) {
-    const all: any[] = [];
-    const fetches = await Promise.allSettled(
-      chunkFiles.map((f) =>
-        fetch(baseUrl + f).then((r) => (r.ok ? r.json() : [])),
-      ),
-    );
-    for (const f of fetches) {
-      if (f.status === "fulfilled") {
-        const chunk = Array.isArray(f.value)
-          ? f.value
-          : (f.value?.results ?? []);
-        all.push(...chunk);
-      }
-    }
-    return all.length > 0 ? all : (raw?.results ?? raw);
-  }
-  return raw?.results ?? raw;
+  return raw;
 }
 
 function formatLapTime(tenths: number): string {
@@ -63,22 +47,31 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "season_id required" }, { status: 400 });
 
   try {
-    // Step 1: get session list for this season/week
-    const sessions = await iracingFetch(
-      `results/season_results?season_id=${seasonId}&race_week_num=${weekNum}&event_type=5`,
+    // Get session list
+    const sessionData = await iracingGet(
+      `results/season_results?season_id=${seasonId}&race_week_num=${weekNum}`,
       token,
     );
-    const sessionList: any[] = Array.isArray(sessions) ? sessions : [];
+
+    const sessions: any[] = Array.isArray(sessionData)
+      ? sessionData
+      : (sessionData?.results ?? sessionData?.sessions ?? []);
+
     console.log(
       "[series-cars] season_id:",
       seasonId,
       "week:",
       weekNum,
       "sessions:",
-      sessionList.length,
+      sessions.length,
     );
+    if (sessions.length > 0)
+      console.log(
+        "[series-cars] session[0] keys:",
+        Object.keys(sessions[0]).join(","),
+      );
 
-    if (!sessionList.length) {
+    if (!sessions.length) {
       return NextResponse.json({
         cars: [],
         total_drivers: 0,
@@ -86,8 +79,8 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Step 2: take top 8 sessions by SOF and fetch full results
-    const topSessions = [...sessionList]
+    // Take top 8 by SOF
+    const topSessions = [...sessions]
       .sort(
         (a, b) =>
           (b.event_strength_of_field ?? 0) - (a.event_strength_of_field ?? 0),
@@ -100,25 +93,25 @@ export async function GET(request: NextRequest) {
 
     const results = await Promise.allSettled(
       topSessions.map((s) =>
-        iracingFetch(`results/get?subsession_id=${s.subsession_id}`, token),
+        iracingGet(`results/get?subsession_id=${s.subsession_id}`, token),
       ),
     );
 
     for (const r of results) {
       if (r.status !== "fulfilled" || !r.value) continue;
-      const data = r.value;
-      const raceSessions = (data?.session_results ?? []).filter(
+      const raceSessions = (r.value?.session_results ?? []).filter(
         (s: any) => s.simsession_type === 6 || s.simsession_name === "RACE",
       );
-
       for (const session of raceSessions) {
         for (const driver of session.results ?? []) {
           const carId = driver.car_id;
-          const carName = driver.car_name ?? `Car ${carId}`;
           const lapTime = driver.best_lap_time;
           if (!carId || !lapTime || lapTime <= 0) continue;
           if (!carMap[carId])
-            carMap[carId] = { car_name: carName, best_laps: [] };
+            carMap[carId] = {
+              car_name: driver.car_name ?? `Car ${carId}`,
+              best_laps: [],
+            };
           carMap[carId].best_laps.push(lapTime);
           totalDrivers++;
         }
@@ -126,7 +119,6 @@ export async function GET(request: NextRequest) {
     }
 
     const cars = Object.entries(carMap)
-      .filter(([, d]) => d.best_laps.length >= 1)
       .map(([carId, d]) => {
         const sorted = [...d.best_laps].sort((a, b) => a - b);
         const topN = Math.max(1, Math.ceil(sorted.length * 0.25));
@@ -154,7 +146,11 @@ export async function GET(request: NextRequest) {
       subsessions_sampled: topSessions.length,
     });
   } catch (e: any) {
-    console.error("[series-cars]", e.message);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    console.error("[series-cars] error:", e.message);
+    return NextResponse.json({
+      cars: [],
+      total_drivers: 0,
+      subsessions_sampled: 0,
+    });
   }
 }

@@ -1,39 +1,39 @@
 // /app/api/iracing/series-stats/route.ts
+// Uses stats/season_driver_standings — documented endpoint, all drivers
 
 import { NextRequest, NextResponse } from "next/server";
 import { getValidToken } from "../../../lib/iracing-token";
 
 const BASE = "https://members-ng.iracing.com/data";
+const TIMEOUT = 10000;
 
-async function resolveLink(link: string): Promise<any[]> {
-  try {
-    const s3 = await fetch(link);
-    if (!s3.ok) {
-      console.error("[series-stats] S3 failed:", s3.status);
-      return [];
-    }
+async function fetchWithTimeout(url: string, opts: RequestInit = {}) {
+  return fetch(url, { ...opts, signal: AbortSignal.timeout(TIMEOUT) });
+}
+
+async function iracingGet(path: string, token: string) {
+  const res = await fetchWithTimeout(`${BASE}/${path}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "User-Agent": "BoxBoxBoard/1.0",
+    },
+  });
+  console.log("[series-stats]", path.split("?")[0], "status:", res.status);
+  if (!res.ok) throw new Error(`iRacing ${res.status}`);
+  const raw = await res.json();
+  if (raw?.link) {
+    console.log("[series-stats] following S3 link...");
+    const s3 = await fetchWithTimeout(raw.link);
     const data = await s3.json();
     console.log(
-      "[series-stats] S3 type:",
-      typeof data,
-      "isArray:",
+      "[series-stats] S3 isArray:",
       Array.isArray(data),
+      "keys:",
+      Array.isArray(data) ? `len=${data.length}` : Object.keys(data).join(","),
     );
-    if (Array.isArray(data)) {
-      console.log(
-        "[series-stats] S3 length:",
-        data.length,
-        "| keys[0]:",
-        data[0] ? Object.keys(data[0]).join(",") : "empty",
-      );
-      return data;
-    }
-    console.log("[series-stats] S3 keys:", Object.keys(data).join(", "));
-    return data?.results ?? data?.sessions ?? data?.data ?? [];
-  } catch (e: any) {
-    console.error("[series-stats] S3 error:", e.message);
-    return [];
+    return data;
   }
+  return raw;
 }
 
 export async function GET(request: NextRequest) {
@@ -43,84 +43,28 @@ export async function GET(request: NextRequest) {
 
   if (!seasonId)
     return NextResponse.json({ error: "season_id required" }, { status: 400 });
-
   const token = await getValidToken(request);
   if (!token)
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   try {
-    // Try multiple param combinations since iRacing docs are inconsistent
-    const urls = [
-      `results/season_results?season_id=${seasonId}&race_week_num=${weekNum}&event_types=5`,
-      `results/season_results?season_id=${seasonId}&race_week_num=${weekNum}`,
-      `results/season_results?season_id=${seasonId}&event_types=5`,
-    ];
+    // stats/season_driver_standings — documented, returns all drivers for a season week
+    const data = await iracingGet(
+      `stats/season_driver_standings?season_id=${seasonId}&race_week_num=${weekNum}`,
+      token,
+    );
 
-    let sessions: any[] = [];
+    const drivers: any[] = Array.isArray(data)
+      ? data
+      : (data?.drivers ?? data?.standings ?? data?.results ?? []);
+    console.log(
+      "[series-stats] drivers:",
+      drivers.length,
+      "| sample keys:",
+      drivers[0] ? Object.keys(drivers[0]).join(",") : "none",
+    );
 
-    for (const url of urls) {
-      console.log("[series-stats] trying:", url);
-      try {
-        const res = await fetch(`${BASE}/${url}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "User-Agent": "BoxBoxBoard/1.0",
-          },
-          signal: AbortSignal.timeout(8000), // 8s timeout per attempt
-        });
-        console.log(
-          "[series-stats] status:",
-          res.status,
-          "for:",
-          url.split("?")[1],
-        );
-
-        if (!res.ok) {
-          const txt = await res.text().catch(() => "");
-          console.error("[series-stats] error:", res.status, txt.slice(0, 100));
-          continue;
-        }
-
-        const raw = await res.json();
-        console.log(
-          "[series-stats] raw keys:",
-          Object.keys(raw ?? {}).join(", "),
-        );
-
-        if (raw?.link) {
-          sessions = await resolveLink(raw.link);
-        } else if (raw?.chunk_info?.chunk_file_names?.length > 0) {
-          const base = raw.chunk_info.base_download_url ?? "";
-          const all: any[] = [];
-          for (const f of raw.chunk_info.chunk_file_names) {
-            const chunk = await resolveLink(base + f);
-            all.push(...chunk);
-          }
-          sessions = all;
-        } else {
-          sessions = Array.isArray(raw)
-            ? raw
-            : (raw?.results ?? raw?.sessions ?? []);
-        }
-
-        console.log(
-          "[series-stats] sessions found:",
-          sessions.length,
-          "via:",
-          url.split("?")[1],
-        );
-        if (sessions.length > 0) break; // Got data, stop trying
-      } catch (e: any) {
-        console.error(
-          "[series-stats] fetch error for",
-          url.split("?")[1],
-          ":",
-          e.message,
-        );
-      }
-    }
-
-    if (!sessions.length) {
+    if (!drivers.length) {
       return NextResponse.json({
         avg_sof: 0,
         avg_drivers: 0,
@@ -130,33 +74,42 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const totalRaces = sessions.length;
-    const totalSof = sessions.reduce(
-      (s: number, r: any) => s + (r.event_strength_of_field ?? r.sof ?? 0),
+    const totalStarts = drivers.reduce(
+      (s: number, d: any) =>
+        s + (d.starts ?? d.week_starts ?? d.num_starts ?? 1),
       0,
     );
-    const totalDrivers = sessions.reduce(
-      (s: number, r: any) => s + (r.num_drivers ?? r.driver_count ?? 0),
-      0,
+    const avgStartsPerDriver = totalStarts / drivers.length;
+    const splits = Math.max(
+      1,
+      Math.round(drivers.length / Math.max(1, avgStartsPerDriver)),
     );
 
-    const byTime = new Map<string, number>();
-    for (const s of sessions) {
-      const t = s.start_time ?? s.session_start_time ?? "";
-      byTime.set(t, (byTime.get(t) ?? 0) + 1);
-    }
-    const avgSplits =
-      byTime.size > 0 ? Math.round(totalRaces / byTime.size) : 1;
+    const ratings = drivers
+      .map((d: any) => d.oldi_rating ?? d.irating ?? d.club_points ?? 0)
+      .filter(Boolean);
+    const avgSof =
+      ratings.length > 0
+        ? Math.round(
+            ratings.reduce((s: number, r: number) => s + r, 0) / ratings.length,
+          )
+        : 0;
 
     return NextResponse.json({
-      avg_sof: totalRaces > 0 ? Math.round(totalSof / totalRaces) : 0,
-      avg_drivers: totalRaces > 0 ? Math.round(totalDrivers / totalRaces) : 0,
-      splits: avgSplits,
-      total_races: totalRaces,
+      avg_sof: avgSof,
+      avg_drivers: Math.round(drivers.length / splits),
+      splits,
+      total_races: totalStarts,
       has_data: true,
     });
   } catch (e: any) {
-    console.error("[series-stats] outer error:", e.message);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    console.error("[series-stats] error:", e.message);
+    return NextResponse.json({
+      avg_sof: 0,
+      avg_drivers: 0,
+      splits: 0,
+      total_races: 0,
+      has_data: false,
+    });
   }
 }

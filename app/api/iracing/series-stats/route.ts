@@ -57,9 +57,23 @@ export async function GET(request: NextRequest) {
 
     const data = await iracingGet(`stats/season_driver_standings?${qs}`, token);
 
+    console.log(
+      "[series-stats] raw type:",
+      typeof data,
+      "isArray:",
+      Array.isArray(data),
+    );
+    if (data && typeof data === "object" && !Array.isArray(data)) {
+      console.log("[series-stats] raw keys:", Object.keys(data).join(", "));
+      console.log(
+        "[series-stats] raw sample:",
+        JSON.stringify(data).slice(0, 400),
+      );
+    }
+
     const drivers: any[] = Array.isArray(data)
       ? data
-      : (data?.drivers ?? data?.standings ?? data?.results ?? []);
+      : (data?.drivers ?? data?.standings ?? data?.results ?? data?.data ?? []);
     console.log(
       "[series-stats] drivers:",
       drivers.length,

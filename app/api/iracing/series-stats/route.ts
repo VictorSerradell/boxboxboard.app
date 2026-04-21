@@ -18,51 +18,60 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   try {
-    // Step 1: get link (fast, small response)
-    const res1 = await fetch(
-      `${BASE}/results/season_results?season_id=${seasonId}&race_week_num=${weekNum}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "User-Agent": "BoxBoxBoard/1.0",
+    let sessions: any[] = [];
+    let weekUsed = Number(weekNum);
+
+    // Try current week, then fall back to previous week if empty
+    for (const week of [weekUsed, weekUsed - 1]) {
+      if (week < 0) continue;
+      const res1 = await fetch(
+        `${BASE}/results/season_results?season_id=${seasonId}&race_week_num=${week}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "User-Agent": "BoxBoxBoard/1.0",
+          },
+          signal: AbortSignal.timeout(8000),
         },
-        signal: AbortSignal.timeout(8000),
-      },
-    );
-    console.log("[series-stats] step1 status:", res1.status, "week:", weekNum);
-    if (!res1.ok) throw new Error(`step1 ${res1.status}`);
+      );
+      console.log("[series-stats] step1 week:", week, "status:", res1.status);
+      if (!res1.ok) continue;
 
-    const json1 = await res1.json();
-    console.log(
-      "[series-stats] step1 keys:",
-      Object.keys(json1 ?? {}).join(","),
-    );
+      const json1 = await res1.json();
+      console.log(
+        "[series-stats] step1 keys:",
+        Object.keys(json1 ?? {}).join(","),
+      );
 
-    if (!json1?.link) {
-      const direct: any[] = Array.isArray(json1)
-        ? json1
-        : (json1?.results ?? []);
-      console.log("[series-stats] direct sessions:", direct.length);
-      return buildResponse(direct);
+      let data: any[] = [];
+      if (json1?.link) {
+        const res2 = await fetch(json1.link, {
+          signal: AbortSignal.timeout(12000),
+        });
+        console.log("[series-stats] step2 status:", res2.status);
+        if (res2.ok) {
+          const json2 = await res2.json();
+          data = Array.isArray(json2)
+            ? json2
+            : (json2?.results ?? json2?.sessions ?? []);
+        }
+      } else {
+        data = Array.isArray(json1) ? json1 : (json1?.results ?? []);
+      }
+
+      console.log(
+        "[series-stats] week",
+        week,
+        "sessions:",
+        data.length,
+        data[0] ? "| keys:" + Object.keys(data[0]).slice(0, 6).join(",") : "",
+      );
+      if (data.length > 0) {
+        sessions = data;
+        weekUsed = week;
+        break;
+      }
     }
-
-    // Step 2: fetch S3 data
-    const res2 = await fetch(json1.link, {
-      signal: AbortSignal.timeout(12000),
-    });
-    console.log("[series-stats] step2 status:", res2.status);
-    if (!res2.ok) throw new Error(`step2 ${res2.status}`);
-
-    const json2 = await res2.json();
-    const sessions: any[] = Array.isArray(json2)
-      ? json2
-      : (json2?.results ?? json2?.sessions ?? []);
-    console.log(
-      "[series-stats] sessions:",
-      sessions.length,
-      "| keys:",
-      sessions[0] ? Object.keys(sessions[0]).slice(0, 8).join(",") : "none",
-    );
 
     return buildResponse(sessions);
   } catch (e: any) {

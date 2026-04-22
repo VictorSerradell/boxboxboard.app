@@ -1,9 +1,15 @@
 // /app/lib/iracing-token.ts
-// Gets a valid iRacing access token with auto-refresh
-
 import { NextRequest } from 'next/server';
+import { createHash } from 'crypto';
 
 const OAUTH_TOKEN_URL = 'https://oauth.iracing.com/oauth2/token';
+
+// iRacing requires client_secret as SHA256(secret + clientId)
+function maskSecret(secret: string, clientId: string): string {
+  return createHash('sha256')
+    .update(`${secret}${clientId.trim().toLowerCase()}`)
+    .digest('base64');
+}
 
 export async function getValidToken(request: NextRequest): Promise<string | null> {
   const accessToken  = request.cookies.get('iracing_access_token')?.value;
@@ -18,12 +24,12 @@ export async function getValidToken(request: NextRequest): Promise<string | null
 
   try {
     const res = await fetch(OAUTH_TOKEN_URL, {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body:    new URLSearchParams({
+      body: new URLSearchParams({
         grant_type:    'refresh_token',
         client_id:     clientId,
-        client_secret: clientSecret,
+        client_secret: maskSecret(clientSecret, clientId), // same hashing as callback
         refresh_token: refreshToken,
       }).toString(),
     });
@@ -34,13 +40,9 @@ export async function getValidToken(request: NextRequest): Promise<string | null
     }
 
     const data = await res.json();
-    const newToken = data.access_token;
-    if (!newToken) return null;
-
-    console.log('[token-refresh] success');
+    const newToken = data.access_token ?? null;
+    if (newToken) console.log('[token-refresh] success');
     return newToken;
-    // Note: we don't set the cookie here to avoid Next.js 14 issues.
-    // The new token will work for this request; re-auth happens on next login.
   } catch (e: any) {
     console.error('[token-refresh] error:', e.message);
     return null;

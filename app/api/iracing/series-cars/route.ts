@@ -162,7 +162,7 @@ export async function GET(request: NextRequest) {
 
     console.log(
       "[series-cars] top10 built, cars:",
-      [...new Set(top10.map((d) => d.car_name))].join(", "),
+      Array.from(new Set(top10.map((d) => d.car_name))).join(", "),
     );
 
     return NextResponse.json({

@@ -81,6 +81,7 @@ export interface ScheduleWeek {
     max_pct_fuel_fill: number;
     weight_penalty_kg: number;
   }[];
+  race_week_cars?: { car_id: number; car_name?: string }[];
   start_date?: string;
 }
 
@@ -124,6 +125,7 @@ export interface SeriesSeason {
   next_race_session?: string; // ISO datetime of next race from iRacing API
   op_duration?: number; // Open practice duration (minutes) - used as race duration proxy
   schedule_description?: string; // e.g. "Every 2h repeating"
+  race_week?: number; // Current race week from API (0-indexed) — authoritative
   status?: SessionType;
   category?: CarCategory;
   minLicenseLevel?: LicenseLevel;

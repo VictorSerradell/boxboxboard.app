@@ -23,7 +23,7 @@ async function iracingFetch(path: string, token: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const token = await getValidToken(request);
+  const { token } = await getValidToken(request);
   if (!token)
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 

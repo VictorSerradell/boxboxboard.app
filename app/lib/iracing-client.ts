@@ -457,7 +457,7 @@ function mapGroupName(level: number): string {
 
 // ─── Demo Data ────────────────────────────────────────────────────────────────
 
-function getDemoSeries(year: number, quarter: number): SeriesSeason[] {
+export function getDemoSeries(year: number, quarter: number): any[] {
   const tracks = [
     {
       track_id: 1,

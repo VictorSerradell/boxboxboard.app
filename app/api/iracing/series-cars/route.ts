@@ -58,12 +58,14 @@ export async function GET(request: NextRequest) {
     });
 
   try {
-    // Step 1: get session list for this season/week (all sessions, no cust_id filter)
     const week = Number(weekNum);
+
+    // Step 1: get session list — try current week, then prev week, then whole season
     let sessions: any[] = [];
 
-    for (const w of [week, week - 1]) {
-      if (w < 0) continue;
+    const weeksToTry = [week, week - 1, week - 2].filter((w) => w >= 0);
+
+    for (const w of weeksToTry) {
       try {
         const data = await iracingGet(
           `results/season_results?season_id=${seasonId}&race_week_num=${w}`,
@@ -84,12 +86,28 @@ export async function GET(request: NextRequest) {
           break;
         }
       } catch (e: any) {
-        console.warn(
-          "[series-cars] season_results week",
-          w,
-          "failed:",
-          e.message,
+        console.warn("[series-cars] week", w, "error:", e.message);
+      }
+    }
+
+    // Last resort: fetch without race_week_num to get any session from this season
+    if (!sessions.length) {
+      try {
+        const data = await iracingGet(
+          `results/season_results?season_id=${seasonId}`,
+          token,
+          10000,
         );
+        const arr = Array.isArray(data)
+          ? data
+          : (data?.results ?? data?.sessions ?? []);
+        console.log(
+          "[series-cars] season_results no-week sessions:",
+          arr.length,
+        );
+        if (arr.length > 0) sessions = arr;
+      } catch (e: any) {
+        console.warn("[series-cars] no-week error:", e.message);
       }
     }
 
@@ -162,7 +180,7 @@ export async function GET(request: NextRequest) {
 
     console.log(
       "[series-cars] top10 built, cars:",
-      Array.from(new Set(top10.map((d) => d.car_name))).join(", "),
+      [...new Set(top10.map((d) => d.car_name))].join(", "),
     );
 
     return NextResponse.json({

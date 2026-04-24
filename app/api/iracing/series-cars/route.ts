@@ -1,28 +1,27 @@
 // /app/api/iracing/series-cars/route.ts
-// Gets top 10 finishing positions from the best SOF race this week
-// Uses results/season_results (no cust_id filter) → results/get for full lap data
+// Simdeck approach: search ALL races (no series_id), filter by series_id,
+// then results/get → ALL drivers in that session → top 10 + fastest car
 
 import { NextRequest, NextResponse } from "next/server";
 import { getValidToken } from "../../../lib/iracing-token";
+import { searchSeries } from "../../../lib/iracing-search";
 
 export const dynamic = "force-dynamic";
 
 const BASE = "https://members-ng.iracing.com/data";
 
-async function iracingGet(path: string, token: string, timeoutMs = 10000) {
+async function iracingGet(path: string, token: string, ms = 10000) {
   const res = await fetch(`${BASE}/${path}`, {
     headers: {
       Authorization: `Bearer ${token}`,
       "User-Agent": "BoxBoxBoard/1.0",
     },
-    signal: AbortSignal.timeout(timeoutMs),
+    signal: AbortSignal.timeout(ms),
   });
   if (!res.ok) throw new Error(`${res.status}: ${path.split("?")[0]}`);
   const raw = await res.json();
   if (raw?.link) {
-    const s3 = await fetch(raw.link, {
-      signal: AbortSignal.timeout(timeoutMs),
-    });
+    const s3 = await fetch(raw.link, { signal: AbortSignal.timeout(ms) });
     if (!s3.ok) throw new Error(`S3 ${s3.status}`);
     return s3.json();
   }
@@ -47,10 +46,12 @@ export async function GET(request: NextRequest) {
     });
 
   const { searchParams } = request.nextUrl;
-  const seasonId = searchParams.get("season_id");
-  const weekNum = searchParams.get("race_week_num") ?? "0";
+  const seriesId = searchParams.get("series_id");
+  const seasonYear = searchParams.get("season_year");
+  const seasonQ = searchParams.get("season_quarter");
+  const weekNum = Number(searchParams.get("race_week_num") ?? "0");
 
-  if (!seasonId)
+  if (!seriesId)
     return NextResponse.json({
       cars: [],
       total_drivers: 0,
@@ -58,60 +59,32 @@ export async function GET(request: NextRequest) {
     });
 
   try {
-    const week = Number(weekNum);
+    // Step 1: get ALL races this season — same call Simdeck makes
+    const allParams = new URLSearchParams({
+      season_year: seasonYear ?? String(new Date().getFullYear()),
+      season_quarter: seasonQ ?? "1",
+      event_types: "5",
+    });
 
-    // Step 1: get session list — try current week, then prev week, then whole season
-    let sessions: any[] = [];
+    const allResults = await searchSeries(allParams, token);
+    console.log("[series-cars] total races this season:", allResults.length);
 
-    const weeksToTry = [week, week - 1, week - 2].filter((w) => w >= 0);
+    // Step 2: filter by series_id + week
+    const weeks = [weekNum, weekNum - 1].filter((w) => w >= 0);
+    const filtered = allResults.filter(
+      (r: any) =>
+        String(r.series_id) === seriesId && weeks.includes(r.race_week_num),
+    );
+    console.log(
+      "[series-cars] filtered series",
+      seriesId,
+      "weeks",
+      weeks,
+      ":",
+      filtered.length,
+    );
 
-    for (const w of weeksToTry) {
-      try {
-        const data = await iracingGet(
-          `results/season_results?season_id=${seasonId}&race_week_num=${w}`,
-          token,
-          10000,
-        );
-        const arr = Array.isArray(data)
-          ? data
-          : (data?.results ?? data?.sessions ?? []);
-        console.log(
-          "[series-cars] season_results week:",
-          w,
-          "sessions:",
-          arr.length,
-        );
-        if (arr.length > 0) {
-          sessions = arr;
-          break;
-        }
-      } catch (e: any) {
-        console.warn("[series-cars] week", w, "error:", e.message);
-      }
-    }
-
-    // Last resort: fetch without race_week_num to get any session from this season
-    if (!sessions.length) {
-      try {
-        const data = await iracingGet(
-          `results/season_results?season_id=${seasonId}`,
-          token,
-          10000,
-        );
-        const arr = Array.isArray(data)
-          ? data
-          : (data?.results ?? data?.sessions ?? []);
-        console.log(
-          "[series-cars] season_results no-week sessions:",
-          arr.length,
-        );
-        if (arr.length > 0) sessions = arr;
-      } catch (e: any) {
-        console.warn("[series-cars] no-week error:", e.message);
-      }
-    }
-
-    if (!sessions.length) {
+    if (!filtered.length) {
       return NextResponse.json({
         cars: [],
         total_drivers: 0,
@@ -119,76 +92,112 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Step 2: pick the highest-SOF session
-    const best = sessions
-      .filter((s: any) => s.subsession_id)
-      .sort(
-        (a: any, b: any) =>
-          (b.event_strength_of_field ?? 0) - (a.event_strength_of_field ?? 0),
-      )[0];
+    // Step 3: get unique subsession_ids sorted by SOF desc → take best 3
+    const subMap = new Map<number, number>();
+    for (const r of filtered) {
+      if (!subMap.has(r.subsession_id))
+        subMap.set(r.subsession_id, r.event_strength_of_field ?? 0);
+    }
+    const topIds = Array.from(subMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([id]) => id);
 
-    if (!best?.subsession_id) {
+    console.log("[series-cars] top subsessions:", topIds);
+
+    // Step 4: fetch full results for those sessions → ALL drivers (not just Victor)
+    const fetchedResults = await Promise.allSettled(
+      topIds.map((id) =>
+        iracingGet(`results/get?subsession_id=${id}`, token, 12000),
+      ),
+    );
+
+    // Step 5: collect best qual laps per driver per car
+    // Use qualifying session (simsession_type=3) if available, else race (type=6)
+    const driverBests: {
+      name: string;
+      car_name: string;
+      car_id: number;
+      lap: number;
+    }[] = [];
+
+    for (const r of fetchedResults) {
+      if (r.status !== "fulfilled" || !r.value) continue;
+      const data = r.value;
+
+      // Prefer qualifying session
+      let targetSession = (data.session_results ?? []).find(
+        (s: any) =>
+          s.simsession_type === 3 || s.simsession_name?.includes("QUAL"),
+      );
+
+      // Fall back to race
+      if (!targetSession) {
+        targetSession = (data.session_results ?? []).find(
+          (s: any) => s.simsession_type === 6 || s.simsession_name === "RACE",
+        );
+      }
+
+      if (!targetSession?.results) continue;
+
+      for (const driver of targetSession.results) {
+        const lap =
+          driver.best_qual_lap_time > 0
+            ? driver.best_qual_lap_time
+            : driver.best_lap_time;
+        if (!lap || lap <= 0) continue;
+        driverBests.push({
+          name: driver.display_name ?? "—",
+          car_name: driver.car_name ?? "—",
+          car_id: driver.car_id,
+          lap,
+        });
+      }
+    }
+
+    if (!driverBests.length) {
       return NextResponse.json({
         cars: [],
         total_drivers: 0,
-        subsessions_sampled: 0,
+        subsessions_sampled: topIds.length,
       });
     }
 
-    console.log(
-      "[series-cars] best subsession:",
-      best.subsession_id,
-      "SOF:",
-      best.event_strength_of_field,
-    );
+    // Step 6: sort by lap time → top 10
+    driverBests.sort((a, b) => a.lap - b.lap);
+    const top10 = driverBests.slice(0, 10);
 
-    // Step 3: fetch full results for that session
-    const subsession = await iracingGet(
-      `results/get?subsession_id=${best.subsession_id}`,
-      token,
-      12000,
-    );
+    // Most common car in top 10
+    const carCount: Record<string, number> = {};
+    for (const d of top10)
+      carCount[d.car_name] = (carCount[d.car_name] ?? 0) + 1;
+    const fastestCar = Object.entries(carCount).sort(
+      (a, b) => b[1] - a[1],
+    )[0]?.[0];
 
-    // Find the race session (simsession_type 6 = race)
-    const raceSession = (subsession?.session_results ?? []).find(
-      (s: any) => s.simsession_type === 6 || s.simsession_name === "RACE",
-    );
-
-    if (!raceSession?.results?.length) {
-      return NextResponse.json({
-        cars: [],
-        total_drivers: 0,
-        subsessions_sampled: 1,
-      });
-    }
-
-    // Step 4: build top 10 by finish position
-    const top10 = [...raceSession.results]
-      .sort((a: any, b: any) => a.finish_position - b.finish_position)
-      .slice(0, 10)
-      .map((d: any) => ({
-        position: d.finish_position + 1, // 0-indexed → 1-indexed
-        driver_name: d.display_name ?? d.name ?? "—",
-        car_name: d.car_name ?? "—",
-        car_id: d.car_id,
-        best_lap: formatLapTime(d.best_lap_time),
-        avg_lap: formatLapTime(d.average_lap),
-        laps: d.laps_complete ?? 0,
-        incidents: d.incidents ?? 0,
-        irating: d.oldi_rating ?? null,
-      }));
+    const leaderLap = top10[0].lap;
+    const result = top10.map((d, i) => ({
+      position: i + 1,
+      driver_name: d.name,
+      car_name: d.car_name,
+      car_id: d.car_id,
+      best_lap: formatLapTime(d.lap),
+      delta: i === 0 ? null : `+${((d.lap - leaderLap) / 10000).toFixed(3)}s`,
+      is_fastest_car: d.car_name === fastestCar,
+    }));
 
     console.log(
-      "[series-cars] top10 built, cars:",
-      Array.from(new Set(top10.map((d) => d.car_name))).join(", "),
+      "[series-cars] top10 fastest car:",
+      fastestCar,
+      "| drivers:",
+      driverBests.length,
     );
 
     return NextResponse.json({
-      cars: top10,
-      total_drivers: raceSession.results.length,
-      subsessions_sampled: 1,
-      sof: best.event_strength_of_field ?? 0,
-      track: best.track?.track_name ?? subsession?.track?.track_name ?? "—",
+      cars: result,
+      fastest_car: fastestCar,
+      total_drivers: driverBests.length,
+      subsessions_sampled: topIds.length,
     });
   } catch (e: any) {
     console.error("[series-cars] error:", e.message);

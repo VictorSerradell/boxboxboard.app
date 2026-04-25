@@ -1,16 +1,12 @@
-// /app/api/iracing/my-races/route.ts
-// Only fetches chunk URLs from iRacing (fast, <3s)
-// Client downloads S3 chunks directly from browser
-
 import { NextRequest, NextResponse } from "next/server";
-import { getValidToken } from "../../../lib/iracing-token";
 
 const BASE = "https://members-ng.iracing.com/data";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const { token, setCookieHeader } = await getValidToken(request);
+  // Use access token directly — no refresh to stay under 10s Vercel limit
+  const token = request.cookies.get("iracing_access_token")?.value;
   if (!token)
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -31,15 +27,16 @@ export async function GET(request: NextRequest) {
         Authorization: `Bearer ${token}`,
         "User-Agent": "BoxBoxBoard/1.0",
       },
-      signal: AbortSignal.timeout(7000),
+      signal: AbortSignal.timeout(8000), // max 8s, leave 2s buffer
     });
+
+    if (res.status === 401) {
+      return NextResponse.json({ error: "token_expired" }, { status: 401 });
+    }
 
     if (!res.ok) {
       console.error("[my-races] iRacing HTTP", res.status);
-      return NextResponse.json(
-        { error: "iracing_error", status: res.status },
-        { status: 502 },
-      );
+      return NextResponse.json({ error: "iracing_error" }, { status: 502 });
     }
 
     const raw = await res.json();
@@ -54,7 +51,6 @@ export async function GET(request: NextRequest) {
       !!raw?.link,
     );
 
-    // Case 1: S3 single link redirect (rare)
     if (raw?.link) {
       return NextResponse.json(
         { type: "link", url: raw.link },
@@ -64,19 +60,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Case 2: results inline (fast path, no chunks)
     if (numDirect > 0) {
-      const response = NextResponse.json(
+      return NextResponse.json(
         { type: "inline", results: raw.results },
         {
           headers: { "Cache-Control": "private, max-age=180" },
         },
       );
-      if (setCookieHeader) response.headers.set("Set-Cookie", setCookieHeader);
-      return response;
     }
 
-    // Case 3: S3 chunks — return URLs to client, let browser download them
     const chunkFiles: string[] = raw?.chunk_info?.chunk_file_names ?? [];
     const baseUrl = raw?.chunk_info?.base_download_url ?? "";
 
@@ -86,7 +78,7 @@ export async function GET(request: NextRequest) {
         chunkFiles.length,
         "chunk URLs to client",
       );
-      const response = NextResponse.json(
+      return NextResponse.json(
         {
           type: "chunks",
           base_url: baseUrl,
@@ -97,12 +89,9 @@ export async function GET(request: NextRequest) {
           headers: { "Cache-Control": "private, max-age=180" },
         },
       );
-      if (setCookieHeader) response.headers.set("Set-Cookie", setCookieHeader);
-      return response;
     }
 
-    // No data
-    console.log("[my-races] no data returned");
+    console.log("[my-races] no data");
     return NextResponse.json({ type: "empty", results: [] });
   } catch (e: any) {
     console.error("[my-races] error:", e.message);

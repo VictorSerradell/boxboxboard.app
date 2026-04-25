@@ -193,3 +193,5 @@ async function refreshAccessToken(
   const data = await res.json();
   return data.access_token ?? null;
 }
+export const dynamic = 'force-dynamic';
+export const maxDuration = 180;   // ← CRÍTICO para Hobby

@@ -14,16 +14,11 @@ export async function searchSeries(
       Authorization: "Bearer " + token,
       "User-Agent": "BoxBoxBoard/1.0",
     },
-    signal: AbortSignal.timeout(12000),
+    signal: AbortSignal.timeout(6000), // tight: must leave room for S3
   });
 
   if (!res.ok) {
-    console.error(
-      "[search_series] HTTP",
-      res.status,
-      "for",
-      params.toString().slice(0, 80),
-    );
+    console.error("[search_series] HTTP", res.status);
     return [];
   }
 
@@ -32,7 +27,7 @@ export async function searchSeries(
   const numDirect = raw?.results?.length ?? 0;
   const numRows = raw?.chunk_info?.rows ?? 0;
   console.log(
-    "[search_series] status OK | direct:",
+    "[search_series] direct:",
     numDirect,
     "| chunks:",
     numChunks,
@@ -44,7 +39,7 @@ export async function searchSeries(
 
   // Format 1: S3 link redirect
   if (raw?.link) {
-    const s3 = await fetch(raw.link, { signal: AbortSignal.timeout(15000) });
+    const s3 = await fetch(raw.link, { signal: AbortSignal.timeout(6000) });
     if (!s3.ok) {
       console.error("[search_series] link S3 failed:", s3.status);
       return [];
@@ -55,27 +50,19 @@ export async function searchSeries(
     return items;
   }
 
-  // Format 2: results in raw.results directly (fast path)
-  if (numDirect > 0) {
-    console.log("[search_series] returning direct results:", numDirect);
-    return raw.results;
-  }
+  // Format 2: results inline
+  if (numDirect > 0) return raw.results;
 
-  // Format 3: results in S3 chunks (chunk_file_names present but raw.results empty)
+  // Format 3: S3 chunks — fetch all in parallel with tight timeout
   const chunkFiles: string[] = raw?.chunk_info?.chunk_file_names ?? [];
   const baseUrl = raw?.chunk_info?.base_download_url ?? "";
 
   if (chunkFiles.length > 0 && baseUrl) {
-    console.log(
-      "[search_series] fetching",
-      chunkFiles.length,
-      "S3 chunks from",
-      baseUrl.slice(0, 60),
-    );
+    console.log("[search_series] fetching", chunkFiles.length, "chunks");
     const allResults: any[] = [];
     const fetches = await Promise.allSettled(
       chunkFiles.map((file) =>
-        fetch(baseUrl + file, { signal: AbortSignal.timeout(12000) }).then(
+        fetch(baseUrl + file, { signal: AbortSignal.timeout(7000) }).then(
           (r) => {
             console.log("[search_series] chunk HTTP:", r.status);
             return r.ok ? r.json() : [];
@@ -97,6 +84,6 @@ export async function searchSeries(
     return allResults;
   }
 
-  console.log("[search_series] no data (rows reported:", numRows, ")");
+  console.log("[search_series] no data (rows:", numRows, ")");
   return [];
 }

@@ -6,7 +6,6 @@ import { Info, Coffee, Heart, LayoutGrid, LayoutList, CalendarClock, MapPin, Use
 import SeriesCard from '../components/SeriesCard';
 import FiltersBar from '../components/FiltersBar';
 import LoginModal from '../components/LoginModal';
-import SeriesDetailPanel from '../components/SeriesDetailPanel';
 import ThemeToggle from '../components/ThemeToggle';
 import LangToggle from '../components/LangToggle';
 import DriverStats from '../components/DriverStats';
@@ -16,6 +15,7 @@ import WeekChangeBanner from '../components/WeekChangeBanner';
 import InstallBanner from '../components/InstallBanner';
 import TrackMap from '../components/TrackMap';
 import DriverProfile from '../components/DriverProfile';
+import SeriesDetailPanel from '../components/SeriesDetailPanel';
 import { useBreakpoint } from '../lib/useBreakpoint';
 import { useT } from '../lib/i18n';
 import type { SeriesSeason, FilterState, SeasonInfo, AppUser } from '../types/iracing';

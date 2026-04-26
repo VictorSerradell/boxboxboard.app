@@ -134,14 +134,22 @@ export async function getSeriesSeasons(
       allSeasons.length,
     );
 
-    // Filter to requested season — try exact match first, then just active
+    // Filter to requested season — try exact match first, then same year, then all
     let seasons = allSeasons.filter((s: any) => {
       const yr = s.season_year ?? s.race_season?.season_year;
       const qt = s.season_quarter ?? s.race_season?.season_quarter;
       return yr === seasonYear && qt === seasonQuarter;
     });
 
-    // If no match (API may return only current season already), use all
+    if (seasons.length === 0) {
+      // Try same year, any quarter (special events like 24h Nürburgring)
+      seasons = allSeasons.filter((s: any) => {
+        const yr = s.season_year ?? s.race_season?.season_year;
+        return yr === seasonYear;
+      });
+    }
+
+    // If still no match, use all
     if (seasons.length === 0) {
       seasons = allSeasons;
       console.log(

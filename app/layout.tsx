@@ -201,6 +201,7 @@ export default function RootLayout({
         <ThemeProvider>
           <I18nProvider>{children}</I18nProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );

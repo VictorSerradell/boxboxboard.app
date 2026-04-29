@@ -621,28 +621,24 @@ export default function SeriesDetailPanel({ series, logoUrl, isFavorite, onClose
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {/* Header row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-                    <SectionTitle><Car size={10} style={{ display: 'inline', marginRight: 5 }} />Top 10 tiempos · {carsExtra.track}</SectionTitle>
-                    {carsExtra.sof > 0 && (
-                      <span style={{ fontSize: 10, fontFamily: 'Orbitron, monospace', color: accent, background: `${accent}18`, border: `1px solid ${accent}35`, borderRadius: 4, padding: '1px 6px' }}>
-                        SOF {carsExtra.sof.toLocaleString()}
-                      </span>
-                    )}
-                    {(carStats as any).fastest_car && (
+                    <SectionTitle><Car size={10} style={{ display: 'inline', marginRight: 5 }} />Top 10 vueltas rápidas</SectionTitle>
+                    {carsExtra.fastest_car && (
                       <span style={{ fontSize: 10, fontFamily: 'Rajdhani, sans-serif', color: '#22C55E', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 4, padding: '1px 6px' }}>
-                        🏆 {(carStats as any).fastest_car}
+                        🏆 {carsExtra.fastest_car}
                       </span>
                     )}
                   </div>
                   {/* Column labels */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 80px 64px 64px 28px', gap: 6, padding: '0 10px', marginBottom: 2 }}>
-                    {['P', 'PILOTO · COCHE', 'MEJOR', 'MEDIA', 'VUELTAS', 'X'].map(h => (
+                  <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 80px 72px', gap: 6, padding: '0 10px', marginBottom: 2 }}>
+                    {['#', 'PILOTO · COCHE', 'MEJOR', 'DELTA'].map(h => (
                       <span key={h} style={{ fontSize: 9, fontFamily: 'Orbitron, monospace', color: '#555', letterSpacing: '0.1em' }}>{h}</span>
                     ))}
                   </div>
                   {carStats.map((d) => {
                     const isFirst = d.position === 1;
+                    const isFastest = (d as any).is_fastest_car;
                     return (
-                      <div key={d.position} style={{ display: 'grid', gridTemplateColumns: '28px 1fr 80px 64px 64px 28px', gap: 6, alignItems: 'center', padding: '8px 10px', borderRadius: 10, background: isFirst ? `${accent}12` : T.rowBg, border: `1px solid ${isFirst ? accent + '35' : T.sectionBorder}` }}>
+                      <div key={d.position} style={{ display: 'grid', gridTemplateColumns: '28px 1fr 80px 72px', gap: 6, alignItems: 'center', padding: '8px 10px', borderRadius: 10, background: isFirst ? `${accent}12` : T.rowBg, border: `1px solid ${isFirst ? accent + '35' : T.sectionBorder}` }}>
                         {/* Position */}
                         <div style={{ width: 22, height: 22, borderRadius: 6, background: isFirst ? accent : T.rowBgAlt, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <span style={{ fontFamily: 'Orbitron, monospace', fontSize: 10, fontWeight: 700, color: isFirst ? '#fff' : '#777' }}>{d.position}</span>
@@ -650,21 +646,22 @@ export default function SeriesDetailPanel({ series, logoUrl, isFavorite, onClose
                         {/* Driver + car */}
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: 12, fontWeight: 600, color: T.textSecondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.driver_name}</div>
-                          <div style={{ fontSize: 10, color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontFamily: 'Rajdhani, sans-serif' }}>{d.car_name}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <div style={{ fontSize: 10, color: isFastest ? '#22C55E' : '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontFamily: 'Rajdhani, sans-serif', fontWeight: isFastest ? 700 : 400 }}>{d.car_name}</div>
+                            {isFastest && <span style={{ fontSize: 8 }}>🏆</span>}
+                          </div>
                         </div>
                         {/* Best lap */}
                         <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 11, fontWeight: 700, color: isFirst ? accent : T.textMuted }}>{d.best_lap}</div>
-                        {/* Avg lap */}
-                        <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 11, color: '#888' }}>{d.avg_lap}</div>
-                        {/* Laps */}
-                        <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 11, color: '#888' }}>{d.laps}</div>
-                        {/* Incidents */}
-                        <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 10, color: d.incidents > 0 ? '#F97316' : '#666' }}>{d.incidents > 0 ? d.incidents : '·'}</div>
+                        {/* Delta */}
+                        <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 10, color: isFirst ? '#22C55E' : '#888' }}>
+                          {isFirst ? 'LÍDER' : ((d as any).delta ?? '—')}
+                        </div>
                       </div>
                     );
                   })}
                   <div style={{ fontSize: 10, color: '#555', fontFamily: 'Rajdhani, sans-serif', marginTop: 2, paddingLeft: 2 }}>
-                    {carsExtra.total_drivers} pilotos en esta sesión
+                    {carsExtra.total_drivers} pilotos analizados · coche más rápido destacado
                   </div>
                 </div>
               )}

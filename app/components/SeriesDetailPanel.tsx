@@ -397,42 +397,13 @@ export default function SeriesDetailPanel({ series, logoUrl, isFavorite, onClose
                       }
                     }
                   }
-                  // Step 1: get chunk URLs or inline data from series-cars
+                  // Use spectator_subsession_ids (global data, no my_races needed)
                   const carsParams = new URLSearchParams({
-                    series_id:      String(series.series_id),
-                    race_week_num:  String(currentWeek),
-                    season_year:    String(series.season_year),
-                    season_quarter: String(series.season_quarter),
+                    season_id:     String(series.season_id),
+                    race_week_num: String(currentWeek),
                   });
                   fetch(`/api/iracing/series-cars?${carsParams}`, { credentials: 'include' })
                     .then(r => r.json())
-                    .then(async (resp: any) => {
-                      if (resp.type === 'chunks') {
-                        // Download S3 chunks browser-side, then re-call with my_races
-                        const fetches = await Promise.allSettled(
-                          resp.chunks.map((file: string) =>
-                            fetch(resp.base_url + file).then(r => r.ok ? r.json() : [])
-                          )
-                        );
-                        const myRaces: any[] = [];
-                        for (const f of fetches) {
-                          if (f.status === 'fulfilled') {
-                            const chunk = Array.isArray(f.value) ? f.value : (f.value?.results ?? []);
-                            myRaces.push(...chunk);
-                          }
-                        }
-                        console.log('[panel] downloaded', myRaces.length, 'races for series-cars');
-                        const params2 = new URLSearchParams({
-                          series_id:      String(series.series_id),
-                          race_week_num:  String(currentWeek),
-                          season_year:    String(series.season_year),
-                          season_quarter: String(series.season_quarter),
-                          my_races:       JSON.stringify(myRaces),
-                        });
-                        return fetch(`/api/iracing/series-cars?${params2}`, { credentials: 'include' }).then(r => r.json());
-                      }
-                      return resp;
-                    })
                     .then(data => { setCarStats(data.cars ?? []); setCarsExtra({ sof: data.sof ?? 0, track: data.track ?? '', total_drivers: data.total_drivers ?? 0, fastest_car: data.fastest_car ?? '' }); setCarsLoaded(true); })
                     .catch(() => {})
                     .finally(() => setCarsLoading(false));

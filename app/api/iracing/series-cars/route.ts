@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getDb } from "../../../lib/mongodb";
 
 const BASE = "https://members-ng.iracing.com/data";
 
@@ -20,7 +21,7 @@ async function iGet(path: string, token: string) {
     },
     signal: AbortSignal.timeout(7000),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const raw = await res.json();
   if (raw?.link) {
     const s3 = await fetch(raw.link, { signal: AbortSignal.timeout(7000) });
@@ -32,8 +33,7 @@ async function iGet(path: string, token: string) {
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("iracing_access_token")?.value;
-  if (!token)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!token) return NextResponse.json({ cars: [] }, { status: 401 });
 
   const { searchParams } = request.nextUrl;
   const seasonId = searchParams.get("season_id");
@@ -42,41 +42,36 @@ export async function GET(request: NextRequest) {
   if (!seasonId) return NextResponse.json({ cars: [] });
 
   try {
-    // Step 1: get subsession IDs for this season via spectator endpoint (global, no cust_id filter)
-    const spectator = await iGet(
-      `spectator_subsession_ids?event_types=5&season_ids=${seasonId}`,
-      token,
-    );
+    // Look up stored subsessions from MongoDB for this season
+    const db = await getDb();
+    const col = db.collection("subsessions");
+
+    const weeks = [weekNum, weekNum - 1].filter((w) => w >= 0);
+    const stored = await col
+      .find({
+        season_id: Number(seasonId),
+        race_week_num: { $in: weeks },
+      })
+      .sort({ event_strength_of_field: -1 })
+      .limit(5)
+      .toArray();
 
     console.log(
-      "[series-cars] spectator raw keys:",
-      Object.keys(spectator ?? {}).join(", "),
-    );
-    console.log(
-      "[series-cars] spectator sample:",
-      JSON.stringify(spectator).slice(0, 200),
-    );
-
-    let subsessionIds: number[] =
-      spectator?.subsession_ids ??
-      spectator?.session_ids ??
-      spectator?.sessions ??
-      [];
-    console.log(
-      "[series-cars] spectator subsessions for season",
+      "[series-cars] MongoDB subsessions for season",
       seasonId,
+      "weeks",
+      weeks,
       ":",
-      subsessionIds.length,
+      stored.length,
     );
 
-    if (!subsessionIds.length) {
-      return NextResponse.json({ cars: [], total_drivers: 0 });
+    if (!stored.length) {
+      return NextResponse.json({ cars: [], total_drivers: 0, no_data: true });
     }
 
-    // Take most recent 3 (highest IDs = most recent)
-    const topIds = [...subsessionIds].sort((a, b) => b - a).slice(0, 3);
+    const topIds = stored.map((s) => s.subsession_id);
 
-    // Step 2: fetch full results → ALL drivers (not filtered by cust_id)
+    // Fetch full results for top subsessions → ALL drivers
     const fetched = await Promise.allSettled(
       topIds.map((id) => iGet(`results/get?subsession_id=${id}`, token)),
     );
@@ -87,21 +82,13 @@ export async function GET(request: NextRequest) {
       car_id: number;
       lap: number;
       irating: number;
-      country: string;
     }[] = [];
 
     for (const r of fetched) {
       if (r.status !== "fulfilled" || !r.value) continue;
       const data = r.value;
 
-      // Check race_week_num matches
-      if (
-        data.race_week_num != null &&
-        Math.abs(data.race_week_num - weekNum) > 1
-      )
-        continue;
-
-      // Prefer qualifying, fallback to race
+      // Prefer qualifying (simsession_type=3), fallback to race (6)
       let session = (data.session_results ?? []).find(
         (s: any) => s.simsession_type === 3,
       );
@@ -120,8 +107,7 @@ export async function GET(request: NextRequest) {
           car_name: d.car_name ?? "—",
           car_id: d.car_id,
           lap,
-          irating: d.oldi_rating ?? d.newi_rating ?? 0,
-          country: d.country_code ?? "",
+          irating: d.oldi_rating ?? 0,
         });
       }
     }
@@ -143,7 +129,7 @@ export async function GET(request: NextRequest) {
     console.log(
       "[series-cars] top car:",
       fastestCar,
-      "| total drivers:",
+      "| drivers sampled:",
       driverBests.length,
     );
 
@@ -154,7 +140,6 @@ export async function GET(request: NextRequest) {
         car_name: d.car_name,
         car_id: d.car_id,
         irating: d.irating,
-        country: d.country,
         best_lap: formatLapTime(d.lap),
         delta: i === 0 ? null : `+${((d.lap - leaderLap) / 10000).toFixed(3)}s`,
         is_fastest_car: d.car_name === fastestCar,

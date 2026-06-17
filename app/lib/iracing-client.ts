@@ -245,7 +245,7 @@ export async function getSeriesSeasons(
         // Computed UI fields
         category: mapCategory(
           s.license_group,
-          s.category,
+          s.car_types?.[0]?.car_type ?? s.category,
           s.series_name,
           s.season_name,
           s.driver_changes,
@@ -424,14 +424,7 @@ function mapCategory(
     if (c.includes("road") || c.includes("sports")) return "Sports Car";
   }
 
-  const map: Record<number, CarCategory> = {
-    1: "Oval",
-    2: "Sports Car",
-    3: "Dirt Oval",
-    4: "Dirt Road",
-    5: "Sports Car",
-  };
-  return map[licenseGroup] ?? "Sports Car";
+  return "Sports Car"; // safe fallback
 }
 
 function mapLicenseLevel(

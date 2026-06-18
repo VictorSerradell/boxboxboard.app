@@ -415,6 +415,28 @@ function mapCategory(
   )
     return "Formula Car";
 
+  // Oval: detect by name keywords
+  if (
+    name.includes("nascar") ||
+    name.includes("stock car") ||
+    name.includes(" oval") ||
+    name.includes("super late model") ||
+    name.includes("late model") ||
+    name.includes("modified") ||
+    name.includes("silver crown") ||
+    name.includes("sprint car cup") ||
+    name.includes("pickup cup") ||
+    name.includes("carburetor cup") ||
+    name.includes("mini stock") ||
+    name.includes("street stock") ||
+    name.includes("arca") ||
+    name.includes("srx series") ||
+    name.includes("sk modified") ||
+    name.includes("cars tour") ||
+    name.includes("draft master")
+  )
+    return "Oval";
+
   if (rawCategory) {
     const c = rawCategory.toLowerCase();
     if (c.includes("formula")) return "Formula Car";

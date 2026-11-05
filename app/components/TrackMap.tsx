@@ -150,14 +150,10 @@ export default function TrackMap({
         attributionControl: true,
       });
 
-      // Dark/light tile layer
-      // Lee el token desde las variables de entorno (o usa un string directo si prefieres probar rápido)
-      const cartoApiKey = process.env.NEXT_PUBLIC_CARTO_API_KEY || "";
-
-      // Tile layer de CARTO con api_key incluido
+      // Usamos nuestra ruta de API interna segura para servir los tiles sin exponer la clave en el cliente
       const tileUrl = isDark
-        ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${cartoApiKey}`
-        : `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_key=${cartoApiKey}`;
+        ? `/api/map-tile?z={z}&x={x}&y={y}&theme=dark`
+        : `/api/map-tile?z={z}&x={x}&y={y}&theme=light`;
 
       L.tileLayer(tileUrl, {
         attribution:
@@ -210,7 +206,7 @@ export default function TrackMap({
       });
 
       leafletMap.current = map;
-    };);
+    });
 
     return () => {
       if (leafletMap.current) {

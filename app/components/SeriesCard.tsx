@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import {
   Heart,
   Lock,
@@ -18,6 +18,7 @@ import { getCurrentRaceWeek } from "../lib/season-week";
 import { useTheme } from "../lib/theme";
 import { useT } from "../lib/i18n";
 import { useIsMobile } from "../lib/useBreakpoint";
+import { CATEGORY_STYLES, LICENSE_CONFIG } from "../lib/tokens";
 
 interface SeriesCardProps {
   series: SeriesSeason;
@@ -31,51 +32,6 @@ interface SeriesCardProps {
   onCompare?: () => void;
   onSchedule?: () => void;
 }
-
-const CATEGORY_STYLE: Record<
-  string,
-  { accent: string; label: string; borderColor: string }
-> = {
-  "Sports Car": {
-    accent: "#3B9EFF",
-    label: "Sports Car",
-    borderColor: "rgba(59,158,255,0.35)",
-  },
-  "Formula Car": {
-    accent: "#A855F7",
-    label: "Formula",
-    borderColor: "rgba(168,85,247,0.35)",
-  },
-  Oval: {
-    accent: "#F97316",
-    label: "Oval",
-    borderColor: "rgba(249,115,22,0.35)",
-  },
-  "Dirt Oval": {
-    accent: "#EAB308",
-    label: "Dirt Oval",
-    borderColor: "rgba(234,179,8,0.35)",
-  },
-  "Dirt Road": {
-    accent: "#22C55E",
-    label: "Dirt Road",
-    borderColor: "rgba(34,197,94,0.35)",
-  },
-  Endurance: {
-    accent: "#E879F9",
-    label: "Endurance",
-    borderColor: "rgba(232,121,249,0.35)",
-  },
-};
-
-const LICENSE_CONFIG = {
-  0: { label: "Rookie", color: "#FF4444" },
-  1: { label: "D", color: "#F97316" },
-  2: { label: "C", color: "#EAB308" },
-  3: { label: "B", color: "#22C55E" },
-  4: { label: "A", color: "#3B9EFF" },
-  5: { label: "PRO", color: "#A855F7" },
-} as const;
 
 function getSessionDuration(series: SeriesSeason): string {
   const td = series.race_time_descriptors;
@@ -140,7 +96,7 @@ function formatCountdown(ms: number): string {
   return `${m}m`;
 }
 
-export default function SeriesCard({
+function SeriesCard({
   series,
   logoUrl,
   isFavorite,
@@ -171,7 +127,7 @@ export default function SeriesCard({
   }, [series]);
 
   const catStyle =
-    CATEGORY_STYLE[series.category ?? ""] ?? CATEGORY_STYLE["Sports Car"];
+    CATEGORY_STYLES[series.category ?? ""] ?? CATEGORY_STYLES["Sports Car"];
   const licConfig =
     LICENSE_CONFIG[series.minLicenseLevel as keyof typeof LICENSE_CONFIG] ??
     LICENSE_CONFIG[0];
@@ -187,7 +143,7 @@ export default function SeriesCard({
 
   const T = {
     cardBg: isDark ? "#1C1C1C" : "#FFFFFF",
-    cardBorder: hovered ? accent + "60" : isDark ? "#1E1E2A" : "#E0E0E8",
+    cardBorder: hovered ? accent + "60" : isDark ? "#2A2A2A" : "#E2E8F0",
     cardShadow: hovered
       ? isDark
         ? `0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px ${accent}40`
@@ -201,21 +157,21 @@ export default function SeriesCard({
     seriesName: isDark ? "#FFFFFF" : "#0A0A0F",
     trackRowBg: isDark ? "#222222" : "#F8F8F8",
     trackRowBorder: isDark ? "#2A2A2A" : "#E8E8EC",
-    trackName: isDark ? "#CCCCCC" : "#222222",
-    trackConfig: isDark ? "#666666" : "#888888",
-    trackNameActive: isDark ? "#F0F0F0" : "#111111",
-    trackConfigActive: isDark ? "#999999" : "#555555",
-    flagColor: isDark ? "#3A3A3A" : "#CCCCCC",
-    moreTracksBg: isDark ? "#222222" : "#F8F8F8",
-    moreTracksBorder: isDark ? "#1A1A24" : "#EBEBF0",
-    moreTracksText: isDark ? "#2E2E3E" : "#CCCCDD",
-    sectionBorder: isDark ? "#252525" : "#EBEBEF",
-    labelColor: isDark ? "#555555" : "#999999",
-    statValue: isDark ? "#E8E8E8" : "#111111",
+    trackName: isDark ? "#E2E8F0" : "#1E293B",
+    trackConfig: isDark ? "#94A3B8" : "#475569",
+    trackNameActive: isDark ? "#F8FAFC" : "#0F172A",
+    trackConfigActive: isDark ? "#CBD5E1" : "#334155",
+    flagColor: isDark ? "#64748B" : "#94A3B8",
+    moreTracksBg: isDark ? "#262626" : "#F1F5F9",
+    moreTracksBorder: isDark ? "#383838" : "#CBD5E1",
+    moreTracksText: isDark ? "#F1F5F9" : "#0F172A",
+    sectionBorder: isDark ? "#2A2A2A" : "#E2E8F0",
+    labelColor: isDark ? "#94A3B8" : "#475569",
+    statValue: isDark ? "#F8FAFC" : "#0F172A",
     footerBg: isDark ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.02)",
-    iconBtnBg: isDark ? "#141418" : "rgba(0,0,0,0.04)",
-    iconBtnBorder: isDark ? "#333333" : "#E0E0E4",
-    iconBtnColor: isDark ? "#555555" : "#999999",
+    iconBtnBg: isDark ? "#141418" : "rgba(0,0,0,0.05)",
+    iconBtnBorder: isDark ? "#475569" : "#CBD5E1",
+    iconBtnColor: isDark ? "#CBD5E1" : "#475569",
   };
 
   function handleFavClick(e: React.MouseEvent) {
@@ -227,8 +183,19 @@ export default function SeriesCard({
     setTimeout(() => setFavAnimating(false), 200);
   }
 
+  const seriesTitle = series.series_name ?? series.season_name ?? "Series";
+
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`${seriesTitle}, ${licConfig.label} license, ${duration}`}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
@@ -283,6 +250,7 @@ export default function SeriesCard({
           <img
             src={logoUrl}
             alt=""
+            loading="lazy"
             onError={(e) => {
               setLogoError(true);
               let el: HTMLElement | null = e.target as HTMLElement;
@@ -310,30 +278,31 @@ export default function SeriesCard({
             top: 8,
             right: 8,
             display: "flex",
-            gap: 3,
+            gap: 6,
             zIndex: 4,
           }}
         >
           <div
             title={series.isOwned ? t.allContentOwned : t.missingContent}
+            aria-label={series.isOwned ? t.allContentOwned : t.missingContent}
             style={{
-              width: 24,
-              height: 24,
-              borderRadius: 6,
+              width: 30,
+              height: 30,
+              borderRadius: 8,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               background: series.isOwned
                 ? "rgba(34,197,94,0.25)"
-                : "rgba(0,0,0,0.5)",
-              border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.15)"}`,
-              color: series.isOwned ? "#22C55E" : "rgba(255,255,255,0.5)",
+                : "rgba(0,0,0,0.6)",
+              border: `1px solid ${series.isOwned ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.2)"}`,
+              color: series.isOwned ? "#22C55E" : "rgba(255,255,255,0.6)",
             }}
           >
             {series.isOwned ? (
-              <Check size={11} strokeWidth={2.5} />
+              <Check size={13} strokeWidth={2.5} />
             ) : (
-              <Lock size={10} strokeWidth={2} />
+              <Lock size={12} strokeWidth={2} />
             )}
           </div>
           {onCompare && (
@@ -342,22 +311,24 @@ export default function SeriesCard({
                 e.stopPropagation();
                 onCompare();
               }}
+              aria-label={isComparing ? t.removeFromCompare : t.addToCompare}
+              title={isComparing ? t.removeFromCompare : t.addToCompare}
               style={{
-                width: 24,
-                height: 24,
-                borderRadius: 6,
+                width: 30,
+                height: 30,
+                borderRadius: 8,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 background: isComparing
                   ? "rgba(232,0,45,0.4)"
-                  : "rgba(0,0,0,0.5)",
-                border: `1px solid ${isComparing ? "#E8002D" : "rgba(255,255,255,0.15)"}`,
-                color: isComparing ? "#FF6080" : "rgba(255,255,255,0.5)",
+                  : "rgba(0,0,0,0.6)",
+                border: `1px solid ${isComparing ? "#E8002D" : "rgba(255,255,255,0.2)"}`,
+                color: isComparing ? "#FF6080" : "rgba(255,255,255,0.8)",
               }}
             >
-              <GitCompare size={10} strokeWidth={2} />
+              <GitCompare size={12} strokeWidth={2} />
             </button>
           )}
           {onSchedule && (
@@ -366,43 +337,47 @@ export default function SeriesCard({
                 e.stopPropagation();
                 onSchedule();
               }}
+              aria-label={isScheduled ? t.removeFromSchedule : t.addToSchedule}
+              title={isScheduled ? t.removeFromSchedule : t.addToSchedule}
               style={{
-                width: 24,
-                height: 24,
-                borderRadius: 6,
+                width: 30,
+                height: 30,
+                borderRadius: 8,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 background: isScheduled
                   ? "rgba(168,85,247,0.4)"
-                  : "rgba(0,0,0,0.5)",
-                border: `1px solid ${isScheduled ? "#A855F7" : "rgba(255,255,255,0.15)"}`,
-                color: isScheduled ? "#C084FC" : "rgba(255,255,255,0.5)",
+                  : "rgba(0,0,0,0.6)",
+                border: `1px solid ${isScheduled ? "#A855F7" : "rgba(255,255,255,0.2)"}`,
+                color: isScheduled ? "#C084FC" : "rgba(255,255,255,0.8)",
               }}
             >
-              <CalendarClock size={10} strokeWidth={2} />
+              <CalendarClock size={12} strokeWidth={2} />
             </button>
           )}
           <button
             onClick={handleFavClick}
+            aria-label={localFav ? t.favorites : t.favorites}
+            title={localFav ? t.favorites : t.favorites}
             style={{
-              width: 24,
-              height: 24,
-              borderRadius: 6,
+              width: 30,
+              height: 30,
+              borderRadius: 8,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: localFav ? "rgba(239,68,68,0.4)" : "rgba(0,0,0,0.5)",
-              border: `1px solid ${localFav ? "#EF4444" : "rgba(255,255,255,0.15)"}`,
-              color: localFav ? "#FCA5A5" : "rgba(255,255,255,0.5)",
+              background: localFav ? "rgba(239,68,68,0.4)" : "rgba(0,0,0,0.6)",
+              border: `1px solid ${localFav ? "#EF4444" : "rgba(255,255,255,0.2)"}`,
+              color: localFav ? "#FCA5A5" : "rgba(255,255,255,0.8)",
               transform: favAnimating ? "scale(1.35)" : "scale(1)",
               transition: "transform 0.15s ease",
             }}
           >
             <Heart
-              size={11}
+              size={13}
               fill={localFav ? "currentColor" : "none"}
               strokeWidth={2}
             />
@@ -593,9 +568,9 @@ export default function SeriesCard({
                 }}
               >
                 {series.isOwned ? (
-                  <Check size={12} strokeWidth={2.5} />
+                  <Check size={13} strokeWidth={2.5} />
                 ) : (
-                  <Lock size={11} strokeWidth={2} />
+                  <Lock size={12} strokeWidth={2} />
                 )}
               </div>
               {onCompare && (
@@ -604,22 +579,24 @@ export default function SeriesCard({
                     e.stopPropagation();
                     onCompare();
                   }}
+                  aria-label={isComparing ? t.removeFromCompare : t.addToCompare}
+                  title={isComparing ? t.removeFromCompare : t.addToCompare}
                   style={{
-                    width: 26,
-                    height: 26,
-                    borderRadius: 7,
+                    width: 30,
+                    height: 30,
+                    borderRadius: 8,
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     background: isComparing
-                      ? "rgba(232,0,45,0.12)"
+                      ? "rgba(232,0,45,0.18)"
                       : T.iconBtnBg,
                     border: `1px solid ${isComparing ? "rgba(232,0,45,0.5)" : T.iconBtnBorder}`,
                     color: isComparing ? "#E8002D" : T.iconBtnColor,
                   }}
                 >
-                  <GitCompare size={11} strokeWidth={2} />
+                  <GitCompare size={12} strokeWidth={2} />
                 </button>
               )}
               {onSchedule && (
@@ -628,30 +605,34 @@ export default function SeriesCard({
                     e.stopPropagation();
                     onSchedule();
                   }}
+                  aria-label={isScheduled ? t.removeFromSchedule : t.addToSchedule}
+                  title={isScheduled ? t.removeFromSchedule : t.addToSchedule}
                   style={{
-                    width: 26,
-                    height: 26,
-                    borderRadius: 7,
+                    width: 30,
+                    height: 30,
+                    borderRadius: 8,
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     background: isScheduled
-                      ? "rgba(168,85,247,0.2)"
+                      ? "rgba(168,85,247,0.25)"
                       : T.iconBtnBg,
                     border: `1px solid ${isScheduled ? "rgba(168,85,247,0.5)" : T.iconBtnBorder}`,
                     color: isScheduled ? "#A855F7" : T.iconBtnColor,
                   }}
                 >
-                  <CalendarClock size={11} strokeWidth={2} />
+                  <CalendarClock size={12} strokeWidth={2} />
                 </button>
               )}
               <button
                 onClick={handleFavClick}
+                aria-label={localFav ? t.favorites : t.favorites}
+                title={localFav ? t.favorites : t.favorites}
                 style={{
-                  width: 26,
-                  height: 26,
-                  borderRadius: 7,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 8,
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
@@ -664,7 +645,7 @@ export default function SeriesCard({
                 }}
               >
                 <Heart
-                  size={12}
+                  size={13}
                   fill={localFav ? "currentColor" : "none"}
                   strokeWidth={2}
                 />
@@ -973,3 +954,5 @@ export default function SeriesCard({
     </div>
   );
 }
+
+export default memo(SeriesCard);

@@ -51,16 +51,16 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
     rowHover: isDark ? "#141418" : "rgba(0,0,0,0.04)",
     colHover: isDark ? "rgba(232,0,45,0.1)" : "rgba(232,0,45,0.1)",
     cellHover: isDark ? "rgba(232,0,45,0.1)" : "rgba(232,0,45,0.1)",
-    text: isDark ? "rgba(255,255,255,0.85)" : "#222230",
-    textMuted: isDark ? "#555566" : "#999AAA",
-    textFaint: isDark ? "#444455" : "#CCCCDD",
-    weekLabel: isDark ? "#444455" : "#999AAA",
-    trackName: isDark ? "rgba(255,255,255,0.78)" : "#444455",
-    configName: isDark ? "#444455" : "#999AAA",
+    text: isDark ? "#F8FAFC" : "#0F172A",
+    textMuted: isDark ? "#CBD5E1" : "#334155",
+    textFaint: isDark ? "#94A3B8" : "#64748B",
+    weekLabel: isDark ? "#CBD5E1" : "#334155",
+    trackName: isDark ? "#F1F5F9" : "#1E293B",
+    configName: isDark ? "#94A3B8" : "#475569",
     emptyCell: isDark ? "rgba(255,255,255,0.015)" : "rgba(0,0,0,0.015)",
     chipBg: isDark ? "#161620" : "rgba(0,0,0,0.05)",
-    chipBorder: isDark ? "rgba(255,255,255,0.10)" : "#E0E0E8",
-    chipColor: isDark ? "#666677" : "#999AAA",
+    chipBorder: isDark ? "rgba(255,255,255,0.10)" : "#CBD5E1",
+    chipColor: isDark ? "#CBD5E1" : "#334155",
     stickyBg: isDark ? "#0D0D12" : "#FFFFFF",
   };
 
@@ -242,6 +242,15 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                 return (
                   <th
                     key={s.series_id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Open series ${s.series_name}`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onSeriesClick(s);
+                      }
+                    }}
                     onMouseEnter={() => setHoveredCol(si)}
                     onMouseLeave={() => setHoveredCol(null)}
                     onClick={() => onSeriesClick(s)}
@@ -403,6 +412,19 @@ export default function CalendarView({ series, onSeriesClick }: Props) {
                     return (
                       <td
                         key={s.series_id}
+                        role={isEmpty ? undefined : "button"}
+                        tabIndex={isEmpty ? undefined : 0}
+                        aria-label={
+                          isEmpty
+                            ? undefined
+                            : `Week ${wi + 1}, ${s.series_name}: ${week?.track?.track_name ?? "Track"}`
+                        }
+                        onKeyDown={(e) => {
+                          if (!isEmpty && (e.key === "Enter" || e.key === " ")) {
+                            e.preventDefault();
+                            onSeriesClick(s);
+                          }
+                        }}
                         onClick={() => !isEmpty && onSeriesClick(s)}
                         style={{
                           borderRight: `1px solid ${T.border}`,

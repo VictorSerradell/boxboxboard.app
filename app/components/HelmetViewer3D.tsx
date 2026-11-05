@@ -14,6 +14,13 @@ function HelmetMesh({ color1, color2, color3 }: HelmetMeshProps) {
 
   useFrame((state) => {
     if (groupRef.current) {
+      if (
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        groupRef.current.rotation.y = 0;
+        return;
+      }
       groupRef.current.rotation.y =
         Math.sin(state.clock.elapsedTime * 0.5) * 0.25;
     }

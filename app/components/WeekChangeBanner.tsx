@@ -86,10 +86,10 @@ export default function WeekChangeBanner({
       : "0 8px 32px rgba(0,0,0,0.12)",
     trackBg: isDark ? "#141418" : "rgba(0,0,0,0.04)",
     trackBorder: isDark ? "#1E1E2A" : "#E0E0E8",
-    text: isDark ? "rgba(255,255,255,0.85)" : "#222230",
-    textMuted: isDark ? "#666677" : "#999AAA",
-    closeBtn: isDark ? "#1A1A26" : "rgba(0,0,0,0.06)",
-    closeBorder: isDark ? "rgba(255,255,255,0.12)" : "#E0E0E8",
+    text: isDark ? "#F8FAFC" : "#0F172A",
+    textMuted: isDark ? "#CBD5E1" : "#334155",
+    closeBtn: isDark ? "#1E293B" : "rgba(0,0,0,0.06)",
+    closeBorder: isDark ? "#334155" : "#CBD5E1",
   };
 
   const isFirstVisit = !localStorage.getItem(
@@ -98,6 +98,8 @@ export default function WeekChangeBanner({
 
   return (
     <div
+      role="status"
+      aria-live="polite"
       style={{
         position: "fixed",
         top: 114,
@@ -179,10 +181,11 @@ export default function WeekChangeBanner({
           </div>
           <button
             onClick={dismiss}
+            aria-label="Dismiss week change notification"
             style={{
-              width: 28,
-              height: 28,
-              borderRadius: 8,
+              width: 38,
+              height: 38,
+              borderRadius: 10,
               border: `1px solid ${T.closeBorder}`,
               background: T.closeBtn,
               cursor: "pointer",
@@ -193,7 +196,7 @@ export default function WeekChangeBanner({
               flexShrink: 0,
             }}
           >
-            <X size={13} />
+            <X size={16} />
           </button>
         </div>
 

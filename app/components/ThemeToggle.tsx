@@ -12,10 +12,11 @@ export default function ThemeToggle() {
     <button
       onClick={toggle}
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       style={{
-        width: 36,
-        height: 36,
-        borderRadius: 10,
+        width: 44,
+        height: 44,
+        borderRadius: 12,
         cursor: "pointer",
         display: "flex",
         alignItems: "center",

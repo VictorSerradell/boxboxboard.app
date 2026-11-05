@@ -11,12 +11,15 @@ export default function LangToggle() {
 
   return (
     <div
+      role="group"
+      aria-label="Language selector"
       style={{
         display: "flex",
-        gap: 2,
-        background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
-        border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
-        borderRadius: 8,
+        alignItems: "center",
+        gap: 3,
+        background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
+        border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)"}`,
+        borderRadius: 10,
         padding: 2,
       }}
     >
@@ -24,30 +27,34 @@ export default function LangToggle() {
         <button
           key={l}
           onClick={() => setLang(l)}
+          aria-pressed={lang === l}
+          aria-label={`Switch language to ${l === "en" ? "English" : "Spanish"}`}
           style={{
-            padding: "4px 9px",
-            borderRadius: 6,
+            minWidth: 38,
+            minHeight: 38,
+            padding: "8px 11px",
+            borderRadius: 8,
             border: "none",
             cursor: "pointer",
-            fontFamily: "DM Mono, monospace",
+            fontFamily: "Orbitron, monospace",
             fontWeight: 700,
-            fontSize: 11,
+            fontSize: 12,
             letterSpacing: "0.06em",
             textTransform: "uppercase",
             background:
               lang === l
                 ? isDark
-                  ? "rgba(255,255,255,0.12)"
-                  : "rgba(0,0,0,0.10)"
+                  ? "rgba(255,255,255,0.16)"
+                  : "rgba(0,0,0,0.12)"
                 : "transparent",
             color:
               lang === l
                 ? isDark
-                  ? "#E2E8F0"
-                  : "#1E293B"
+                  ? "#F8FAFC"
+                  : "#0F172A"
                 : isDark
-                  ? "#475569"
-                  : "#94A3B8",
+                  ? "#CBD5E1"
+                  : "#334155",
             transition: "all 0.15s",
           }}
         >

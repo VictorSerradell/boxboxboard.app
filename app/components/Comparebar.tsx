@@ -48,12 +48,12 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
     colBorder: isDark ? "#161620" : "rgba(0,0,0,0.07)",
     rowBg: isDark ? "#111118" : "rgba(0,0,0,0.03)",
     rowBorder: isDark ? "#161620" : "rgba(0,0,0,0.07)",
-    text: isDark ? "rgba(255,255,255,0.85)" : "#222230",
-    textMuted: isDark ? "#555566" : "#999AAA",
-    textFaint: isDark ? "#444455" : "#CCCCDD",
-    flagColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.18)",
-    closeBtn: isDark ? "#1A1A26" : "rgba(0,0,0,0.06)",
-    closeBtnBorder: isDark ? "rgba(255,255,255,0.12)" : "#E0E0E8",
+    text: isDark ? "#F8FAFC" : "#0F172A",
+    textMuted: isDark ? "#CBD5E1" : "#334155",
+    textFaint: isDark ? "#94A3B8" : "#64748B",
+    flagColor: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
+    closeBtn: isDark ? "#1E293B" : "rgba(0,0,0,0.06)",
+    closeBtnBorder: isDark ? "#334155" : "#CBD5E1",
     shadow: isDark ? "0 -8px 40px rgba(0,0,0,0.6)" : "0 -8px 32px #E0E0E8",
   };
 
@@ -78,15 +78,21 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
       }}
     >
       {/* ── HANDLE BAR ─────────────────────────────────────── */}
-      <div
+      <button
+        type="button"
+        aria-expanded={expanded}
+        aria-label="Toggle series comparison panel"
         style={{
+          width: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           padding: "10px 20px",
           background: T.headerBg,
+          border: "none",
           borderBottom: `1px solid ${T.border}`,
           cursor: "pointer",
+          textAlign: "left",
         }}
         onClick={() => setExpanded(!expanded)}
       >
@@ -130,17 +136,22 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
                       e.stopPropagation();
                       onRemove(s.series_id);
                     }}
+                    aria-label={`Remove ${s.series_name ?? "series"} from comparison`}
                     style={{
                       background: "none",
                       border: "none",
                       cursor: "pointer",
                       color: "inherit",
-                      padding: 0,
-                      display: "flex",
-                      lineHeight: 1,
+                      padding: 4,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: 24,
+                      minHeight: 24,
+                      borderRadius: 4,
                     }}
                   >
-                    <X size={10} />
+                    <X size={12} />
                   </button>
                 </span>
               );
@@ -153,11 +164,13 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
               e.stopPropagation();
               onClear();
             }}
+            aria-label="Clear all compared series"
             style={{
               display: "flex",
               alignItems: "center",
               gap: 5,
-              padding: "4px 10px",
+              minHeight: 32,
+              padding: "6px 12px",
               borderRadius: 8,
               cursor: "pointer",
               background: T.closeBtn,
@@ -174,7 +187,7 @@ export default function CompareBar({ series, onRemove, onClear }: Props) {
             {expanded ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </div>
         </div>
-      </div>
+      </button>
 
       {/* ── COLUMNS ────────────────────────────────────────── */}
       {expanded && (

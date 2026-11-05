@@ -1,6 +1,7 @@
 "use client";
 // /app/components/LoginModal.tsx
 
+import { useEffect } from "react";
 import { X, ShieldCheck, ExternalLink } from "lucide-react";
 import { useTheme } from "../lib/theme";
 import { useT } from "../lib/i18n";
@@ -14,17 +15,25 @@ export default function LoginModal({ onClose }: LoginModalProps) {
   const { t } = useT();
   const isDark = theme === "dark";
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   function handleConnect() {
     window.location.href = "/api/auth/login";
   }
 
   const bg = isDark ? "#0D1117" : "#FFFFFF";
-  const border = isDark ? "rgba(255,255,255,0.10)" : "#E0E0E8";
+  const border = isDark ? "rgba(255,255,255,0.14)" : "#E2E8F0";
   const itemBg = isDark ? "#111520" : "#F8FAFC";
-  const itemBorder = isDark ? "#161620" : "#E0E0E8";
-  const text = isDark ? "rgba(255,255,255,0.85)" : "#222230";
-  const muted = isDark ? "#666677" : "#999AAA";
-  const faint = isDark ? "#444455" : "#CCCCDD";
+  const itemBorder = isDark ? "#1E293B" : "#E2E8F0";
+  const text = isDark ? "#F8FAFC" : "#0F172A";
+  const muted = isDark ? "#CBD5E1" : "#334155";
+  const faint = isDark ? "#94A3B8" : "#64748B";
 
   return (
     <div
@@ -44,6 +53,9 @@ export default function LoginModal({ onClose }: LoginModalProps) {
       }}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="login-modal-title"
         style={{
           background: bg,
           border: `1px solid ${border}`,
@@ -58,13 +70,14 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         {/* Close */}
         <button
           onClick={onClose}
+          aria-label="Close login dialog"
           style={{
             position: "absolute",
-            top: 14,
-            right: 14,
-            width: 28,
-            height: 28,
-            borderRadius: 8,
+            top: 12,
+            right: 12,
+            width: 44,
+            height: 44,
+            borderRadius: 10,
             background: itemBg,
             border: `1px solid ${itemBorder}`,
             cursor: "pointer",
@@ -74,7 +87,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             color: muted,
           }}
         >
-          <X size={12} strokeWidth={2.5} />
+          <X size={18} strokeWidth={2.5} />
         </button>
 
         {/* Icon */}
@@ -103,6 +116,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
 
         {/* Title */}
         <h2
+          id="login-modal-title"
           style={{
             fontFamily: "Rajdhani, sans-serif",
             fontWeight: 900,
@@ -191,7 +205,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             fontFamily: "Rajdhani, sans-serif",
             fontWeight: 900,
             fontSize: 14,
-            color: "#111118",
+            color: "#FFFFFF",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

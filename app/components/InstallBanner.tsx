@@ -98,9 +98,9 @@ export default function InstallBanner() {
           </p>
           <p
             style={{
-              fontFamily: "DM Sans, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
               fontSize: 12,
-              color: isDark ? "#666677" : "#999AAA",
+              color: isDark ? "#CBD5E1" : "#334155",
               margin: "2px 0 0",
             }}
           >
@@ -108,42 +108,44 @@ export default function InstallBanner() {
           </p>
         </div>
         {/* Actions */}
-        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+        <div style={{ display: "flex", gap: 6, flexShrink: 0, alignItems: "center" }}>
           <button
             onClick={install}
             style={{
               display: "flex",
               alignItems: "center",
               gap: 5,
-              padding: "7px 12px",
+              minHeight: 38,
+              padding: "7px 14px",
               borderRadius: 8,
               border: "none",
               cursor: "pointer",
               background: "#E8002D",
               color: "white",
-              fontFamily: "Syne, sans-serif",
+              fontFamily: "Rajdhani, sans-serif",
               fontWeight: 700,
-              fontSize: 12,
+              fontSize: 13,
             }}
           >
-            <Download size={13} /> {t.installBtn}
+            <Download size={14} /> {t.installBtn}
           </button>
           <button
             onClick={dismiss}
+            aria-label="Dismiss install banner"
             style={{
-              width: 30,
-              height: 30,
+              width: 38,
+              height: 38,
               borderRadius: 8,
-              border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
+              border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)"}`,
               background: isDark ? "#141418" : "rgba(0,0,0,0.04)",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: isDark ? "#555566" : "#999AAA",
+              color: isDark ? "#CBD5E1" : "#334155",
             }}
           >
-            <X size={13} />
+            <X size={16} />
           </button>
         </div>
       </div>

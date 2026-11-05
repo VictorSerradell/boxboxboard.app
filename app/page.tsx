@@ -60,6 +60,13 @@ function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
   const { ref, inView } = useInView(0.5);
   useEffect(() => {
     if (!inView) return;
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      setVal(to);
+      return;
+    }
     let start = 0;
     const step = Math.ceil(to / 40);
     const id = setInterval(() => {
@@ -84,9 +91,9 @@ function MiniCard({ name, cat, lic, weeks, duration, delay, isDark }: typeof DEM
   return (
     <div style={{
       background: isDark ? '#111118' : '#FFFFFF',
-      border: `1px solid ${isDark ? '#1E1E2A' : '#E0E0E8'}`,
+      border: `1px solid ${isDark ? '#1E1E2A' : '#E2E8F0'}`,
       borderTop: `2px solid ${accent}`,
-      borderRadius: 6, overflow: 'hidden', flexShrink: 0, width: 210,
+      borderRadius: 8, overflow: 'hidden', flexShrink: 0, width: 210,
       opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(14px)',
       transition: 'opacity 0.5s ease, transform 0.5s ease',
     }}>
@@ -100,8 +107,8 @@ function MiniCard({ name, cat, lic, weeks, duration, delay, isDark }: typeof DEM
       <div style={{ padding: '8px 14px', display: 'flex', gap: 14 }}>
         {[{ label: 'Lic', value: lic }, { label: 'Weeks', value: String(weeks) }, { label: 'Time', value: duration }].map(s => (
           <div key={s.label}>
-            <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 9, color: isDark ? '#334155' : '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{s.label}</div>
-            <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 12, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.75)' : '#1E293B', marginTop: 2 }}>{s.value}</div>
+            <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 9, color: isDark ? '#CBD5E1' : '#334155', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{s.label}</div>
+            <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 12, fontWeight: 700, color: isDark ? '#F8FAFC' : '#0F172A', marginTop: 2 }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -112,30 +119,33 @@ function MiniCard({ name, cat, lic, weeks, duration, delay, isDark }: typeof DEM
 // ── FAQ item ──────────────────────────────────────────────────
 function FaqItem({ q, a, isDark }: { q: string; a: string; isDark: boolean }) {
   const [open, setOpen] = useState(false);
+  const answerId = `faq-${q.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`;
   return (
     <div style={{
       borderRadius: 12, overflow: 'hidden',
-      border: `1px solid ${open ? 'rgba(59,158,255,0.3)' : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'}`,
+      border: `1px solid ${open ? 'rgba(59,158,255,0.3)' : isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'}`,
       transition: 'border-color 0.2s',
     }}>
       <button
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-controls={answerId}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '18px 20px', background: 'transparent', border: 'none', cursor: 'pointer',
           gap: 16, textAlign: 'left',
         }}
       >
-        <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 15, color: isDark ? 'rgba(255,255,255,0.9)' : '#0F172A' }}>
+        <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 16, color: isDark ? '#F8FAFC' : '#0F172A' }}>
           {q}
         </span>
-        <span style={{ color: open ? ACCENT : isDark ? '#475569' : '#94A3B8', flexShrink: 0, transition: 'color 0.2s' }}>
+        <span style={{ color: open ? ACCENT : isDark ? '#CBD5E1' : '#334155', flexShrink: 0, transition: 'color 0.2s' }}>
           {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </span>
       </button>
       {open && (
-        <div style={{ padding: '0 20px 18px' }}>
-          <p style={{ fontSize: 14, color: isDark ? '#64748B' : '#475569', lineHeight: 1.7, margin: 0 }}>{a}</p>
+        <div id={answerId} style={{ padding: '0 20px 18px' }}>
+          <p style={{ fontSize: 14, color: isDark ? '#CBD5E1' : '#334155', lineHeight: 1.7, margin: 0 }}>{a}</p>
         </div>
       )}
     </div>
@@ -159,16 +169,16 @@ export default function LandingPage() {
 
   // Theme tokens
   const T = {
-    text:        isDark ? '#FFFFFF'   : '#0A0A0F',
-    textSub:     isDark ? '#888898'   : '#555566',
-    textMuted:   isDark ? '#444455'   : '#AAAABC',
-    border:      isDark ? '#1E1E2A'   : '#E0E0E8',
+    text:        isDark ? '#F8FAFC'   : '#0F172A',
+    textSub:     isDark ? '#CBD5E1'   : '#334155',
+    textMuted:   isDark ? '#94A3B8'   : '#475569',
+    border:      isDark ? '#1E1E2A'   : '#E2E8F0',
     cardBg:      isDark ? '#111118'   : '#FFFFFF',
-    cardBorder:  isDark ? '#1E1E2A'   : '#E0E0E8',
-    footerBg:    isDark ? '#0D0D12'   : '#F5F5F7',
+    cardBorder:  isDark ? '#1E1E2A'   : '#E2E8F0',
+    footerBg:    isDark ? '#0D0D12'   : '#F8FAFC',
     githubBtn:   isDark ? '#1A1A22'   : '#F0F0F8',
-    githubBtnBorder: isDark ? '#2A2A38' : '#D8D8E8',
-    githubBtnColor:  isDark ? '#888898' : '#666677',
+    githubBtnBorder: isDark ? '#334155' : '#CBD5E1',
+    githubBtnColor:  isDark ? '#F8FAFC' : '#0F172A',
     stepNum:     isDark ? 'rgba(232,0,45,0.1)' : 'rgba(232,0,45,0.06)',
   };
 

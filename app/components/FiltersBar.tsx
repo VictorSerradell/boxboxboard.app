@@ -1,7 +1,7 @@
 "use client";
 // /app/components/FiltersBar.tsx
 
-import { useState } from "react";
+import { useState, useEffect, memo } from "react";
 import {
   Heart,
   Shield,
@@ -50,7 +50,7 @@ const STATUSES: { label: string; value: SessionType; color: string }[] = [
   { label: "Unranked", value: "UNRANKED", color: "#777777" },
 ];
 
-export default function FiltersBar({
+function FiltersBar({
   filters,
   onChange,
   autoLicense,
@@ -60,6 +60,20 @@ export default function FiltersBar({
   const { t } = useT();
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    if (drawerOpen) {
+      document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setDrawerOpen(false);
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [drawerOpen]);
 
   // Guard after hooks — filters can arrive undefined during SSR hydration
   const safeFilters = filters ?? {
@@ -78,20 +92,20 @@ export default function FiltersBar({
 
   const T = {
     barBg: isDark ? "rgba(8,8,8,0.97)" : "rgba(255,255,255,0.97)",
-    barBorder: isDark ? "#2A2A2A" : "#E0E0E8",
-    divider: isDark ? "#2A2A2A" : "#E0E0E8",
-    groupLabel: isDark ? "#555555" : "#999AAA",
+    barBorder: isDark ? "#2A2A2A" : "#E2E8F0",
+    divider: isDark ? "#2A2A2A" : "#E2E8F0",
+    groupLabel: isDark ? "#CBD5E1" : "#334155",
     chipDefault: isDark
-      ? { color: "#666666", border: "#2A2A3A", bg: "transparent" }
-      : { color: "#888899", border: "#D8D8E8", bg: "transparent" },
+      ? { color: "#CBD5E1", border: "#334155", bg: "transparent" }
+      : { color: "#334155", border: "#CBD5E1", bg: "transparent" },
     chipHover: isDark
-      ? { color: "#AAAABC", border: "#3E3E4E", bg: "#1C1C1C" }
-      : { color: "#333344", border: "#B8B8C8", bg: "rgba(0,0,0,0.03)" },
+      ? { color: "#F8FAFC", border: "#475569", bg: "#1C1C1C" }
+      : { color: "#0F172A", border: "#94A3B8", bg: "rgba(0,0,0,0.04)" },
     searchBg: isDark ? "#1C1C1C" : "#FFFFFF",
-    searchBorder: isDark ? "#2A2A3A" : "#D8D8E8",
-    searchText: isDark ? "#FFFFFF" : "#0A0A0F",
-    searchPlaceholder: isDark ? "#555555" : "#CCCCDD",
-    resetColor: isDark ? "#666666" : "#888899",
+    searchBorder: isDark ? "#334155" : "#CBD5E1",
+    searchText: isDark ? "#F8FAFC" : "#0F172A",
+    searchPlaceholder: isDark ? "#94A3B8" : "#64748B",
+    resetColor: isDark ? "#CBD5E1" : "#334155",
   };
 
   function toggleCategory(cat: CarCategory) {
@@ -508,6 +522,7 @@ export default function FiltersBar({
           <input
             type="text"
             placeholder={t.searchPlaceholder}
+            aria-label={t.searchPlaceholder}
             value={safeFilters.searchQuery}
             onChange={(e) =>
               onChange({ ...filters, searchQuery: e.target.value })
@@ -580,6 +595,7 @@ export default function FiltersBar({
             <input
               type="text"
               placeholder={t.searchPlaceholder}
+              aria-label={t.searchPlaceholder}
               value={safeFilters.searchQuery}
               onChange={(e) =>
                 onChange({ ...filters, searchQuery: e.target.value })
@@ -603,9 +619,13 @@ export default function FiltersBar({
           </div>
           <button
             onClick={() => setDrawerOpen(true)}
+            aria-label="Filter series"
             style={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
+              minHeight: 44,
+              minWidth: 44,
               gap: 6,
               padding: "8px 14px",
               borderRadius: 10,
@@ -655,6 +675,9 @@ export default function FiltersBar({
               }}
             />
             <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Filter series"
               style={{
                 position: "fixed",
                 bottom: 0,
@@ -689,10 +712,11 @@ export default function FiltersBar({
                 </span>
                 <button
                   onClick={() => setDrawerOpen(false)}
+                  aria-label="Close filters"
                   style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 8,
+                    minWidth: 44,
+                    minHeight: 44,
+                    borderRadius: 10,
                     border: `1px solid ${T.barBorder}`,
                     background: T.searchBg,
                     cursor: "pointer",
@@ -702,7 +726,7 @@ export default function FiltersBar({
                     color: T.groupLabel,
                   }}
                 >
-                  <X size={15} />
+                  <X size={18} />
                 </button>
               </div>
               {filtersContent}
@@ -729,3 +753,5 @@ export default function FiltersBar({
     </div>
   );
 }
+
+export default memo(FiltersBar);

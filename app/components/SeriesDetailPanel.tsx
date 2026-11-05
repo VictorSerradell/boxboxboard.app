@@ -198,25 +198,25 @@ export default function SeriesDetailPanel({ series, logoUrl, isFavorite, onClose
   const T = {
     panelBg:       isDark ? '#161616'  : '#FFFFFF',
     headerBg:      isDark ? `linear-gradient(160deg, ${accent}18 0%, #0D0D12 100%)` : `linear-gradient(160deg, ${accent}10 0%, #FAFAFA 100%)`,
-    sectionBorder: isDark ? '#2A2A2A'  : '#E8E8F0',
+    sectionBorder: isDark ? '#2A2A2A'  : '#E2E8F0',
     rowBg:         isDark ? '#1E1E1E'  : '#F8F8FC',
-    rowBgAlt:      isDark ? '#111116'  : '#F5F5FA',
-    rowBorder:     isDark ? '#2A2A2A'  : '#E8E8F0',
-    labelColor:    isDark ? '#555555'  : '#888899',
-    textPrimary:   isDark ? '#FFFFFF'  : '#0A0A0F',
-    textSecondary: isDark ? '#CCCCDC'  : '#222230',
-    textMuted:     isDark ? '#888898'  : '#777777',
-    textFaint:     isDark ? '#555555'  : '#AAAABC',
-    statValue:     isDark ? '#FFFFFF'  : '#0A0A0F',
+    rowBgAlt:      isDark ? '#111116'  : '#F1F5F9',
+    rowBorder:     isDark ? '#2A2A2A'  : '#E2E8F0',
+    labelColor:    isDark ? '#CBD5E1'  : '#334155',
+    textPrimary:   isDark ? '#F8FAFC'  : '#0F172A',
+    textSecondary: isDark ? '#E2E8F0'  : '#1E293B',
+    textMuted:     isDark ? '#94A3B8'  : '#475569',
+    textFaint:     isDark ? '#94A3B8'  : '#64748B',
+    statValue:     isDark ? '#F8FAFC'  : '#0F172A',
     iconBtnBg:     isDark ? '#252525'  : '#F0F0F8',
-    iconBtnBorder: isDark ? '#333333'  : '#D8D8E8',
-    iconBtnColor:  isDark ? '#666666'  : '#888899',
-    flagColor:     isDark ? '#2E2E3E'  : '#CCCCDD',
+    iconBtnBorder: isDark ? '#334155'  : '#CBD5E1',
+    iconBtnColor:  isDark ? '#F1F5F9'  : '#0F172A',
+    flagColor:     isDark ? '#64748B'  : '#94A3B8',
     carIconBg:     isDark ? '#1E1E1E'  : '#F0F0F8',
-    carIconBorder: isDark ? '#333333'  : '#D8D8E8',
-    dateColor:     isDark ? '#555555'  : '#888899',
+    carIconBorder: isDark ? '#334155'  : '#CBD5E1',
+    dateColor:     isDark ? '#94A3B8'  : '#475569',
     infoGridBg:    isDark ? '#1E1E1E'  : '#F8F8FC',
-    infoGridBorder:isDark ? '#2A2A2A'  : '#E8E8F0',
+    infoGridBorder:isDark ? '#2A2A2A'  : '#E2E8F0',
   };
 
   function handleFav() {
@@ -266,22 +266,27 @@ export default function SeriesDetailPanel({ series, logoUrl, isFavorite, onClose
       }} />
 
       {/* Panel — slides in from right, below fixed header + filters */}
-      <div style={{
-        position: 'fixed',
-        top: isMobile ? 0 : 108,
-        right: 0,
-        bottom: 0,
-        zIndex: 201,
-        width: isMobile ? '100vw' : 'min(520px, 100vw)',
-        background: T.panelBg,
-        borderLeft: isMobile ? 'none' : `1px solid ${accent}30`,
-        borderTop: isMobile ? 'none' : `1px solid #161620`,
-        display: 'flex', flexDirection: 'column',
-        transform: visible ? 'translateX(0)' : 'translateX(100%)',
-        transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
-        overflowY: 'auto',
-        boxShadow: '-8px 0 40px rgba(0,0,0,0.4)',
-      }}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={series?.series_name ?? "Series Details"}
+        style={{
+          position: 'fixed',
+          top: isMobile ? 0 : 108,
+          right: 0,
+          bottom: 0,
+          zIndex: 201,
+          width: isMobile ? '100vw' : 'min(520px, 100vw)',
+          background: T.panelBg,
+          borderLeft: isMobile ? 'none' : `1px solid ${accent}30`,
+          borderTop: isMobile ? 'none' : `1px solid #161620`,
+          display: 'flex', flexDirection: 'column',
+          transform: visible ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
+          overflowY: 'auto',
+          boxShadow: '-8px 0 40px rgba(0,0,0,0.4)',
+        }}
+      >
 
         {/* ── HEADER ─────────────────────────────────────────── */}
         <div style={{
@@ -352,20 +357,82 @@ export default function SeriesDetailPanel({ series, logoUrl, isFavorite, onClose
             {/* Botones de acción */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
               {/* Cerrar */}
-              <button onClick={onClose} style={{ width: 36, height: 36, borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.iconBtnBg, border: `1px solid ${T.iconBtnBorder}`, color: T.iconBtnColor }}>
-                <X size={16} />
+              <button
+                onClick={onClose}
+                aria-label="Close series details"
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: T.iconBtnBg,
+                  border: `1px solid ${T.iconBtnBorder}`,
+                  color: T.iconBtnColor,
+                }}
+              >
+                <X size={18} />
               </button>
               {/* Copiar link */}
-              <button onClick={copyLink} title={t.copyLink} style={{ width: 36, height: 36, borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: copied ? 'rgba(34,197,94,0.15)' : T.iconBtnBg, border: `1px solid ${copied ? 'rgba(34,197,94,0.4)' : T.iconBtnBorder}`, color: copied ? '#22C55E' : T.iconBtnColor, transition: 'all 0.2s' }}>
-                {copied ? <Check size={15} strokeWidth={2.5} /> : <Link size={14} strokeWidth={2} />}
+              <button
+                onClick={copyLink}
+                aria-label={t.copyLink}
+                title={t.copyLink}
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: copied ? 'rgba(34,197,94,0.15)' : T.iconBtnBg,
+                  border: `1px solid ${copied ? 'rgba(34,197,94,0.4)' : T.iconBtnBorder}`,
+                  color: copied ? '#22C55E' : T.iconBtnColor,
+                  transition: 'all 0.2s',
+                }}
+              >
+                {copied ? <Check size={16} strokeWidth={2.5} /> : <Link size={16} strokeWidth={2} />}
               </button>
               {/* Favorito */}
-              <button onClick={handleFav} style={{ width: 36, height: 36, borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: localFav ? 'rgba(239,68,68,0.18)' : T.iconBtnBg, border: `1px solid ${localFav ? 'rgba(239,68,68,0.45)' : T.iconBtnBorder}`, color: localFav ? '#EF4444' : T.iconBtnColor }}>
-                <Heart size={15} fill={localFav ? 'currentColor' : 'none'} strokeWidth={2} />
+              <button
+                onClick={handleFav}
+                aria-label={localFav ? t.favorites : t.favorites}
+                title={localFav ? t.favorites : t.favorites}
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: localFav ? 'rgba(239,68,68,0.18)' : T.iconBtnBg,
+                  border: `1px solid ${localFav ? 'rgba(239,68,68,0.45)' : T.iconBtnBorder}`,
+                  color: localFav ? '#EF4444' : T.iconBtnColor,
+                }}
+              >
+                <Heart size={16} fill={localFav ? 'currentColor' : 'none'} strokeWidth={2} />
               </button>
               {/* Owned */}
-              <div title={series.isOwned ? t.contentOwned : t.missingContent} style={{ width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: series.isOwned ? 'rgba(34,197,94,0.15)' : T.iconBtnBg, border: `1px solid ${series.isOwned ? 'rgba(34,197,94,0.35)' : T.iconBtnBorder}`, color: series.isOwned ? '#22C55E' : T.iconBtnColor }}>
-                {series.isOwned ? <Check size={15} strokeWidth={2.5} /> : <Lock size={14} strokeWidth={2} />}
+              <div
+                title={series.isOwned ? t.contentOwned : t.missingContent}
+                aria-label={series.isOwned ? t.contentOwned : t.missingContent}
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: series.isOwned ? 'rgba(34,197,94,0.15)' : T.iconBtnBg,
+                  border: `1px solid ${series.isOwned ? 'rgba(34,197,94,0.35)' : T.iconBtnBorder}`,
+                  color: series.isOwned ? '#22C55E' : T.iconBtnColor,
+                }}
+              >
+                {series.isOwned ? <Check size={16} strokeWidth={2.5} /> : <Lock size={15} strokeWidth={2} />}
               </div>
             </div>
           </div>
@@ -375,12 +442,29 @@ export default function SeriesDetailPanel({ series, logoUrl, isFavorite, onClose
         <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
           {/* Tab selector */}
-          <div style={{ display: 'flex', borderBottom: `1px solid ${T.sectionBorder}`, gap: 4, paddingTop: 20 }}>
+          <div role="tablist" style={{ display: 'flex', borderBottom: `1px solid ${T.sectionBorder}`, gap: 8, paddingTop: 20 }}>
             {([
               { id: 'info', label: t.seriesInfo },
               { id: 'cars', label: t.topCars },
             ] as const).map(tab => (
-              <button key={tab.id} onClick={() => {
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                style={{
+                  minHeight: 40,
+                  padding: '8px 16px',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: `2px solid ${activeTab === tab.id ? accent : 'transparent'}`,
+                  color: activeTab === tab.id ? (isDark ? '#F8FAFC' : '#0F172A') : T.textMuted,
+                  fontFamily: 'Rajdhani, sans-serif',
+                  fontWeight: 700,
+                  fontSize: 14,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                onClick={() => {
                 setActiveTab(tab.id);
                 if (tab.id === 'cars' && !carsLoaded) {
                   setCarsLoading(true);

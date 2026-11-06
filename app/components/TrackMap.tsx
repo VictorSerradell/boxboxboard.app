@@ -1,6 +1,6 @@
 "use client";
 // /app/components/TrackMap.tsx
-// Interactive world map of iRacing circuits using Leaflet + OpenStreetMap
+// Interactive world map of iRacing circuits using Leaflet + CARTO
 
 import { useEffect, useRef, useState } from "react";
 import type { SeriesSeason } from "../types/iracing";
@@ -150,7 +150,7 @@ export default function TrackMap({
         attributionControl: true,
       });
 
-      // Usamos nuestra ruta de API interna segura para servir los tiles sin exponer la clave en el cliente
+      // Petición limpia a nuestra API proxy que ya incluye la clave de CARTO
       const tileUrl = isDark
         ? `/api/map-tile?z={z}&x={x}&y={y}&theme=dark`
         : `/api/map-tile?z={z}&x={x}&y={y}&theme=light`;
@@ -167,19 +167,24 @@ export default function TrackMap({
         const primaryCat = pin.categories[0] ?? "Sports Car";
         const color = CATEGORY_COLORS[primaryCat] ?? "#3B9EFF";
 
-        // Create custom SVG marker
-        const size = pin.isActiveThisWeek ? 20 : 14;
+        const size = pin.isActiveThisWeek ? 22 : 14;
+        const pinBg = color; // Respeta el color de la categoría de la leyenda
+        const borderColor = pin.isActiveThisWeek
+          ? "#22C55E"
+          : pin.isOwned
+            ? "#FFFFFF"
+            : "rgba(255,255,255,0.7)";
+        const glowColor = pin.isActiveThisWeek ? "#22C55E" : color;
+
         const svgIcon = L.divIcon({
           html: `
-            <div style="
-              width: ${size}px; height: ${size}px; border-radius: 50%;
-              background: ${color};
-              border: ${pin.isActiveThisWeek ? "3px solid #22C55E" : pin.isOwned ? "2px solid white" : "2px solid rgba(255,255,255,0.5)"};
-              box-shadow: 0 0 ${pin.isActiveThisWeek ? "12px" : "4px"} ${pin.isActiveThisWeek ? "#22C55E" : color}80;
-              cursor: pointer;
-              ${pin.isActiveThisWeek ? "animation: pulse 1.5s infinite;" : ""}
+            <div class="neon-pin ${pin.isActiveThisWeek ? "neon-pin-active" : ""}" style="
+              width: ${size}px; 
+              height: ${size}px; 
+              background: radial-gradient(circle at 30% 30%, #ffffff 0%, ${pinBg} 70%);
+              border: 2.5px solid ${borderColor};
+              box-shadow: 0 0 ${pin.isActiveThisWeek ? "18px" : "10px"} ${glowColor};
             "></div>
-            ${pin.isActiveThisWeek ? `<style>@keyframes pulse { 0%,100%{box-shadow:0 0 8px #22C55E80} 50%{box-shadow:0 0 16px #22C55E} }</style>` : ""}
           `,
           className: "",
           iconSize: [size, size],
@@ -235,12 +240,46 @@ export default function TrackMap({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {/* CSS for Leaflet */}
+      {/* CSS for Leaflet & Neon Pins */}
       <style>{`
         @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
-        .leaflet-container { background: ${isDark ? "#080808" : "#F5F5F7"}; border-radius: 16px; }
-        .leaflet-tooltip { background: ${isDark ? "#111118" : "#FFFFFF"} !important; border: 1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} !important; color: ${isDark ? "#E2E8F0" : "#222230"} !important; border-radius: 8px !important; padding: 6px 10px !important; }
-        .leaflet-tooltip-top:before { border-top-color: ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} !important; }
+        .leaflet-container { 
+          background: ${isDark ? "#080808" : "#F5F5F7"} !important; 
+          border-radius: 16px; 
+        }
+        
+        /* Clases CSS para los pines fluorescentes y animados */
+        .neon-pin {
+          position: relative;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .neon-pin-active {
+          animation: neonPulse 1.8s infinite ease-in-out;
+        }
+        @keyframes neonPulse {
+          0%, 100% {
+            box-shadow: 0 0 8px #22C55E, 0 0 20px #22C55E, inset 0 0 6px #ffffff;
+            transform: scale(1);
+          }
+          50% {
+            box-shadow: 0 0 16px #22C55E, 0 0 32px #22C55E, inset 0 0 10px #ffffff;
+            transform: scale(1.18);
+          }
+        }
+
+        .leaflet-tooltip { 
+          background: ${isDark ? "#111118" : "#FFFFFF"} !important; 
+          border: 1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"} !important; 
+          color: ${isDark ? "#E2E8F0" : "#222230"} !important; 
+          border-radius: 8px !important; 
+          padding: 6px 10px !important; 
+          box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        .leaflet-tooltip-top:before { border-top-color: ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"} !important; }
         .leaflet-control-attribution { background: ${isDark ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.8)"} !important; color: ${isDark ? "#555566" : "#999AAA"} !important; font-size: 9px !important; }
         .leaflet-control-attribution a { color: ${isDark ? "#E8002D" : "#CC0020"} !important; }
       `}</style>

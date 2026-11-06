@@ -167,24 +167,47 @@ export default function TrackMap({
         const primaryCat = pin.categories[0] ?? "Sports Car";
         const color = CATEGORY_COLORS[primaryCat] ?? "#3B9EFF";
 
-        const size = pin.isActiveThisWeek ? 22 : 14;
-        const pinBg = color; // Respeta el color de la categoría de la leyenda
-        const borderColor = pin.isActiveThisWeek
-          ? "#22C55E"
-          : pin.isOwned
-            ? "#FFFFFF"
-            : "rgba(255,255,255,0.7)";
+        const size = pin.isActiveThisWeek ? 24 : 16;
         const glowColor = pin.isActiveThisWeek ? "#22C55E" : color;
 
         const svgIcon = L.divIcon({
           html: `
-            <div class="neon-pin ${pin.isActiveThisWeek ? "neon-pin-active" : ""}" style="
-              width: ${size}px; 
-              height: ${size}px; 
-              background: radial-gradient(circle at 30% 30%, #ffffff 0%, ${pinBg} 70%);
-              border: 2.5px solid ${borderColor};
-              box-shadow: 0 0 ${pin.isActiveThisWeek ? "18px" : "10px"} ${glowColor};
-            "></div>
+            <div style="
+              position: relative;
+              width: ${size}px; height: ${size}px;
+              display: flex; align-items: center; justify-content: center;
+            ">
+              <!-- Halo exterior de resplandor (Blur Glow) -->
+              <div style="
+                position: absolute;
+                inset: ${pin.isActiveThisWeek ? "-6px" : "-4px"};
+                border-radius: 50%;
+                background: ${glowColor};
+                opacity: ${pin.isActiveThisWeek ? "0.5" : "0.35"};
+                filter: blur(4px);
+                ${pin.isActiveThisWeek ? "animation: neonPulse 2s infinite ease-in-out;" : ""}
+              "></div>
+              
+              <!-- Núcleo fluorescente con degradado y borde brillante -->
+              <div style="
+                position: relative;
+                width: ${size}px; height: ${size}px; border-radius: 50%;
+                background: radial-gradient(circle at 30% 30%, #ffffff 0%, ${glowColor} 70%);
+                border: ${pin.isActiveThisWeek ? "2.5px solid #FFFFFF" : pin.isOwned ? "2px solid #FFFFFF" : "1.5px solid rgba(255,255,255,0.7)"};
+                box-shadow: 0 0 ${pin.isActiveThisWeek ? "16px" : "10px"} ${glowColor};
+                cursor: pointer;
+              "></div>
+            </div>
+            ${
+              pin.isActiveThisWeek
+                ? `<style>
+              @keyframes neonPulse { 
+                0%, 100% { transform: scale(0.95); opacity: 0.35; } 
+                50% { transform: scale(1.4); opacity: 0.8; } 
+              }
+            </style>`
+                : ""
+            }
           `,
           className: "",
           iconSize: [size, size],

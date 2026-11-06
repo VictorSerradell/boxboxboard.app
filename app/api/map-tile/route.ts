@@ -8,14 +8,24 @@ export async function GET(request: Request) {
   const y = searchParams.get("y");
   const theme = searchParams.get("theme") || "dark";
 
+  // Usamos los subdominios públicos oficiales de CARTO para basemaps libres
   const baseStyle = theme === "dark" ? "dark_all" : "light_all";
+  const subdomains = ["a", "b", "c", "d"];
+  const sub =
+    subdomains[
+      Math.abs(parseInt(x || "0", 10) + parseInt(y || "0", 10)) %
+        subdomains.length
+    ];
 
-  // Para los basemaps estándar de CARTO de libre acceso (sin token restrictivo de cuenta),
-  // la URL pública estándar funciona perfectamente si no requiere auth privada de SQL/Data Warehouse:
-  const cartoUrl = `https://a.basemaps.cartocdn.com/${baseStyle}/${z}/${x}/${y}.png`;
+  const cartoUrl = `https://${sub}.basemaps.cartocdn.com/${baseStyle}/${z}/${x}/${y}.png`;
 
   try {
-    const response = await fetch(cartoUrl);
+    const response = await fetch(cartoUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      },
+    });
+
     if (!response.ok) {
       return NextResponse.json(
         { error: "Failed to fetch tile" },

@@ -183,18 +183,18 @@ export default function TrackMap({
                 inset: ${pin.isActiveThisWeek ? "-6px" : "-4px"};
                 border-radius: 50%;
                 background: ${glowColor};
-                opacity: ${pin.isActiveThisWeek ? "0.5" : "0.35"};
+                opacity: ${pin.isActiveThisWeek ? "0.6" : "0.4"};
                 filter: blur(4px);
                 ${pin.isActiveThisWeek ? "animation: neonPulse 2s infinite ease-in-out;" : ""}
               "></div>
               
-              <!-- Núcleo fluorescente con degradado y borde brillante -->
+              <!-- Núcleo fluorescente con degradado sin borde sólido -->
               <div style="
                 position: relative;
                 width: ${size}px; height: ${size}px; border-radius: 50%;
                 background: radial-gradient(circle at 30% 30%, #ffffff 0%, ${glowColor} 70%);
-                border: ${pin.isActiveThisWeek ? "2.5px solid #FFFFFF" : pin.isOwned ? "2px solid #FFFFFF" : "1.5px solid rgba(255,255,255,0.7)"};
-                box-shadow: 0 0 ${pin.isActiveThisWeek ? "16px" : "10px"} ${glowColor};
+                border: none;
+                box-shadow: 0 0 ${pin.isActiveThisWeek ? "18px" : "12px"} ${glowColor};
                 cursor: pointer;
               "></div>
             </div>
@@ -202,8 +202,8 @@ export default function TrackMap({
               pin.isActiveThisWeek
                 ? `<style>
               @keyframes neonPulse { 
-                0%, 100% { transform: scale(0.95); opacity: 0.35; } 
-                50% { transform: scale(1.4); opacity: 0.8; } 
+                0%, 100% { transform: scale(0.95); opacity: 0.4; } 
+                50% { transform: scale(1.4); opacity: 0.85; } 
               }
             </style>`
                 : ""

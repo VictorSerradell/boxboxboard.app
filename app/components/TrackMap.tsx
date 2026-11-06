@@ -167,7 +167,8 @@ export default function TrackMap({
         const primaryCat = pin.categories[0] ?? "Sports Car";
         const color = CATEGORY_COLORS[primaryCat] ?? "#3B9EFF";
 
-        const size = pin.isActiveThisWeek ? 24 : 16;
+        // Tamaños ligeramente más compactos para evitar saturación
+        const size = pin.isActiveThisWeek ? 20 : 12;
         const glowColor = pin.isActiveThisWeek ? "#22C55E" : color;
 
         const svgIcon = L.divIcon({
@@ -177,24 +178,24 @@ export default function TrackMap({
               width: ${size}px; height: ${size}px;
               display: flex; align-items: center; justify-content: center;
             ">
-              <!-- Halo exterior de resplandor (Blur Glow) -->
+              <!-- Halo exterior más sutil y compacto para evitar aglomeración -->
               <div style="
                 position: absolute;
-                inset: ${pin.isActiveThisWeek ? "-6px" : "-4px"};
+                inset: ${pin.isActiveThisWeek ? "-3px" : "-2px"};
                 border-radius: 50%;
                 background: ${glowColor};
-                opacity: ${pin.isActiveThisWeek ? "0.6" : "0.4"};
-                filter: blur(4px);
+                opacity: ${pin.isActiveThisWeek ? "0.5" : "0.3"};
+                filter: blur(2px);
                 ${pin.isActiveThisWeek ? "animation: neonPulse 2s infinite ease-in-out;" : ""}
               "></div>
               
-              <!-- Núcleo fluorescente con degradado sin borde sólido -->
+              <!-- Núcleo fluorescente limpio -->
               <div style="
                 position: relative;
                 width: ${size}px; height: ${size}px; border-radius: 50%;
                 background: radial-gradient(circle at 30% 30%, #ffffff 0%, ${glowColor} 70%);
                 border: none;
-                box-shadow: 0 0 ${pin.isActiveThisWeek ? "18px" : "12px"} ${glowColor};
+                box-shadow: 0 0 ${pin.isActiveThisWeek ? "12px" : "8px"} ${glowColor};
                 cursor: pointer;
               "></div>
             </div>
@@ -202,8 +203,8 @@ export default function TrackMap({
               pin.isActiveThisWeek
                 ? `<style>
               @keyframes neonPulse { 
-                0%, 100% { transform: scale(0.95); opacity: 0.4; } 
-                50% { transform: scale(1.4); opacity: 0.85; } 
+                0%, 100% { transform: scale(0.95); opacity: 0.3; } 
+                50% { transform: scale(1.25); opacity: 0.7; } 
               }
             </style>`
                 : ""
